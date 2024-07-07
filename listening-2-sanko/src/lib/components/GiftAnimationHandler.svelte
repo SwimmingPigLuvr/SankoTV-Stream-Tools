@@ -9,16 +9,17 @@
     import { XI_API_KEY } from "$env/static/private";
 
     let zynVideo: HTMLVideoElement;
+    let audio: HTMLAudioElement;
+    let responseText = "";
 
     onMount(() => {
         const eventSource = new EventSource("/api/trigger-gift-animation");
-
-        eventSource.onmessage = (event) => {
+        eventSource.onmessage = async (event) => {
             const data = JSON.parse(event.data);
-            const sender = data.sender;
-            const quanity = data.quanity;
-            if (data.animation === "zyn") {
-                playAnimation(zynVideo, sender, quanity);
+            const { sender, quanity, response, animation } = data;
+            if (animation === "zyn") {
+                playAnimation(zynVideo);
+                await playTextToSpeech(response);
             }
         };
 
@@ -32,14 +33,15 @@
         };
     });
 
-    async function makeApiCallToElevenLabs(sender: string, quantity: string, giftname = "zyn") {
-        const XI_API_KEY = "your_api_key_here"; // Replace with your actual API key
-        const apiUrl = "https://api.elevenlabs.io/your-endpoint"; // Replace with the actual endpoint
-
+    async function playTextToSpeech(text: string) {
+        const apiUrl = "https://api.elevenlabs.io/v1/text-to-speech/your-voice-id"; // Replace with the actual endpoint
         const requestBody = {
-            sender: sender,
-            quantity: quantity,
-            giftname: giftname,
+            text: text,
+            model_id: "eleven_monolingual_v1",
+            voice_settings: {
+                stability: 0.5,
+                similarity_boost: 0.5
+            }
         };
 
         try {
@@ -47,26 +49,25 @@
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${XI_API_KEY}`,
+                    "xi-api-key": XI_API_KEY,
                 },
                 body: JSON.stringify(requestBody),
             });
 
             if (!response.ok) {
-                throw new Error(
-                    "Network response was not ok " + response.statusText,
-                );
+                throw new Error("xi api response was NOT OKAY");
             }
 
-            const responseData = await response.json();
-            console.log(`Thank you ${sender} for ${quantity} ${giftname}s!`);
-            return responseData;
+            const audioBlob = await response.blob();
+            const audioUrl = URL.createObjectURL(audioBlob);
+            audio.src = audioUrl;
+            await audio.play();
         } catch (error) {
-            console.error("Error making API call:", error);
+            console.error("Error playing text to speech:", error);
         }
     }
 
-    function playAnimation(videoElement: HTMLVideoElement, sender: string, quantity: string) {
+    function playAnimation(videoElement: HTMLVideoElement,) {
         if (videoElement) {
             videoElement.style.display = "block";
             videoElement.currentTime = 0;
@@ -85,4 +86,10 @@
         on:ended={() => (zynVideo.style.display = "none")}
     >
     </video>
+    <audio bind:this={audio} style="display: none;"></audio>
+    {#if responseText}
+        <div class="-tracking-widest font-serif italic text-blue-700 absolute top-0 left-0 w-full text-center p-4 bg-black bg-opacity-50  text-5xl">
+            {responseText}
+        </div>
+    {/if}
 </div>
