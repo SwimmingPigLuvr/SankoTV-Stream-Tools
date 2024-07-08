@@ -1,61 +1,83 @@
 <script lang="ts">
-    // todo
-    // make zyn animation
-
-    // use eleven labs to thank the user?????
-    // use ai to thank them and formulate a unique response!
-
     import { onMount } from "svelte";
-    import { XI_API_KEY } from "$env/static/private";
+    import { dev } from "$app/environment";
 
     let zynVideo: HTMLVideoElement;
     let audio: HTMLAudioElement;
     let responseText = "";
 
-    onMount(() => {
+    async function testAnimation() {
+        try {
+            const response = await fetch("/api/test-gift-animation", {
+                method: "POST",
+            });
+            if (!response.ok) {
+                throw new Error("Failed to trigger test animation");
+            }
+            console.log("Test animation triggered");
+        } catch (error) {
+            console.error("Error triggering test animation:", error);
+        }
+    }
+
+    function setupEventSource() {
         const eventSource = new EventSource("/api/trigger-gift-animation");
+
         eventSource.onmessage = async (event) => {
-            const data = JSON.parse(event.data);
-            const { sender, quanity, response, animation } = data;
-            if (animation === "zyn") {
-                playAnimation(zynVideo);
-                await playTextToSpeech(response);
+            console.log("raw event data", event.data);
+            try {
+                const data = JSON.parse(event.data);
+                console.log("parsed animation data:", data);
+
+                if (
+                    data.event === "GIFT" &&
+                    data.data.event.attributes.giftName === "Zyn"
+                ) {
+                    const { attributes } = data.data.event;
+                    const sender = attributes.name;
+                    const quantity = parseInt(attributes.quantity, 10);
+                    const response = data.response || `${sender} gifted ${quantity} ${'zyns'}`
+
+                    responseText = response;
+                    playAnimation(zynVideo);
+                    await playTextToSpeech(responseText);
+                }
+            } catch (error) {
+                console.error("error parsing event data:", error);
             }
         };
 
         eventSource.onerror = (error) => {
             console.error("EventSource failed:", error);
             eventSource.close();
+            setTimeout(() => {
+                console.log("attempting to reconnect...");
+                setupEventSource();
+            }, 5000);
         };
 
+        return eventSource;
+    }
+
+    onMount(() => {
+        const eventSource = setupEventSource();
         return () => {
             eventSource.close();
         };
     });
 
     async function playTextToSpeech(text: string) {
-        const apiUrl = "https://api.elevenlabs.io/v1/text-to-speech/your-voice-id"; // Replace with the actual endpoint
-        const requestBody = {
-            text: text,
-            model_id: "eleven_monolingual_v1",
-            voice_settings: {
-                stability: 0.5,
-                similarity_boost: 0.5
-            }
-        };
-
         try {
-            const response = await fetch(apiUrl, {
+            const response = await fetch("api/text-to-speech", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "xi-api-key": XI_API_KEY,
                 },
-                body: JSON.stringify(requestBody),
+                body: JSON.stringify({ text }),
             });
 
             if (!response.ok) {
-                throw new Error("xi api response was NOT OKAY");
+                throw new Error("text to speech api response was not ok");
             }
 
             const audioBlob = await response.blob();
@@ -63,11 +85,11 @@
             audio.src = audioUrl;
             await audio.play();
         } catch (error) {
-            console.error("Error playing text to speech:", error);
+            console.error("error playing text to speech:", error);
         }
     }
 
-    function playAnimation(videoElement: HTMLVideoElement,) {
+    function playAnimation(videoElement: HTMLVideoElement) {
         if (videoElement) {
             videoElement.style.display = "block";
             videoElement.currentTime = 0;
@@ -88,8 +110,19 @@
     </video>
     <audio bind:this={audio} style="display: none;"></audio>
     {#if responseText}
-        <div class="-tracking-widest font-serif italic text-blue-700 absolute top-0 left-0 w-full text-center p-4 bg-black bg-opacity-50  text-5xl">
+        <div
+            class="-tracking-widest font-serif italic text-blue-700 absolute top-0 left-0 w-full text-center p-4 bg-black bg-opacity-50 text-5xl"
+        >
             {responseText}
         </div>
+    {/if}
+
+    {#if dev}
+        <button
+            on:click={testAnimation}
+            class="fixed bottom-4 right-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+            Test Zyn Animation
+        </button>
     {/if}
 </div>

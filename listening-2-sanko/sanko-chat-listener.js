@@ -66,12 +66,12 @@ function connectWebSocket() {
                     const giftData = message.data.event;
                     const giftName = giftData.attributes.giftName;
                     const giftSenderName = giftData.attributes.name || '';
-                    const giftQuanity = giftData.attributes.quanity;
-                    console.log(`${giftSenderName} SENT ${giftQuanity} ${giftName} + ${giftQuanity > 1 ? 's!' : ''}`);
+                    const giftQuantity = giftData.attributes.quantity;
+                    console.log(`${giftSenderName} SENT ${giftQuantity} ${giftName} + ${giftQuantity > 1 ? 's!' : ''}`);
 
 
-                    if (giftData.attributes.giftName === "Zyn") {
-                        triggerGiftAnimation('zyn', giftSenderName, giftQuanity);
+                    if (giftName === "Zyn") {
+                        triggerGiftAnimation('zyn', giftSenderName, giftQuantity);
                     }
 
 
@@ -99,11 +99,11 @@ function connectWebSocket() {
           .catch(error => console.error('Error triggering animation:', error));
     }
 
-    function triggerGiftAnimation(animation, sender, quanity) {
+    function triggerGiftAnimation(animation, sender, quantity) {
         fetch(`${SVELTEKIT_SERVER}/api/trigger-gift-animation`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ animation, sender, quanity })
+            body: JSON.stringify({ animation, sender, quantity })
         }).then(response => response.json())
             .then(data => console.log('Gift Animation triggered:', data))
             .catch(error => console.error('error triggering animation:', error));
