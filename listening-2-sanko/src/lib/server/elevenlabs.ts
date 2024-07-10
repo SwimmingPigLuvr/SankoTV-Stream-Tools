@@ -13,8 +13,12 @@ export const createAudioStreamFromText = async (
   text: string
 ): Promise<Buffer> => {
   const audioStream = await client.generate({
-    voice: "Rachel", // You can change this to your preferred voice
+    voice: "Dr. Joe", // You can change this to your preferred voice
     model_id: "eleven_turbo_v2",
+    voice_settings: {
+      "stability": 0.1,
+      "similarity_boost": 1,
+    },
     text,
   });
 

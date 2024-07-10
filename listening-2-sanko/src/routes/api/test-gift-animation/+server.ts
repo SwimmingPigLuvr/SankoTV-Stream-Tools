@@ -15,10 +15,11 @@ export const POST: RequestHandler = async ({ fetch }) => {
                 }
             }
         },
-        response: `Thanks for the test Zyn, TestUser! You're really putting the Z in Zyn!`
+
+        response: `Thanks for the Zyn-credible gift, Swimming! Now I'm officially in the Zyn zone!`
     };
 
-    // Send the data to the actual gift animation endpoint
+    // Send the data to the actual gift animation endpoint 
     const response = await fetch('/api/trigger-gift-animation', {
         method: 'POST',
         headers: {

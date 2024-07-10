@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "elevenlabs": "^0.8.2",
+    "openai": "^4.52.3"
+  }
+}

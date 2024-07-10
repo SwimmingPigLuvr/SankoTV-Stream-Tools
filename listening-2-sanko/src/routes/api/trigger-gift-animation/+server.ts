@@ -23,14 +23,14 @@ export const POST: RequestHandler = async ({ request }) => {
 
     clients.forEach(client => {
         try {
-            client.enqueue(`data: ${message})}\n\n`);
+            client.enqueue(`data: ${message}\n\n`);
         } catch (error) {
             console.error('Error sending event to client:', error);
             clients.delete(client);
         }
     });
 
-    return json({ success: true, message: `${animation} gift animation triggered!` });
+    return json({ success: true, message: 'gift animation triggered' });
 };
 
 export const GET: RequestHandler = async () => {

@@ -18,3 +18,23 @@ gift data
         timestamp: "2024-07-07T16:24:53.035Z"
     event: "GIFT"
 
+
+july 8 sanko day
+tts is playing 2x
+    the voice is different both times so it must have been called twice
+real zyn donation not working just the test
+need a better video
+text should die after it is read
+use a better video / animation
+
+ideas:
+    ways sanko users can interact
+    buy pass / sell pass
+    mint donations
+    chat
+    watch
+
+what can we control
+    emoji widget
+    donation widget
+    chat widget

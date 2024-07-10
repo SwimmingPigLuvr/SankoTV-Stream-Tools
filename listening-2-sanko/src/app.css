@@ -1,3 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+    font-family: 'Cinema';
+    src: url('/fonts/Cinema.otf') format('opentype');
+}
+
+.text-dreamy {
+    text-shadow: 0 0 2px #ffffff, /* Small white glow */
+                 0 0 4px #ffffff, /* Larger white glow */
+                 0 0 8px #ffffff, /* Even larger white glow */
+                 0 0 20px #ffffff; /* Even larger white glow */
+}
+
