@@ -38,3 +38,16 @@ what can we control
     emoji widget
     donation widget
     chat widget
+
+donation alert
+
+    chime is important.
+    it sounds nice and the user will like to hear it
+    also the user will like to see their name onscreen
+
+    {user}
+    donated {quantity} {gift}!
+    custom message
+
+    need to change the data to get the name quantity and gift
+    actually no, this can be separate from the tts

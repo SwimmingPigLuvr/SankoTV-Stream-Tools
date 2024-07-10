@@ -1,5 +1,5 @@
 <script>
-	import AnimationHandler from "$lib/components/AnimationHandler.svelte";
+	import Emotes from "$lib/components/Emotes.svelte";
 </script>
 
-<AnimationHandler />
+<Emotes />

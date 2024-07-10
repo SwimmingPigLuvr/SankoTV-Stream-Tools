@@ -1,5 +1,4 @@
 <script>
-	import AnimationHandler from "$lib/components/AnimationHandler.svelte";
 </script>
 
 <div class="text-white items-center p-8 w-full h-screen flex flex-col">
@@ -15,9 +14,9 @@
 	
 	<!-- links -->
 	<div class="m-auto flex space-x-2">
-		<a class="rounded border-white border-2 w-32 text-center h-10 items-center flex justify-center" href="/emotes">emotes</a>
-		<a class="rounded border-white border-2 w-32 text-center h-10 items-center flex justify-center" href="/gifts">gifts</a>
+		<a class="hover:bg-red-600 rounded border-white border-2 w-32 text-center h-10 items-center flex justify-center" href="/emotes">emotes</a>
+		<a class="hover:bg-blue-600 rounded border-white border-2 w-32 text-center h-10 items-center flex justify-center" href="/donations">gifts</a>
+		<a class="hover:bg-lime-600 rounded border-white border-2 w-32 text-center h-10 items-center flex justify-center" href="/text-to-speech">text to speech</a>
 	</div>
-	<AnimationHandler />
 	<p class="fixed bottom-2 text-xs">by <span class="text-sky-300">swimming</span> 🐷 ❤️r</p>
 </div>
