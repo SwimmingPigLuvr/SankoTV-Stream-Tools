@@ -14,3 +14,9 @@
                  0 0 20px #ffffff; /* Even larger white glow */
 }
 
+.text-dark {
+    font-family: sans;
+    color: black;
+
+}
+
