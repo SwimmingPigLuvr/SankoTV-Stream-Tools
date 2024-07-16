@@ -1,0 +1,8 @@
+notes on styles
+_______________
+
+animation toggle
+message syntax
+sliders or options instead of text inputs
+
+

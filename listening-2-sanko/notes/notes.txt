@@ -51,3 +51,21 @@ donation alert
 
     need to change the data to get the name quantity and gift
     actually no, this can be separate from the tts
+
+
+
+checklist
+
+donations
+    ui flex wrap
+    format plural messages
+    trigger accurate alert with sound
+        implement muting
+    implement img upload
+    implement custom layout
+    message template info on hover
+    background color info on hover
+
+    add sections
+        sounds
+        animations

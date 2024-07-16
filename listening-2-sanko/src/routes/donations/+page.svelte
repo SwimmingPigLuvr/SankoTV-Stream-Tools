@@ -14,13 +14,14 @@
 	});
 </script>
 
-<div class="bg-blue-600 p-4 min-h-screen">
+<div class="p-4 w-full min-h-screen">
+
 	<Notifications />
 
 	{#if dev}
 		<button
 			on:click={testDonation}
-			class="fixed top-4 right-4 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded font-bold"
+			class="fixed top-4 right-20 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded font-bold"
 		>
 			simulate donation
 		</button>

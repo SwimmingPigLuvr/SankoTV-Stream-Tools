@@ -1,0 +1,29 @@
+create front end for users
+  features:
+
+    custom event triggers
+      trading passes
+      donations
+      emojis
+      chat
+      tts
+
+    wallet auth
+    db holds user settings
+    landing page
+
+
+
+
+todo:
+  fix tts
+  create frontend where user can set up stream events and customize widgets
+  create 3 pre made themes for donation events
+  create 3 pre made themes for chat windows
+
+  ability to customize every detail of the stream
+  choose fonts, css styles
+  sounds,
+  drag and drop videos/ animations
+
+

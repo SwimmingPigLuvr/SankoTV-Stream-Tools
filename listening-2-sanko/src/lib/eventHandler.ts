@@ -5,6 +5,7 @@ export const sender = writable('');
 export const giftName = writable('');
 export const quantity = writable(0);
 export const showNotification = writable(false);
+export const allowNotificationSound = writable(true);
 
 interface GiftEvent {
 	event: string;
@@ -19,6 +20,27 @@ interface GiftEvent {
 	};
 }
 
+export interface Donation {
+    id: string;
+    sender: string;
+    giftName: string;
+    quantity: number;
+    timestamp: number;
+}
+
+export const currentDonations = writable<Donation[]>([]);
+
+function addDonation(donation: Donation) {
+    currentDonations.update(donations => {
+        donations.push(donation);
+        return donations;
+    });
+
+    setTimeout(() => {
+        currentDonations.update(donations => donations.filter(d => d.id !== donations.id));
+    }, 10000);
+}
+
 export function setupEventSource() {
     const eventSource = new EventSource("/api/trigger-gift-animation");
 
@@ -31,16 +53,14 @@ export function setupEventSource() {
 
             if (data.event === "GIFT") {
                 const attributes = data.data.event.attributes;
-                sender.set(attributes.name);
-                giftName.set(attributes.giftName);
-                quantity.set(parseInt(attributes.quantity, 10));
-                currentGift.set(attributes.giftName.toLowerCase());
-                showNotification.set(true);
-
-                // Hide notification after 5 seconds
-                setTimeout(() => {
-                    showNotification.set(false);
-                }, 10000);
+                const donation: Donation = {
+                    id: Math.random().toString(36).substr(2, 9),
+                    sender: attributes.name,
+                    giftName: attributes.giftName,
+                    quntity: parseInt(attributes.quantity, 10),
+                    timestamp: Date.now()
+                };
+                addDonation(donation);
             }
         } catch (error) {
             console.error("error parsing event data:", error);
@@ -62,18 +82,14 @@ export function setupEventSource() {
 export function testDonation() {
     const gifts = ["zyn", "trump", "addys"];
     const randomGift = gifts[Math.floor(Math.random() * gifts.length)];
-    sender.set("TestUser");
-    giftName.set(randomGift);
-    quantity.set(Math.floor(Math.random() * 5) + 1);
-    currentGift.set(randomGift);
-    showNotification.set(true);
 
-    console.log(`Test donation triggered for ${randomGift}`);
-    console.log(`Sender: ${get(sender)}, Gift: ${get(giftName)}, Quantity: ${get(quantity)}, show notification? ${get(showNotification)}`);
-
-    // Hide notification after 5 seconds
-    setTimeout(() => {
-        showNotification.set(false);
-        console.log(`notification hidden, show notification: ${get(showNotification)}`);
-    }, 5000);
+    const donation: Donation = {
+        id: Math.random().toString(36).substr(2, 9),
+        sender: "testuser",
+        giftName: randomGift,
+        quantity: Math.floor(Math.random() * 5) + 1,
+        timestamp: Date.now()
+    };
+    addDonation(donation);
+    console.log(`received donation ${donation.id}`);
 }
