@@ -2,6 +2,7 @@ import { writable } from 'svelte/store';
 
 
 export interface DonationStyle {
+    alertDuration: string;
     borderRadius: string;
     fontFamily: string;
     fontSize: string;
@@ -14,6 +15,7 @@ export interface DonationStyle {
 }
 
 const defaultDonationStyle: DonationStyle = {
+    alertDuration: "8s",
     borderRadius: "0px",
     fontFamily: "sans-serif",
     fontSize: "1rem",

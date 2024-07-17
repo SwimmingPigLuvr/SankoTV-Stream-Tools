@@ -9,6 +9,9 @@
 
 	let currentBackgroundColor = "#000000";
 
+	let imageExists = false;
+
+	let showUploadControls = false;
 	let showFonts = false;
 	let showWeights = false;
 	let showTemplateInfo = false;
@@ -19,8 +22,11 @@
 	let fontSize = 34;
 	let letterSpacing = 0;
 
+	let alertDuration = 8;
+
 	const fonts = ["sans-serif", "serif", "monospace", "cursive", "fantasy"];
 	let selectedFont = fonts[2];
+	let selectedWeight = "normal";
 	let selectedTextTransform = "none";
 
 	const fontWeights = [
@@ -53,46 +59,21 @@
 		}
 	}
 
-	function handleTextTransformChange(event: Event) {
-		const target = event.target as HTMLSelectElement;
-		if (target) {
-			setTextTransform(target.value);
-		}
-	}
-
 	function setFont(font: string) {
 		selectedFont = font;
 		console.log("hey");
 		donationSettings.update((s) => ({ ...s, fontFamily: font }));
 	}
 
-	function setTextTransform(textTransform: string) {
-		selectedTextTransform = textTransform;
-		console.log("transform");
-		donationSettings.update((s) => ({
-			...s,
-			textTransform: textTransform,
-		}));
+	function handleWeightChange(event: Event) {
+		const target = event.target as HTMLSelectElement;
+		if (target) {
+			setWeight(target.value);
+		}
 	}
-
-	function setFontSize(size: number) {
-		let sizeString: string = `${size}px`;
-		donationSettings.update((s) => ({ ...s, fontSize: sizeString }));
-	}
-
-	$: setFontSize(fontSize);
-
-	function setLetterSpacing(spacing: number) {
-		let spacingString: string = `${spacing}em`;
-		donationSettings.update((s) => ({
-			...s,
-			letterSpacing: spacingString,
-		}));
-	}
-
-	$: setLetterSpacing(letterSpacing);
 
 	function setWeight(weight: string) {
+		selectedWeight = weight;
 		let numericalWeight: string;
 		switch (weight) {
 			case "thin":
@@ -131,6 +112,49 @@
 			fontWeight: numericalWeight,
 		}));
 	}
+
+	function handleTextTransformChange(event: Event) {
+		const target = event.target as HTMLSelectElement;
+		if (target) {
+			setTextTransform(target.value);
+		}
+	}
+
+	function setTextTransform(textTransform: string) {
+		selectedTextTransform = textTransform;
+		console.log("transform");
+		donationSettings.update((s) => ({
+			...s,
+			textTransform: textTransform,
+		}));
+	}
+
+	function setFontSize(size: number) {
+		let sizeString: string = `${size}px`;
+		donationSettings.update((s) => ({ ...s, fontSize: sizeString }));
+	}
+
+	$: setFontSize(fontSize);
+
+	function setLetterSpacing(spacing: number) {
+		let spacingString: string = `${spacing}em`;
+		donationSettings.update((s) => ({
+			...s,
+			letterSpacing: spacingString,
+		}));
+	}
+
+	$: setLetterSpacing(letterSpacing);
+
+	function setAlertDuration(duration: number) {
+		let durationString: string = `${duration}s`;
+		donationSettings.update((s) => ({
+			...s,
+			alertDuration: durationString,
+		}));
+	}
+
+	$: setAlertDuration(alertDuration);
 
 	function setTextShadow(preset: string) {
 		let shadowStyle: string;
@@ -222,24 +246,27 @@
 </svelte:head>
 
 <main class="text-white bg-slate-900 font-mono p-4 pt-20">
-	<div class="p-4 flex flex-col sm:flex-wrap space-y-4 m-auto -white w-full">
-		<h1 class="text-xl mb- m-auto w-full text-left">Donation Alerts</h1>
+	<h1 class="text-xl py-2 m-auto w-full text-left">Donation Alerts</h1>
 
+	<div class="alert-grid sm:text-sm text-xs">
 		<!-- donation preview -->
-		<div class="flex flex-col border-white border-[1px]">
+		<div class="alert-grid-preview-container">
 			<div
-				class="min-h-[525px] p-8 text-center"
+				class="min-h-[420px] flex items-center text-center"
 				style="background-color: {currentBackgroundColor}; border-radius: {$donationSettings.borderRadius}; font-family: {$donationSettings.fontFamily}; font-size: {$donationSettings.fontSize}; font-weight: {$donationSettings.fontWeight}; color: {$donationSettings.textColor}; text-transform: {$donationSettings.textTransform}; letter-spacing: {$donationSettings.letterSpacing}; text-shadow: {$donationSettings.textShadow};"
 			>
 				{generateRandomMessage($messageTemplate)}
 			</div>
-			<div class="w-full p-4 flex space-x-6 justify-end items-center">
+			<div class="w-full p-4 flex space-x-2 justify-end items-center">
 				<!-- background color -->
-				<div class="flex mr-auto space-x-6 items-center">
-					<div class="flex space-x-4 items-center">
+				<div class="flex mr-auto space-x-4 items-center">
+					<div class="flex space-x-2 items-center">
 						<label for="color">Background Color</label>
 						<button
-							on:click={() => (showBackgroundColorInfo = true)}
+							on:mouseenter={() =>
+								(showBackgroundColorInfo = true)}
+							on:mouseleave={() =>
+								(showBackgroundColorInfo = false)}
 							class="hover:bg-slate-400 hover:text-slate-900 rounded-full bg-slate-600 text-slate-400 w-4 h-4 text-xs"
 							>i</button
 						>
@@ -274,9 +301,7 @@
 		</div>
 
 		<!-- layout -->
-		<div
-			class="flex flex-col space-y-3 w-full border-white border-[0.5px] p-4"
-		>
+		<div class="alert-grid-container">
 			<!-- composition of elements -->
 			<div class="flex flex-col space-y-2">
 				<label for="layout">Layout</label>
@@ -302,9 +327,26 @@
 					name="image"
 					id="image"
 				>
-					<img class="w-6 h-6" src="" alt="🪲" />
-					<p>upload / link image</p>
-					<button class="text-2xl absolute right-2 p-2">+</button>
+					<img class="absolute max-w-[3.25rem] h-[3.25rem] left-0" src='https://basedretard.com/cdn/shop/files/red.gif' alt="🪲" />
+					<p class="pl-10">select media</p>
+					<button
+						on:mouseenter={() => (showUploadControls = true)}
+						on:mouseleave={() => (showUploadControls = false)}
+						class="text-xs flex space-x-4 absolute right-2 p-2"
+					>
+						{#if showUploadControls}
+							<!-- link image url -->
+							<button class="hover:bg-slate-600 p-2 px-4">link</button>
+							<!-- delete -->
+							{#if imageExists}
+								<button>remove</button>
+							{/if}
+							<!-- upload -->
+							<button class="hover:bg-slate-600 p-2 px-4">upload</button>
+						{:else}
+							<p class="text-2xl">+</p>
+						{/if}
+					</button>
 				</button>
 			</div>
 
@@ -331,12 +373,31 @@
 					type="text"
 				/>
 			</div>
+
+			<!-- alert duration -->
+			<div class="flex flex-col space-y-2">
+				<div class="flex space-x-6">
+					<label
+						class="block text-slate-200 font-bold mb-2"
+						for="alertduration">Alert Duration</label
+					>
+					<p>{alertDuration}s</p>
+				</div>
+				<!-- letter spacing slider -->
+				<input
+					bind:value={alertDuration}
+					type="range"
+					id="alertduration"
+					name="alertduration"
+					min="2"
+					max="200"
+					step="1"
+				/>
+			</div>
 		</div>
 
 		<!-- font settings -->
-		<div
-			class="flex flex-col space-y-3 w-full border-white border-[0.5px] p-4"
-		>
+		<div class="alert-grid-container">
 			<!-- font family -->
 			<div class="flex flex-col space-y-2">
 				<label for="font">Font</label>
@@ -364,7 +425,7 @@
 					>
 					<p>{fontSize}px</p>
 				</div>
-				<!-- Create input slider -->
+				<!-- font size slider -->
 				<input
 					bind:value={fontSize}
 					type="range"
@@ -383,6 +444,8 @@
 					class="custom-dropdown p-4 bg-slate-800"
 					name="font"
 					id="font"
+					bind:value={selectedWeight}
+					on:click={handleWeightChange}
 				>
 					{#each fontWeights as weight}
 						<option
@@ -403,7 +466,7 @@
 					>
 					<p>{letterSpacing}em</p>
 				</div>
-				<!-- Create input slider -->
+				<!-- letter spacing slider -->
 				<input
 					bind:value={letterSpacing}
 					type="range"
@@ -464,113 +527,6 @@
 				</select>
 			</div>
 		</div>
-
-		<div class="bg-red-900 flex space-x-3">
-			<!-- font -->
-			<div class="flex flex-col space-y-3 w-1/4 items-center">
-				<button
-					on:click={() => toggle("font")}
-					class="block text-center w-full p-4 border-b-[1px] border-white"
-					>Font</button
-				>
-				{#if showFonts}
-					<div class="flex flex-col space-y-3 w-32">
-						{#each fonts as font}
-							<button
-								class="px-4 py-3 rounded-none border border-white hover:bg-white hover:text-black transition-colors {$donationSettings.fontFamily ===
-								font
-									? 'bg-white text-black'
-									: 'bg-lack'}"
-								on:click={() => setFont(font)}
-								style="font-family: {font};"
-							>
-								{font}
-							</button>
-						{/each}
-					</div>
-				{/if}
-			</div>
-
-			<!-- weight -->
-			<div class="flex flex-col space-y-3 w-1/4 items-center">
-				<button
-					on:click={() => toggle("weight")}
-					class="block text-center w-full p-4 border-b-[1px] border-white"
-					>Weight</button
-				>
-				{#if showWeights}
-					<div class="flex flex-col space-y-3 w-32">
-						{#each fontWeights as weight}
-							<button
-								class="px-4 py-3 rounded-none border border-white hover:bg-white hover:text-black transition-colors {$donationSettings.fontWeight ===
-								weight
-									? 'bg-white text-black'
-									: 'bg-lack'}"
-								on:click={() => setWeight(weight)}
-								>{weight}
-							</button>
-						{/each}
-					</div>
-				{/if}
-			</div>
-		</div>
-
-		<label class="block">
-			Text Color:
-			<input
-				type="color"
-				bind:value={$donationSettings.textColor}
-				class="mt-1 block"
-			/>
-		</label>
-
-		<label class="block">
-			Text Transform:
-			<select
-				bind:value={$donationSettings.textTransform}
-				class="mt-1 block w-full bg-gray-800 border border-gray-700 rounded px-2 py-1"
-			>
-				{#each textTransformOptions as option}
-					<option value={option}>{option}</option>
-				{/each}
-			</select>
-		</label>
-
-		<label class="block">
-			Letter Spacing:
-			<input
-				type="text"
-				bind:value={$donationSettings.letterSpacing}
-				class="mt-1 block w-full bg-gray-800 border border-gray-700 rounded px-2 py-1"
-			/>
-		</label>
-
-		<label class="block">
-			Text Shadow:
-			<input
-				type="text"
-				bind:value={$donationSettings.textShadow}
-				class="mt-1 block w-full bg-gray-800 border border-gray-700 rounded px-2 py-1"
-			/>
-		</label>
-
-		<div>
-			<h3 class="text-lg mb-2">Preset Styles</h3>
-			<button
-				class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded mr-2"
-				on:click={() => setTextShadow("3d")}>3D Effect</button
-			>
-			<button
-				class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded"
-				on:click={() => applyPresetStyle("3d-bold")}
-				>Bold 3D Effect</button
-			>
-		</div>
-
-		<button
-			class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded mt-4"
-			on:click={saveSettings}>Save Settings</button
-		>
 	</div>
 </main>
 
@@ -581,5 +537,48 @@
 	}
 	select.custom-dropdown option:hover {
 		background-color: #f3f4f6;
+	}
+
+	/* Base classes */
+	.alert-grid {
+		display: grid;
+		grid-template-columns: repeat(2, calc(50% - 12px));
+		gap: 24px;
+	}
+
+	.alert-grid-container {
+		padding: 1rem;
+		display: flex;
+		flex-flow: column nowrap;
+		align-items: stretch;
+		justify-content: flex-start;
+		gap: 20px;
+		width: calc(100% - 1px);
+		border: 1px solid;
+		border-radius: 0px;
+	}
+
+	.alert-grid-preview-container {
+		display: flex;
+		flex-flow: column nowrap;
+		align-items: stretch;
+		justify-content: flex-start;
+		gap: 20px;
+		width: calc(100% - 1px);
+		border: 1px solid;
+		border-radius: 0px;
+	}
+
+	/* Variations for screen sizes large and smaller */
+	@media (max-width: 1024px) {
+		.alert-grid {
+			grid-template-columns: 1fr; /* Single column grid layout */
+			gap: 24px;
+		}
+
+		.alert-grid-container {
+			width: 100%; /* Full width */
+			padding: 1rem; /* Adjust padding for larger screens */
+		}
 	}
 </style>
