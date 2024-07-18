@@ -57,7 +57,7 @@ donation alert
 checklist
 
 donations
-    ui flex wrap
+    💎ui flex wrap
     format plural messages
     trigger accurate alert with sound
         implement muting

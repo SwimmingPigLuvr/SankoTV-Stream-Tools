@@ -1,9 +1,11 @@
 import { writable } from 'svelte/store';
 
 
-export interface DonationStyle {
-    alertDuration: string;
+export interface AlertConfig {
+    alertDuration: number;
     borderRadius: string;
+    eventTrigger: string,
+    specificAmount: number;
     fontFamily: string;
     fontSize: string;
     fontWeight: string;
@@ -14,9 +16,11 @@ export interface DonationStyle {
     textShadow: string;
 }
 
-const defaultDonationStyle: DonationStyle = {
-    alertDuration: "8s",
+const defaultAlertConfig: AlertConfig = {
+    alertDuration: 8, // 8s
     borderRadius: "0px",
+    eventTrigger: "donation",
+    specificAmount: 5,
     fontFamily: "sans-serif",
     fontSize: "1rem",
     fontWeight: "900",
@@ -27,6 +31,6 @@ const defaultDonationStyle: DonationStyle = {
     textShadow: "none",
 };
 
-export const donationSettings = writable<DonationStyle>(defaultDonationStyle);
+export const alertConfig = writable<DonationStyle>(defaultAlertConfig);
 
 export const messageTemplate = writable<string>('{sender} donated {amount} {gift}!');

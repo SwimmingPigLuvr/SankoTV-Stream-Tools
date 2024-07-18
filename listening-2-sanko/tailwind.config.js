@@ -3,7 +3,7 @@ export default {
   content: ['./src/**/*.{html,js,svelte,ts}'],
   theme: {
     extend: {
-      fontface: {
+      fontFamily: {
         'cinema': ['Cinema', 'sans-serif'],
       }
     },
