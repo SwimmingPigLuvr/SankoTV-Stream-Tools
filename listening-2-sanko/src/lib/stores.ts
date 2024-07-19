@@ -3,6 +3,7 @@ import { writable } from 'svelte/store';
 
 export interface AlertConfig {
     alertDuration: number;
+    alertVolume: number;
     borderRadius: string;
     eventTrigger: string,
     specificAmount: number;
@@ -18,6 +19,7 @@ export interface AlertConfig {
 
 const defaultAlertConfig: AlertConfig = {
     alertDuration: 8, // 8s
+    alertVolume: 50, // 50%
     borderRadius: "0px",
     eventTrigger: "donation",
     specificAmount: 5,

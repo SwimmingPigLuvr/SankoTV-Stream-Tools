@@ -1,14 +1,45 @@
 <!-- src/routes/settings/+page.svelte -->
 <script lang="ts">
 	import { onMount } from "svelte";
+	import { browser } from "$app/environment";
+
 	import { alertConfig, messageTemplate } from "$lib/stores";
 	import { fade, fly } from "svelte/transition";
+
+	let volumePercent = 50;
+	let volume = volumePercent / 100;
+
+	$: {
+		volume = volumePercent / 100;
+		if (audio) {
+			audio.volume = volume;
+		}
+	}
+
+	let audio: HTMLAudioElement | undefined;
+	let currentAudioSrc: string | null = "/sounds/notification.mp3";
+
+	// This will run only in the browser
+	if (browser) {
+		onMount(() => {
+			if (currentAudioSrc) {
+				audio = new Audio(currentAudioSrc);
+				audio.volume = volume;
+			}
+		});
+	}
+
+	function playAudio() {
+		if (audio) {
+			audio.play();
+		}
+	}
 
 	let isPreviewPlaying = false;
 
 	let defaultMedia =
 		"https://i.seadn.io/s/raw/files/e34c296e6e2089853f59748e87975c70.gif?auto=format&dpr=1&w=3840";
-	let donationMediaSrc: string = defaultMedia;
+	let currentMediaSrc: string | null = defaultMedia;
 	let layoutSelection = "imageAboveText";
 
 	let previewContainer: HTMLElement;
@@ -50,7 +81,8 @@
 
 	let imageExists = false;
 
-	let showUploadControls = false;
+	let showImgUploadControls = false;
+	let showAudioUploadControls = false;
 	let showFonts = false;
 	let showWeights = false;
 	let showTemplateInfo = false;
@@ -61,7 +93,7 @@
 	let fontSize = 34;
 	let letterSpacing = 0;
 
-	let alertDuration = 2;
+	let alertDuration = 4;
 
 	let specificDonationAmount = 5;
 
@@ -135,6 +167,14 @@
 		"Head Phones",
 		"Zyn",
 	];
+
+	function handleRemoveCurrentMedia() {
+		currentMediaSrc = null;
+	}
+
+	function handleRemoveCurrentAudio() {
+		currentAudioSrc = null;
+	}
 
 	function handleSpecificDonationAmount() {
 		// todo use this to set the specific donation amount for
@@ -232,6 +272,12 @@
 			textTransform: textTransform,
 		}));
 	}
+
+	function setAlertVolume(volume: number) {
+		alertConfig.update((s) => ({ ...s, alertVolume: volume }));
+	}
+
+	$: setAlertVolume(volume);
 
 	function setFontSize(size: number) {
 		let sizeString: string = `${size}px`;
@@ -379,10 +425,16 @@
 	}
 
 	function handleDonationPreview() {
-		isPreviewPlaying = true;
-		setTimeout(() => {
-			isPreviewPlaying = false;
-		}, alertDuration * 1000);
+		// play /sounds/notification.mp3
+		if (!isPreviewPlaying) {
+			isPreviewPlaying = true;
+			if (!muted) {
+				playAudio();
+			}
+			setTimeout(() => {
+				isPreviewPlaying = false;
+			}, alertDuration * 1000);
+		}
 	}
 </script>
 
@@ -421,16 +473,16 @@
 						"textOverImage"}
 					class:layout-imgLeft={layoutSelection === "imgLeft"}
 					class:layout-imgRight={layoutSelection === "imgRight"}
-					class="preview-content leading-tight flex items-center justify-center text-center"
+					class="preview-content leading-snug flex items-center justify-center text-center"
 					style="background-color: {currentBackgroundColor}; border-radius: {$alertConfig.borderRadius}; font-family: {$alertConfig.fontFamily}; font-size: {$alertConfig.fontSize}; font-weight: {$alertConfig.fontWeight}; color: {$alertConfig.textColor}; text-transform: {$alertConfig.textTransform}; letter-spacing: {$alertConfig.letterSpacing}; text-shadow: {$alertConfig.textShadow};"
 				>
 					{#if layoutSelection === "textOverImage"}
-						<img src={donationMediaSrc} alt="" />
+						<img src={currentMediaSrc} alt="" />
 						<div class="text">
 							{generateRandomMessage($messageTemplate)}
 						</div>
 					{:else}
-						<img src={donationMediaSrc} alt="" />
+						<img src={currentMediaSrc} alt="" />
 						{generateRandomMessage($messageTemplate)}
 					{/if}
 				</div>
@@ -474,7 +526,8 @@
 				<!-- preview button -->
 				<button
 					on:click={handleDonationPreview}
-					class="text-xs ml-auto text-right p-4 bg-slate-800 hover:bg-slate-600 text-white"
+					disabled={isPreviewPlaying}
+					class="text-xs ml-auto text-right p-4 bg-slate-800 {isPreviewPlaying ? 'cursor-not-allowed' : 'hover:bg-slate-600'} text-white"
 					>preview</button
 				>
 			</div>
@@ -545,31 +598,41 @@
 					id="image"
 				>
 					<img
-						class="absolute max-w-[3.25rem] h-[3.25rem] left-0"
-						src={donationMediaSrc}
+						class="absolute max-w-[3.25rem] h-[3rem] left-0"
+						src={currentMediaSrc
+							? currentMediaSrc
+							: "/gifs/minecraft.gif"}
 						alt="🪲"
 					/>
-					<p class="pl-10">select media</p>
+					<p class="pl-10 truncate max-w-sm sm:max-w-lg">
+						{currentMediaSrc
+							? currentMediaSrc
+							: "upload/link media"}
+					</p>
 					<button
-						on:mouseenter={() => (showUploadControls = true)}
-						on:mouseleave={() => (showUploadControls = false)}
-						class="text-xs flex space-x-4 absolute right-2 p-2"
+						on:mouseenter={() => (showImgUploadControls = true)}
+						on:mouseleave={() => (showImgUploadControls = false)}
+						class="text-xs flex bg-slate-800 space-x-0 absolute right-2"
 					>
-						{#if showUploadControls}
+						{#if showImgUploadControls}
 							<!-- link image url -->
 							<button class="hover:bg-slate-600 p-2 px-4"
 								>link</button
 							>
 							<!-- delete -->
-							{#if imageExists}
-								<button>remove</button>
+							{#if currentMediaSrc}
+								<button
+									on:click={handleRemoveCurrentMedia}
+									class="hover:bg-slate-600 p-2 px-4"
+									>remove</button
+								>
 							{/if}
 							<!-- upload -->
 							<button class="hover:bg-slate-600 p-2 px-4"
 								>upload</button
 							>
 						{:else}
-							<p class="text-2xl">+</p>
+							<p class="text-2xl p-2">+</p>
 						{/if}
 					</button>
 				</button>
@@ -631,151 +694,66 @@
 				<!-- image upload -->
 				<button
 					class="relative flex items-center space-x-4 p-4 bg-slate-800"
-					name="image"
-					id="image"
+					name="sound"
+					id="sound"
 				>
-					<img
-						class="absolute max-w-[3.25rem] h-[3.25rem] left-0"
-						src={donationMediaSrc}
-						alt="🪲"
-					/>
-					<p class="pl-10">select media</p>
+					<p class="absolute text-2xl left-3">🎧</p>
+
+					<p class="pl-10">
+						{currentAudioSrc
+							? currentAudioSrc
+							: "upload/link audio"}
+					</p>
 					<button
-						on:mouseenter={() => (showUploadControls = true)}
-						on:mouseleave={() => (showUploadControls = false)}
-						class="text-xs flex space-x-4 absolute right-2 p-2"
+						on:mouseenter={() => (showAudioUploadControls = true)}
+						on:mouseleave={() => (showAudioUploadControls = false)}
+						class="text-xs z-20 bg-slate-800 flex space-x-0 absolute right-2"
 					>
-						{#if showUploadControls}
+						{#if showAudioUploadControls}
 							<!-- link image url -->
 							<button class="hover:bg-slate-600 p-2 px-4"
 								>link</button
 							>
 							<!-- delete -->
-							{#if imageExists}
-								<button>remove</button>
+							{#if currentAudioSrc}
+								<button
+									on:click={handleRemoveCurrentAudio}
+									class="hover:bg-slate-600 p-2 px-4"
+									>remove</button
+								>
 							{/if}
 							<!-- upload -->
 							<button class="hover:bg-slate-600 p-2 px-4"
 								>upload</button
 							>
 						{:else}
-							<p class="text-2xl">+</p>
+							<p class="text-2xl p-2">+</p>
 						{/if}
 					</button>
 				</button>
 			</div>
 
-			<!-- size -->
+			<!-- alert volume -->
 			<div class="flex flex-col space-y-2">
 				<div class="flex space-x-6">
 					<label
 						class="block text-slate-200 font-bold mb-2"
-						for="font">Size</label
+						for="volume">Volume</label
 					>
-					<p>{fontSize}px</p>
+					<p>{volumePercent}%</p>
 				</div>
-				<!-- font size slider -->
+				<!-- volume slider -->
 				<input
-					bind:value={fontSize}
+					bind:value={volumePercent}
 					type="range"
-					id="fontsize"
-					name="fontsize"
-					min="12"
-					max="80"
+					id="volume"
+					name="volume"
+					min="0"
+					max="100"
 					step="1"
 				/>
 			</div>
 
-			<!-- weight -->
-			<div class="flex flex-col space-y-2">
-				<label for="fontweight">Weight</label>
-				<select
-					class="custom-dropdown p-4 bg-slate-800"
-					name="font"
-					id="font"
-					bind:value={selectedWeight}
-					on:click={handleWeightChange}
-				>
-					{#each fontWeights as weight}
-						<option
-							style="font-weight: {weight};"
-							class=""
-							value={weight}>{weight}</option
-						>
-					{/each}
-				</select>
-			</div>
-
-			<!-- tracking -->
-			<div class="flex flex-col space-y-2">
-				<div class="flex space-x-6">
-					<label
-						class="block text-slate-200 font-bold mb-2"
-						for="letterspacing">Letter Spacing</label
-					>
-					<p>{letterSpacing}em</p>
-				</div>
-				<!-- letter spacing slider -->
-				<input
-					bind:value={letterSpacing}
-					type="range"
-					id="letterspacing"
-					name="letterspacing"
-					min="-0.15"
-					max="0.15"
-					step="0.005"
-				/>
-			</div>
-
-			<!-- text color -->
-			<div class="flex space-x-12 justify-start py-2">
-				<!-- color -->
-				<div class="flex space-x-2 items-center">
-					<label for="color">Text Color</label>
-					<input
-						name="color"
-						id="color"
-						type="color"
-						bind:value={$alertConfig.textColor}
-						class="mt-1 block"
-					/>
-				</div>
-
-				<!-- highlight color -->
-				<div class="flex space-x-2 items-center">
-					<label for="color">Highlight Color</label>
-					<input
-						name="highlightcolor"
-						id="highlightcolor"
-						type="color"
-						bind:value={$alertConfig.highlightColor}
-						class="mt-1 block"
-					/>
-				</div>
-			</div>
-
-			<!-- Text Transform -->
-			<div class="flex flex-col space-y-2">
-				<label for="texttransform">Text Transform</label>
-				<select
-					class="custom-dropdown p-4 bg-slate-800"
-					name="texttransform"
-					id="texttransform"
-					bind:value={selectedTextTransform}
-					on:change={handleTextTransformChange}
-				>
-					<option class="" value="none">none</option>
-					<option class="lowercase" value="lowercase"
-						>lowercase</option
-					>
-					<option class="uppsercase" value="uppercase"
-						>uppercase</option
-					>
-					<option class="capitalize" value="capitalize"
-						>capitalize</option
-					>
-				</select>
-			</div>
 		</div>
 
 		<!-- font settings -->
@@ -854,9 +832,9 @@
 					type="range"
 					id="letterspacing"
 					name="letterspacing"
-					min="-0.15"
-					max="0.15"
-					step="0.005"
+					min="-0.1"
+					max="0.1"
+					step="0.01"
 				/>
 			</div>
 
@@ -981,7 +959,7 @@
 	}
 
 	.layout-imageAboveText {
-		gap: 2rem;
+		gap: 0.5rem;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
