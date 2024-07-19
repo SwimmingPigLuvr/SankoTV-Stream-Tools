@@ -2,9 +2,50 @@
 @tailwind components;
 @tailwind utilities;
 
+
+@font-face {
+    font-family: 'Amsterdam';
+    src: url('/fonts/Amsterdam.otf') format('opentype');
+}
+
+@font-face {
+    font-family: 'Amsterdam-Display';
+    src: url('/fonts/Amsterdam-Display.otf') format('opentype');
+}
+
+@font-face {
+    font-family: 'Anthem';
+    src: url('/fonts/Anthem.otf') format('opentype');
+}
+
 @font-face {
     font-family: 'Cinema';
     src: url('/fonts/Cinema.otf') format('opentype');
+}
+
+@font-face {
+    font-family: 'Coolfont';
+    src: url('/fonts/COOLFONT.otf') format('opentype');
+}
+
+@font-face {
+    font-family: 'Coolfont-Pixel';
+    src: url('/fonts/COOLFONT-Pixel.otf') format('opentype');
+}
+
+@font-face {
+    font-family: 'Coolfont-Pix-Outlined';
+    src: url('/fonts/COOLFONT-Pix-Outlined.otf') format('opentype');
+}
+
+@font-face {
+    font-family: 'Coolfont-Trippy';
+    src: url('/fonts/COOLFONT-Trippy.otf') format('opentype');
+}
+
+@font-face {
+    font-family: 'Sunny';
+    src: url('/fonts/Sunny.otf') format('opentype');
 }
 
 .text-dreamy {

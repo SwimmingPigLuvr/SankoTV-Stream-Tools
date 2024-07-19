@@ -2,10 +2,52 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 	import { browser } from "$app/environment";
-
 	import { alertConfig, messageTemplate } from "$lib/stores";
-	import { fade, fly } from "svelte/transition";
+	import { fade, fly, slide, scale, draw, blur } from "svelte/transition";
+	import {
+		linear,
+		backIn,
+		backOut,
+		backInOut,
+		bounceIn,
+		bounceOut,
+		bounceInOut,
+		circIn,
+		circOut,
+		circInOut,
+		cubicIn,
+		cubicOut,
+		cubicInOut,
+		elasticIn,
+		elasticOut,
+		elasticInOut,
+		expoIn,
+		expoOut,
+		expoInOut,
+		quadIn,
+		quadOut,
+		quadInOut,
+		quartIn,
+		quartOut,
+		quartInOut,
+		quintIn,
+		quintOut,
+		quintInOut,
+		sineIn,
+		sineOut,
+		sineInOut,
+	} from "svelte/easing";
 
+	interface AnimationConfig {
+		type: keyof typeof animationFunctions;
+		duration: number;
+		delay?: number;
+		easing: keyof typeof easingFunctions;
+		[key: string]: any;
+	}
+
+	let alertName = "";
+	let alertActive = true;
 	let volumePercent = 50;
 	let volume = volumePercent / 100;
 
@@ -46,7 +88,7 @@
 	let previewContent: HTMLElement;
 	let previewePlaceholder: HTMLElement;
 	let maxWidth = 1080;
-	let scale = 1;
+	let divScale = 1;
 
 	onMount(() => {
 		const resizeObserver = new ResizeObserver((entries) => {
@@ -64,16 +106,16 @@
 
 	function updatePreviewScale() {
 		const containerWidth = previewContainer.offsetWidth;
-		scale = containerWidth / maxWidth;
+		divScale = containerWidth / maxWidth;
 
 		if (previewePlaceholder) {
-			previewePlaceholder.style.transform = `scale(${scale})`;
+			previewePlaceholder.style.transform = `scale(${divScale})`;
 			previewePlaceholder.style.transformOrigin = "center";
-			previewePlaceholder.style.width = `${100 / scale}%`;
+			previewePlaceholder.style.width = `${100 / divScale}%`;
 			previewePlaceholder.style.height = "540px";
 		}
 		if (previewContent) {
-			previewContent.style.transform = `scale(${scale})`;
+			previewContent.style.transform = `scale(${divScale})`;
 		}
 	}
 
@@ -98,13 +140,132 @@
 	let specificDonationAmount = 5;
 
 	const fonts = [
+		"amsterdam",
+		"amsterdam-display",
+		"anthem",
 		"cinema",
+		"coolfont",
+		"coolfont-pixel",
+		"coolfont-pix-outlined",
+		"coolfont-trippy",
+		"sunny",
 		"sans-serif",
 		"serif",
 		"monospace",
 		"cursive",
 		"fantasy",
 	];
+
+	let selectedAnimationIn = "fly up";
+	let selectedAnimationOut = "fly down";
+	let durationIn = 1000;
+	let durationOut = 1000;
+	let xIn = 0;
+	let yIn = 1000;
+	let xOut = 0;
+	let yOut = 1000;
+	let easingIn = "cubicInOut";
+	let easingOut = "cubicInOut";
+
+	const animationsIn = [
+		"fade in",
+		"fly up",
+		"fly down",
+		"scale",
+		"slide",
+		"draw",
+		"blur",
+	];
+	const animationsOut = [
+		"fade out",
+		"fly up",
+		"fly down",
+		"scale",
+		"slide",
+		"draw",
+		"blur",
+	];
+
+	const animationFunctions = {
+		fade,
+		fly,
+		slide,
+		scale,
+		draw,
+		blur,
+	};
+
+	const easingFunctions = {
+		linear,
+		backIn,
+		backOut,
+		backInOut,
+		bounceIn,
+		bounceOut,
+		bounceInOut,
+		circIn,
+		circOut,
+		circInOut,
+		cubicIn,
+		cubicOut,
+		cubicInOut,
+		elasticIn,
+		elasticOut,
+		elasticInOut,
+		expoIn,
+		expoOut,
+		expoInOut,
+		quadIn,
+		quadOut,
+		quadInOut,
+		quartIn,
+		quartOut,
+		quartInOut,
+		quintIn,
+		quintOut,
+		quintInOut,
+		sineIn,
+		sineOut,
+		sineInOut,
+	};
+
+	function getAnimationProps(config: AnimationConfig) {
+		const { type, duration, delay, easing, ...rest } = config;
+		const baseProps = { duration, delay, easing: easingFunctions[easing] };
+
+		switch (type) {
+			case "fly":
+				return { ...baseProps, x: rest.x || 0, y: rest.y || 0 };
+			case "slide":
+				return { ...baseProps, axis: rest.axis || "y" };
+			case "scale":
+				return {
+					...baseProps,
+					start: rest.start || 0,
+					opacity: rest.opacity || 0,
+				};
+			case "draw":
+				return { ...baseProps, speed: rest.speed || 1 };
+			case "blur":
+				return { ...baseProps, amount: rest.amount || 5 };
+			default:
+				return baseProps;
+		}
+	}
+
+	function applyAnimation(node: HTMLElement, config: AnimationConfig) {
+		const animationFunction = animationFunctions[config.type];
+		if (!animationFunction) {
+			console.error(`Animation type "${config.type}" not found`);
+			return;
+		}
+
+		const props = getAnimationProps(config);
+		return animationFunction(node, props);
+	}
+
+	export { applyAnimation, AnimationConfig };
+
 	let selectedFont = fonts[1];
 	let selectedWeight = "normal";
 	let selectedTextTransform = "none";
@@ -194,6 +355,32 @@
 		selectedTrigger = trigger;
 		console.log("set trigger: ", trigger);
 		alertConfig.update((s) => ({ ...s, eventTrigger: trigger }));
+	}
+
+	function setAnimationIn(animation: string) {
+		selectedAnimationIn = animation;
+		console.log("set animation in: ", animation);
+		alertConfig.update((s) => ({ ...s, animationIn: animation }));
+	}
+
+	function setAnimationOut(animation: string) {
+		selectedAnimationOut = animation;
+		console.log("set animation out: ", animation);
+		alertConfig.update((s) => ({ ...s, animationOut: animation }));
+	}
+
+	function handleAnimationInChange(event: Event) {
+		const target = event.target as HTMLSelectElement;
+		if (target) {
+			setAnimationIn(target.value);
+		}
+	}
+
+	function handleAnimationOutChange(event: Event) {
+		const target = event.target as HTMLSelectElement;
+		if (target) {
+			setAnimationOut(target.value);
+		}
 	}
 
 	function handleFontChange(event: Event) {
@@ -309,6 +496,10 @@
 		muted = !muted;
 	}
 
+	function toggleAlert() {
+		alertActive = !alertActive;
+	}
+
 	function getRandomSender() {
 		return senders[Math.floor(Math.random() * senders.length)];
 	}
@@ -413,15 +604,29 @@
 		return `${gift}s`;
 	}
 
-	function generateRandomMessage(template: string) {
+	function generateRandomMessage(template: string): {
+		parts: { text: string; highlight: boolean }[];
+	} {
 		const sender = getRandomSender();
 		const amount = getRandomAmount();
 		const gift = getRandomGift();
 
-		return template
-			.replace("{sender}", sender)
-			.replace("{amount}", amount.toString())
-			.replace("{gift}", formatPluralities(amount, gift));
+		const placeholders = {
+			"{sender}": sender,
+			"{amount}": amount.toString(),
+			"{gift}": formatPluralities(amount, gift),
+		};
+
+		const parts = template
+			.split(/(\{sender\}|\{amount\}|\{gift\})/g)
+			.map((part) => {
+				if (part in placeholders) {
+					return { text: placeholders[part], highlight: true };
+				}
+				return { text: part, highlight: false };
+			});
+
+		return { parts };
 	}
 
 	function handleDonationPreview() {
@@ -473,13 +678,17 @@
 						"textOverImage"}
 					class:layout-imgLeft={layoutSelection === "imgLeft"}
 					class:layout-imgRight={layoutSelection === "imgRight"}
-					class="preview-content leading-snug flex items-center justify-center text-center"
+					class="preview-content leading-[1] flex items-center justify-center text-center"
 					style="background-color: {currentBackgroundColor}; border-radius: {$alertConfig.borderRadius}; font-family: {$alertConfig.fontFamily}; font-size: {$alertConfig.fontSize}; font-weight: {$alertConfig.fontWeight}; color: {$alertConfig.textColor}; text-transform: {$alertConfig.textTransform}; letter-spacing: {$alertConfig.letterSpacing}; text-shadow: {$alertConfig.textShadow};"
 				>
 					{#if layoutSelection === "textOverImage"}
 						<img src={currentMediaSrc} alt="" />
 						<div class="text">
-							{generateRandomMessage($messageTemplate)}
+							{#each generateRandomMessage($messageTemplate).parts as part}
+								<span style="color: {part.highlight ? $alertConfig.highlightColor : $alertConfig.textColor};">
+									{part.text}
+								</span>
+							{/each}
 						</div>
 					{:else}
 						<img src={currentMediaSrc} alt="" />
@@ -527,16 +736,53 @@
 				<button
 					on:click={handleDonationPreview}
 					disabled={isPreviewPlaying}
-					class="text-xs ml-auto text-right p-4 bg-slate-800 {isPreviewPlaying ? 'cursor-not-allowed' : 'hover:bg-slate-600'} text-white"
-					>preview</button
+					class="text-xs ml-auto text-right p-4 bg-slate-800 {isPreviewPlaying
+						? 'cursor-not-allowed'
+						: 'hover:bg-slate-600'} text-white">preview</button
 				>
 			</div>
 		</div>
 
 		<!-- alert config -->
-		<div class="alert-grid-container">
+		<div class="alert-grid-container relative">
+			<div
+				class="bg-black border-b-white border-b-[1px] z-20 p-4 absolute top-0 w-full left-0 flex justify-between"
+			>
+				<!-- alert name -->
+				<div class="flex flex-col space-y-2 w-[70%]">
+					<label for="alertname">Alert Name</label>
+					<!-- text input -->
+					<input
+						bind:value={alertName}
+						name="alertName"
+						id="alertName"
+						class=" flex space-x-4 p-4 bg-slate-800"
+						type="text"
+					/>
+				</div>
+
+				<!-- alert active -->
+				<div class="flex flex-col space-y-2 w-[30%] items-center">
+					<label for="active" class="text-center"
+						>Alert {alertActive ? "Enabled" : "Disabled"}</label
+					>
+					<button
+						name="active"
+						id="active"
+						on:click={() => toggleAlert()}
+						class="max-w-20 px-3 p-2 text-xl hover:bg-slate-800"
+					>
+						{#if alertActive}
+							✅
+						{:else}
+							❌
+						{/if}
+					</button>
+				</div>
+			</div>
+
 			<!-- event trigger -->
-			<div class="flex flex-col space-y-2">
+			<div class="flex flex-col space-y-2 mt-28">
 				<label for="eventtrigger">Event Trigger</label>
 				<select
 					class="custom-dropdown p-4 bg-slate-800"
@@ -691,7 +937,7 @@
 
 			<div class="flex flex-col space-y-2">
 				<label for="sound">Sound</label>
-				<!-- image upload -->
+				<!-- sound upload -->
 				<button
 					class="relative flex items-center space-x-4 p-4 bg-slate-800"
 					name="sound"
@@ -754,6 +1000,44 @@
 				/>
 			</div>
 
+			<!-- animation -->
+			<div class="flex flex-col space-y-2">
+				<label for="animation">Animation</label>
+
+				<div id="animation" class="flex space-x-2">
+					<!-- Animation in -->
+					<div class="flex flex-col space-y-2 w-1/3">
+						<label for="animationin">In</label>
+						<select
+							class="custom-dropdown p-4 bg-slate-800"
+							name="animationin"
+							id="animationin"
+							bind:value={selectedAnimationIn}
+							on:change={handleAnimationInChange}
+						>
+							{#each animationsIn as animation}
+								<option value={animation}>{animation}</option>
+							{/each}
+						</select>
+					</div>
+
+					<!-- Animation out -->
+					<div class="flex flex-col space-y-2 w-1/3">
+						<label for="animationout">Out</label>
+						<select
+							class="custom-dropdown p-4 bg-slate-800"
+							name="animationout"
+							id="animationout"
+							bind:value={selectedAnimationOut}
+							on:change={handleAnimationOutChange}
+						>
+							{#each animationsOut as animation}
+								<option value={animation}>{animation}</option>
+							{/each}
+						</select>
+					</div>
+				</div>
+			</div>
 		</div>
 
 		<!-- font settings -->
