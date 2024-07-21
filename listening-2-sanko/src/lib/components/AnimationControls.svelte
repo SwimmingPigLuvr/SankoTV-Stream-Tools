@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { writable } from "svelte/store";
+    import { get, type Writable } from "svelte/store";
     import type { AnimationType, AnimationConfig } from "../animations/types";
     import {
         defaultConfigs,
@@ -7,26 +7,50 @@
         specificParams,
         easingFunctions,
     } from "../animations/constants";
+    import * as easings from "svelte/easing";
+    import { inConfig, outConfig } from "$lib/animations/stores";
 
     let showAdvanced = false;
 
-    const inConfig = writable<AnimationConfig>(defaultConfigs.fade);
-    const outConfig = writable<AnimationConfig>(defaultConfigs.fade);
-
     function handlePremadeAnimationChange(
-        config: typeof inConfig | typeof outConfig,
+        config: Writable<AnimationConfig>,
         event: Event,
+        direction: "in" | "out",
     ) {
         const target = event.target as HTMLSelectElement;
         const selectedAnimation = target.value as keyof typeof premadeConfigs;
-        updateConfig(config, premadeConfigs[selectedAnimation]);
+        const updates = premadeConfigs[selectedAnimation];
+
+        updateConfig(config, updates);
+
+        console.log(`Selected animation ${direction}: ${selectedAnimation}`);
+        console.log(`${direction} config:`, JSON.stringify(get(config)));
     }
 
     function updateConfig(
-        config: typeof inConfig | typeof outConfig,
+        config: Writable<AnimationConfig>,
         updates: Partial<AnimationConfig>,
     ) {
-        config.update((curr) => ({ ...curr, ...updates }));
+        config.update((curr) => {
+            // start with default config
+            let newConfig = { ...defaultConfigs[updates.type || curr.type] };
+
+            // apply updates
+            newConfig = { ...newConfig, ...updates };
+
+            // ensure easing is a function
+            if (newConfig.easing && typeof newConfig.easing === "string") {
+                newConfig.easing =
+                    easings[newConfig.easing as keyof typeof easings] ||
+                    easings.linear;
+            }
+
+            console.log("Current config:", curr);
+            console.log("Updates to apply:", updates);
+            console.log("New config:", newConfig); // Log new config after updates
+
+            return newConfig;
+        });
     }
 
     function handleInputChange(
@@ -126,6 +150,17 @@
                                 <option value={easing}>{easing}</option>
                             {/each}
                         </select>
+                    {:else if param === "axis"}
+                        <select
+                            id={`in-${param}`}
+                            class="custom-dropdown p-4 bg-slate-800"
+                            bind:value={$inConfig[param]}
+                            on:change={(e) =>
+                                handleInputChange(inConfig, param, e)}
+                        >
+                            <option value="x">x</option>
+                            <option value="y">y</option>
+                        </select>
                     {:else}
                         <input
                             class="custom-dropdown p-4 bg-slate-800"
@@ -141,7 +176,8 @@
                 <select
                     id="animationIn"
                     class="custom-dropdown p-4 bg-slate-800"
-                    on:change={(e) => handlePremadeAnimationChange(inConfig, e)}
+                    on:change={(e) =>
+                        handlePremadeAnimationChange(inConfig, e, "in")}
                 >
                     {#each premadeAnimationsIn as animation}
                         <option value={animation}>{animation}</option>
@@ -153,19 +189,22 @@
         <!-- Animation out -->
         <div class="flex flex-col space-y-2 w-1/2">
             <label for="animationOut">Out</label>
-            <select
-                id="animationOut"
-                class="custom-dropdown p-4 bg-slate-800"
-                bind:value={$outConfig.type}
-                on:change={() =>
-                    updateConfig(outConfig, defaultConfigs[$outConfig.type])}
-            >
-                {#each Object.keys(defaultConfigs) as type}
-                    <option value={type}>{type}</option>
-                {/each}
-            </select>
-
             {#if showAdvanced}
+                <select
+                    id="animationOut"
+                    class="custom-dropdown p-4 bg-slate-800"
+                    bind:value={$outConfig.type}
+                    on:change={() =>
+                        updateConfig(
+                            outConfig,
+                            defaultConfigs[$outConfig.type],
+                        )}
+                >
+                    {#each Object.keys(defaultConfigs) as type}
+                        <option value={type}>{type}</option>
+                    {/each}
+                </select>
+
                 {#each relevantParamsOut as param}
                     <label for={`out-${param}`}>{param}</label>
                     {#if param === "easing"}
@@ -180,17 +219,40 @@
                                 <option value={easing}>{easing}</option>
                             {/each}
                         </select>
+                    {:else if param === "axis"}
+                        <select
+                            id={`out-${param}`}
+                            class="custom-dropdown p-4 bg-slate-800"
+                            bind:value={$outConfig[param]}
+                            on:change={(e) =>
+                                handleInputChange(outConfig, param, e)}
+                        >
+                            <option value="x">x</option>
+                            <option value="y">y</option>
+                        </select>
                     {:else}
                         <input
                             class="custom-dropdown p-4 bg-slate-800"
                             type="number"
                             id={`out-${param}`}
+                            placeholder="500"
                             bind:value={$outConfig[param]}
                             on:input={(e) =>
                                 handleInputChange(outConfig, param, e)}
                         />
                     {/if}
                 {/each}
+            {:else}
+                <select
+                    id="animationOut"
+                    class="custom-dropdown p-4 bg-slate-800"
+                    on:change={(e) =>
+                        handlePremadeAnimationChange(outConfig, e, "out")}
+                >
+                    {#each premadeAnimationsOut as animation}
+                        <option value={animation}>{animation}</option>
+                    {/each}
+                </select>
             {/if}
         </div>
     </div>

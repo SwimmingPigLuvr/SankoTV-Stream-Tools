@@ -1,9 +1,9 @@
 export const defaultConfigs: Record<AnimationType, AnimationConfig> = {
-    fade: { type: 'fade', delay: 0, duration: 300, easing: 'cubicInOut' },
-    fly: { type: 'fly', delay: 0, duration: 300, easing: 'cubicInOut', y: -20, x: 0 },
-    slide: { type: 'slide', delay: 0, duration: 300, easing: 'cubicInOut', axis: 'y' },
-    scale: { type: 'scale', delay: 0, duration: 300, easing: 'cubicInOut', start: 0 },
-    blur: { type: 'blur', delay: 0, duration: 300, easing: 'cubicInOut', amount: 5 },
+    fade: { type: 'fade', delay: 0, duration: 500, easing: 'cubicInOut' },
+    fly: { type: 'fly', delay: 0, duration: 500, easing: 'cubicInOut', y: -20, x: 0 },
+    slide: { type: 'slide', delay: 0, duration: 500, easing: 'cubicInOut', axis: 'y' },
+    scale: { type: 'scale', delay: 0, duration: 500, easing: 'cubicInOut', start: 0 },
+    blur: { type: 'blur', delay: 0, duration: 500, easing: 'cubicInOut', amount: 5 },
 }
 
 export const commonParams = ['delay', 'duration', 'easing'];

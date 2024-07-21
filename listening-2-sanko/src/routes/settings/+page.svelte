@@ -6,76 +6,11 @@
 	import { browser } from "$app/environment";
 	import { alertConfig, messageTemplate } from "$lib/stores";
 	import { fade, fly, slide, scale, draw, blur } from "svelte/transition";
-	import {
-		linear,
-		backIn,
-		backOut,
-		backInOut,
-		bounceIn,
-		bounceOut,
-		bounceInOut,
-		circIn,
-		circOut,
-		circInOut,
-		cubicIn,
-		cubicOut,
-		cubicInOut,
-		elasticIn,
-		elasticOut,
-		elasticInOut,
-		expoIn,
-		expoOut,
-		expoInOut,
-		quadIn,
-		quadOut,
-		quadInOut,
-		quartIn,
-		quartOut,
-		quartInOut,
-		quintIn,
-		quintOut,
-		quintInOut,
-		sineIn,
-		sineOut,
-		sineInOut,
-	} from "svelte/easing";
 	import AnimationControls from "$lib/components/AnimationControls.svelte";
-
-	interface AnimationConfig {
-		type: keyof typeof animationFunctions;
-		duration: number;
-		delay?: number;
-		easing: keyof typeof easingFunctions;
-		[key: string]: any;
-	}
+	import { inConfig, outConfig } from "$lib/animations/stores";
+	import * as easings from "svelte/easing";
 
 	type Placeholder = "{sender}" | "{amount}" | "{gift}";
-
-	const animationParams = {
-		blur: ["amount", "opacity"],
-		fade: [],
-		fly: ["x", "y", "opacity"],
-		scale: ["start", "opacity"],
-		slide: ["axis"],
-	};
-
-	const commonParams = ["delay", "duration", "easing"];
-
-	const inProps = writable({
-		type: "fade",
-		delay: 0,
-		duration: 1000,
-		easing: "cubicInOut",
-		y: 1000,
-	});
-
-	const outProps = writable({
-		type: "fade",
-		delay: 0,
-		duration: 1000,
-		easing: "cubicInOut",
-		y: 1000,
-	});
 
 	let alertName = "";
 	let alertActive = true;
@@ -152,14 +87,8 @@
 
 	let currentBackgroundColor = "#000000";
 
-	let imageExists = false;
-
-	let showAdvanced = false;
-
 	let showImgUploadControls = false;
 	let showAudioUploadControls = false;
-	let showFonts = false;
-	let showWeights = false;
 	let showTemplateInfo = false;
 	let showBackgroundColorInfo = false;
 	let message: string;
@@ -189,161 +118,6 @@
 		"cursive",
 		"fantasy",
 	];
-	let selectedBaseAnimationIn = "fade";
-	let selectedBaseAnimationOut = "fade";
-
-	let selectedAnimationIn = "fade in";
-	let selectedAnimationOut = "fade out";
-	let selectedTextAnimation = "bounce";
-	let durationIn = 1000;
-	let durationOut = 1000;
-	let xIn = 0;
-	let yIn = 1000;
-	let xOut = 0;
-	let yOut = 1000;
-	let easingIn = "cubicInOut";
-	let easingOut = "cubicInOut";
-
-	const animationsIn = [
-		"fade in",
-		"fly up",
-		"fly down",
-		"scale",
-		"slide",
-		"draw",
-		"blur",
-	];
-	const animationsOut = [
-		"fade out",
-		"fly up",
-		"fly down",
-		"scale",
-		"slide",
-		"draw",
-		"blur",
-	];
-	const textAnimations = ["pulse", "ping", "bounce", "spin"];
-
-	const baseAnimations = ["fade", "fly", "slide", "scale", "draw", "blur"];
-
-	const easingFunctionsString = [
-		"linear",
-		"backIn",
-		"backOut",
-		"backInOut",
-		"bounceIn",
-		"bounceOut",
-		"bounceInOut",
-		"circIn",
-		"circOut",
-		"circInOut",
-		"cubicIn",
-		"cubicOut",
-		"cubicInOut",
-		"elasticIn",
-		"elasticOut",
-		"elasticInOut",
-		"expoIn",
-		"expoOut",
-		"expoInOut",
-		"quadIn",
-		"quadOut",
-		"quadInOut",
-		"quartIn",
-		"quartOut",
-		"quartInOut",
-		"quintIn",
-		"quintOut",
-		"quintInOut",
-		"sineIn",
-		"sineOut",
-		"sineInOut",
-	];
-
-	const animationFunctions = {
-		fade,
-		fly,
-		slide,
-		scale,
-		draw,
-		blur,
-	};
-
-	const easingFunctions = {
-		linear,
-		backIn,
-		backOut,
-		backInOut,
-		bounceIn,
-		bounceOut,
-		bounceInOut,
-		circIn,
-		circOut,
-		circInOut,
-		cubicIn,
-		cubicOut,
-		cubicInOut,
-		elasticIn,
-		elasticOut,
-		elasticInOut,
-		expoIn,
-		expoOut,
-		expoInOut,
-		quadIn,
-		quadOut,
-		quadInOut,
-		quartIn,
-		quartOut,
-		quartInOut,
-		quintIn,
-		quintOut,
-		quintInOut,
-		sineIn,
-		sineOut,
-		sineInOut,
-	};
-
-	function getAnimationProps(config: AnimationConfig) {
-		const { type, duration, delay, easing, ...rest } = config;
-		const baseProps = { duration, delay, easing: easingFunctions[easing] };
-
-		switch (type) {
-			case "fly":
-				return { ...baseProps, x: rest.x || 0, y: rest.y || 0 };
-			case "slide":
-				return { ...baseProps, axis: rest.axis || "y" };
-			case "scale":
-				return {
-					...baseProps,
-					start: rest.start || 0,
-					opacity: rest.opacity || 0,
-				};
-			case "draw":
-				return { ...baseProps, speed: rest.speed || 1 };
-			case "blur":
-				return { ...baseProps, amount: rest.amount || 5 };
-			default:
-				return baseProps;
-		}
-	}
-
-	function applyAnimation(node: HTMLElement, props: any) {
-		const { type, ...params } = props;
-		switch (type) {
-			case "blur":
-				return blur(node, params);
-			case "fade":
-				return fade(node, params);
-			case "fly":
-				return fly(node, params);
-			case "scale":
-				return scale(node, params);
-			case "slide":
-				return slide(node, params);
-			default:
-				return {};
-		}
-	}
 
 	let selectedFont = "coolfont-pix-outlined";
 	let selectedWeight = "normal";
@@ -412,6 +186,28 @@
 		"Zyn",
 	];
 
+	function applyAnimation(node: HTMLElement, props: any) {
+		const { type, easing: easingName, ...params } = props;
+		const easing =
+			typeof easingName === "string"
+				? easings[easingName as keyof typeof easings] || easings.linear
+				: easingName;
+		switch (type) {
+			case "blur":
+				return blur(node, { ...params, easing });
+			case "fade":
+				return fade(node, { ...params, easing });
+			case "fly":
+				return fly(node, { ...params, easing });
+			case "scale":
+				return scale(node, { ...params, easing });
+			case "slide":
+				return slide(node, { ...params, easing });
+			default:
+				return {};
+		}
+	}
+
 	function handleRemoveCurrentMedia() {
 		currentMediaSrc = null;
 	}
@@ -443,66 +239,6 @@
 		selectedTrigger = trigger;
 		console.log("set trigger: ", trigger);
 		alertConfig.update((s) => ({ ...s, eventTrigger: trigger }));
-	}
-
-	function setAnimationIn(animation: string) {
-		selectedAnimationIn = animation;
-		console.log("set animation in: ", animation);
-		alertConfig.update((s) => ({ ...s, animationIn: animation }));
-	}
-
-	function setAnimationOut(animation: string) {
-		selectedAnimationOut = animation;
-		console.log("set animation out: ", animation);
-		alertConfig.update((s) => ({ ...s, animationOut: animation }));
-	}
-
-	function setTextAnimation(animation: string) {
-		selectedTextAnimation = animation;
-		console.log("set text animation: ", animation);
-		alertConfig.update((s) => ({ ...s, textAnimation: animation }));
-	}
-
-	function handleAnimationChange(
-		props: typeof inProps | typeof outProps,
-		event: Event,
-	) {
-		const target = event.target as HTMLSelectElement;
-		if (target) {
-			props.update((currentProps) => ({
-				...currentProps,
-				type: target.value,
-			}));
-		}
-	}
-
-	function updateAnimationProp(
-		props: typeof inProps | typeof outProps,
-		prop: string,
-		event: Event,
-	) {
-		const target = event.target as HTMLInputElement | HTMLSelectElement;
-		if (target) {
-			props.update((currentProps) => ({
-				...currentProps,
-				[prop]: target.type === "number" ? +target.value : target.value,
-			}));
-		}
-	}
-
-	function updateAnimationInProp(prop: string, value: any) {
-		inProps.update((props) => ({ ...props, [prop]: value }));
-	}
-
-	function updateAnimationOutProp(prop: string, value: any) {
-		outProps.update((props) => ({ ...props, [prop]: value }));
-	}
-
-	function handleTextAnimationChange(event: Event) {
-		const target = event.target as HTMLSelectElement;
-		if (target) {
-			setTextAnimation(target.value);
-		}
 	}
 
 	function handleFontChange(event: Event) {
@@ -758,6 +494,9 @@
 	}
 
 	function handleDonationPreview() {
+		console.log("animation props");
+		console.log("IN: ", $inConfig);
+		console.log("OUT: ", $outConfig);
 		// play /sounds/notification.mp3
 		if (!isPreviewPlaying) {
 			isPreviewPlaying = true;
@@ -798,8 +537,8 @@
 
 			{#if isPreviewPlaying}
 				<div
-					in:applyAnimation={$inProps}
-					out:applyAnimation={$outProps}
+					in:applyAnimation={$inConfig}
+					out:applyAnimation={$outConfig}
 					bind:this={previewContent}
 					class:layout-imageAboveText={layoutSelection ===
 						"imageAboveText"}

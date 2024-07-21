@@ -1,20 +1,7 @@
 import { writable } from 'svelte/store';
-import type { AnimationProps } from './types.ts';
+import type { AnimationConfig } from './types.ts';
+import { defaultConfigs } from './constants.ts';
 
-export const inProps = writable<AnimationProps>({
-    type: 'fly',
-    delay: 0,
-    duration: 1000,
-    easing: 'cubicInOut',
-    y: 1000,
-})
-
-export const outProps = writable<AnimationProps>({
-    type: 'fly',
-    delay: 0,
-    duration: 1000,
-    easing: 'cubicInOut',
-    y: 1000,
-})
-
+export const inConfig = writable<AnimationConfig>(defaultConfigs.fade);
+export const outConfig = writable<AnimationConfig>(defaultConfigs.fade);
 

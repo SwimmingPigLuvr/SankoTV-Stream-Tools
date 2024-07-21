@@ -69,3 +69,15 @@ donations
     add sections
         sounds
         animations
+
+
+
+
+july 21
+
+axis needs to be x or y
+easing selection makes correct change but value does not reflect in ui
+duration number is weird to edit. can't type in 1000. 
+    because the 0 just sits there so i end up having to do 
+    01000
+    also can't input negative numbers but i can just hold the down arrow and lower the number 1 by 1
