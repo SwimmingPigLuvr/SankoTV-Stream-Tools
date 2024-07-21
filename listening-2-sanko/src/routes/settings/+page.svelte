@@ -1,6 +1,8 @@
 <!-- src/routes/settings/+page.svelte -->
 <script lang="ts">
+	import type { AnimationProps } from "$lib/types";
 	import { onMount } from "svelte";
+	import { writable } from "svelte/store";
 	import { browser } from "$app/environment";
 	import { alertConfig, messageTemplate } from "$lib/stores";
 	import { fade, fly, slide, scale, draw, blur } from "svelte/transition";
@@ -37,6 +39,7 @@
 		sineOut,
 		sineInOut,
 	} from "svelte/easing";
+	import AnimationControls from "$lib/components/AnimationControls.svelte";
 
 	interface AnimationConfig {
 		type: keyof typeof animationFunctions;
@@ -45,6 +48,34 @@
 		easing: keyof typeof easingFunctions;
 		[key: string]: any;
 	}
+
+	type Placeholder = "{sender}" | "{amount}" | "{gift}";
+
+	const animationParams = {
+		blur: ["amount", "opacity"],
+		fade: [],
+		fly: ["x", "y", "opacity"],
+		scale: ["start", "opacity"],
+		slide: ["axis"],
+	};
+
+	const commonParams = ["delay", "duration", "easing"];
+
+	const inProps = writable({
+		type: "fade",
+		delay: 0,
+		duration: 1000,
+		easing: "cubicInOut",
+		y: 1000,
+	});
+
+	const outProps = writable({
+		type: "fade",
+		delay: 0,
+		duration: 1000,
+		easing: "cubicInOut",
+		y: 1000,
+	});
 
 	let alertName = "";
 	let alertActive = true;
@@ -123,6 +154,8 @@
 
 	let imageExists = false;
 
+	let showAdvanced = false;
+
 	let showImgUploadControls = false;
 	let showAudioUploadControls = false;
 	let showFonts = false;
@@ -132,12 +165,13 @@
 	let message: string;
 	let muted = false;
 
-	let fontSize = 34;
+	let fontSize = 32;
 	let letterSpacing = 0;
 
 	let alertDuration = 4;
 
-	let specificDonationAmount = 5;
+	let specificDonationAmount: number | null = null;
+	let specificGift: string | null = null;
 
 	const fonts = [
 		"amsterdam",
@@ -155,9 +189,12 @@
 		"cursive",
 		"fantasy",
 	];
+	let selectedBaseAnimationIn = "fade";
+	let selectedBaseAnimationOut = "fade";
 
-	let selectedAnimationIn = "fly up";
-	let selectedAnimationOut = "fly down";
+	let selectedAnimationIn = "fade in";
+	let selectedAnimationOut = "fade out";
+	let selectedTextAnimation = "bounce";
 	let durationIn = 1000;
 	let durationOut = 1000;
 	let xIn = 0;
@@ -184,6 +221,43 @@
 		"slide",
 		"draw",
 		"blur",
+	];
+	const textAnimations = ["pulse", "ping", "bounce", "spin"];
+
+	const baseAnimations = ["fade", "fly", "slide", "scale", "draw", "blur"];
+
+	const easingFunctionsString = [
+		"linear",
+		"backIn",
+		"backOut",
+		"backInOut",
+		"bounceIn",
+		"bounceOut",
+		"bounceInOut",
+		"circIn",
+		"circOut",
+		"circInOut",
+		"cubicIn",
+		"cubicOut",
+		"cubicInOut",
+		"elasticIn",
+		"elasticOut",
+		"elasticInOut",
+		"expoIn",
+		"expoOut",
+		"expoInOut",
+		"quadIn",
+		"quadOut",
+		"quadInOut",
+		"quartIn",
+		"quartOut",
+		"quartInOut",
+		"quintIn",
+		"quintOut",
+		"quintInOut",
+		"sineIn",
+		"sineOut",
+		"sineInOut",
 	];
 
 	const animationFunctions = {
@@ -253,23 +327,32 @@
 		}
 	}
 
-	function applyAnimation(node: HTMLElement, config: AnimationConfig) {
-		const animationFunction = animationFunctions[config.type];
-		if (!animationFunction) {
-			console.error(`Animation type "${config.type}" not found`);
-			return;
+	function applyAnimation(node: HTMLElement, props: any) {
+		const { type, ...params } = props;
+		switch (type) {
+			case "blur":
+				return blur(node, params);
+			case "fade":
+				return fade(node, params);
+			case "fly":
+				return fly(node, params);
+			case "scale":
+				return scale(node, params);
+			case "slide":
+				return slide(node, params);
+			default:
+				return {};
 		}
-
-		const props = getAnimationProps(config);
-		return animationFunction(node, props);
 	}
 
-	export { applyAnimation, AnimationConfig };
-
-	let selectedFont = fonts[1];
+	let selectedFont = "coolfont-pix-outlined";
 	let selectedWeight = "normal";
 	let selectedTextTransform = "none";
 	let selectedTrigger = "donation";
+
+	$: if (selectedTrigger !== "specificgift") {
+		specificGift = null;
+	}
 
 	const fontWeights = [
 		"thin",
@@ -344,6 +427,11 @@
 		specificDonationAmount;
 	}
 
+	function handleSpecificGiftChoice() {
+		// do something with the specific gift
+		specificGift;
+	}
+
 	function handleTriggerChange(event: Event) {
 		const target = event.target as HTMLSelectElement;
 		if (target) {
@@ -369,17 +457,51 @@
 		alertConfig.update((s) => ({ ...s, animationOut: animation }));
 	}
 
-	function handleAnimationInChange(event: Event) {
+	function setTextAnimation(animation: string) {
+		selectedTextAnimation = animation;
+		console.log("set text animation: ", animation);
+		alertConfig.update((s) => ({ ...s, textAnimation: animation }));
+	}
+
+	function handleAnimationChange(
+		props: typeof inProps | typeof outProps,
+		event: Event,
+	) {
 		const target = event.target as HTMLSelectElement;
 		if (target) {
-			setAnimationIn(target.value);
+			props.update((currentProps) => ({
+				...currentProps,
+				type: target.value,
+			}));
 		}
 	}
 
-	function handleAnimationOutChange(event: Event) {
+	function updateAnimationProp(
+		props: typeof inProps | typeof outProps,
+		prop: string,
+		event: Event,
+	) {
+		const target = event.target as HTMLInputElement | HTMLSelectElement;
+		if (target) {
+			props.update((currentProps) => ({
+				...currentProps,
+				[prop]: target.type === "number" ? +target.value : target.value,
+			}));
+		}
+	}
+
+	function updateAnimationInProp(prop: string, value: any) {
+		inProps.update((props) => ({ ...props, [prop]: value }));
+	}
+
+	function updateAnimationOutProp(prop: string, value: any) {
+		outProps.update((props) => ({ ...props, [prop]: value }));
+	}
+
+	function handleTextAnimationChange(event: Event) {
 		const target = event.target as HTMLSelectElement;
 		if (target) {
-			setAnimationOut(target.value);
+			setTextAnimation(target.value);
 		}
 	}
 
@@ -609,22 +731,28 @@
 	} {
 		const sender = getRandomSender();
 		const amount = getRandomAmount();
-		const gift = getRandomGift();
+		let gift;
+		if (specificGift) {
+			gift = specificGift;
+		} else {
+			gift = getRandomGift();
+		}
 
-		const placeholders = {
+		const placeholders: Record<Placeholder, string> = {
 			"{sender}": sender,
 			"{amount}": amount.toString(),
 			"{gift}": formatPluralities(amount, gift),
 		};
 
-		const parts = template
-			.split(/(\{sender\}|\{amount\}|\{gift\})/g)
-			.map((part) => {
-				if (part in placeholders) {
-					return { text: placeholders[part], highlight: true };
-				}
-				return { text: part, highlight: false };
-			});
+		const parts = template.split(/({\w+})/g).map((part) => {
+			if (part in placeholders) {
+				return {
+					text: placeholders[part as Placeholder],
+					highlight: true,
+				};
+			}
+			return { text: part, highlight: false };
+		});
 
 		return { parts };
 	}
@@ -670,7 +798,8 @@
 
 			{#if isPreviewPlaying}
 				<div
-					in:fly={{ y: 1000, duration: 1000 }}
+					in:applyAnimation={$inProps}
+					out:applyAnimation={$outProps}
 					bind:this={previewContent}
 					class:layout-imageAboveText={layoutSelection ===
 						"imageAboveText"}
@@ -683,16 +812,30 @@
 				>
 					{#if layoutSelection === "textOverImage"}
 						<img src={currentMediaSrc} alt="" />
-						<div class="text">
+						<div class="text" style="white-space: nowrap;">
 							{#each generateRandomMessage($messageTemplate).parts as part}
-								<span style="color: {part.highlight ? $alertConfig.highlightColor : $alertConfig.textColor};">
+								<span
+									style="color: {part.highlight
+										? $alertConfig.highlightColor
+										: $alertConfig.textColor};"
+								>
 									{part.text}
 								</span>
 							{/each}
 						</div>
 					{:else}
 						<img src={currentMediaSrc} alt="" />
-						{generateRandomMessage($messageTemplate)}
+						<div style="white-space: nowrap;">
+							{#each generateRandomMessage($messageTemplate).parts as part}
+								<span
+									style="color: {part.highlight
+										? $alertConfig.highlightColor
+										: $alertConfig.textColor};"
+								>
+									{part.text}
+								</span>
+							{/each}
+						</div>
 					{/if}
 				</div>
 			{/if}
@@ -708,9 +851,20 @@
 								(showBackgroundColorInfo = true)}
 							on:mouseleave={() =>
 								(showBackgroundColorInfo = false)}
-							class="hover:bg-slate-400 hover:text-slate-900 rounded-full bg-slate-600 text-slate-400 w-4 h-4 text-xs"
-							>i</button
-						>
+							class="relative hover:bg-slate-400 hover:text-slate-900 rounded-full bg-slate-600 text-slate-400 w-4 h-4 text-xs"
+							>i
+							{#if showBackgroundColorInfo}
+								<div
+									in:fly={{ y: 10 }}
+									class="absolute -top-36 -left-20 text-left w-48 z-20 p-3 bg-slate-300 text-slate-600"
+								>
+									This will not effect the background color of
+									the alert. This is just for preview
+									purposes. For best results set background
+									color to match your stream.
+								</div>
+							{/if}
+						</button>
 					</div>
 					<input
 						name="color"
@@ -802,6 +956,25 @@
 					>
 				</select>
 			</div>
+
+			{#if selectedTrigger === "specificgift"}
+				<!-- specific gift -->
+				<!-- reverse this -->
+				<div class="flex flex-col space-y-2">
+					<label for="gift">Gift</label>
+					<select
+						class="custom-dropdown p-4 bg-slate-800"
+						name="gift"
+						id="gift"
+						bind:value={specificGift}
+						on:change={handleSpecificGiftChoice}
+					>
+						{#each gifts as gift}
+							<option value={gift}>{gift}</option>
+						{/each}
+					</select>
+				</div>
+			{/if}
 
 			{#if selectedTrigger === "atleast" || selectedTrigger === "exactamount"}
 				<!-- donation amount -->
@@ -999,45 +1172,10 @@
 					step="1"
 				/>
 			</div>
+		</div>
 
-			<!-- animation -->
-			<div class="flex flex-col space-y-2">
-				<label for="animation">Animation</label>
-
-				<div id="animation" class="flex space-x-2">
-					<!-- Animation in -->
-					<div class="flex flex-col space-y-2 w-1/3">
-						<label for="animationin">In</label>
-						<select
-							class="custom-dropdown p-4 bg-slate-800"
-							name="animationin"
-							id="animationin"
-							bind:value={selectedAnimationIn}
-							on:change={handleAnimationInChange}
-						>
-							{#each animationsIn as animation}
-								<option value={animation}>{animation}</option>
-							{/each}
-						</select>
-					</div>
-
-					<!-- Animation out -->
-					<div class="flex flex-col space-y-2 w-1/3">
-						<label for="animationout">Out</label>
-						<select
-							class="custom-dropdown p-4 bg-slate-800"
-							name="animationout"
-							id="animationout"
-							bind:value={selectedAnimationOut}
-							on:change={handleAnimationOutChange}
-						>
-							{#each animationsOut as animation}
-								<option value={animation}>{animation}</option>
-							{/each}
-						</select>
-					</div>
-				</div>
-			</div>
+		<div class="alert-grid-container">
+			<AnimationControls />
 		</div>
 
 		<!-- font settings -->

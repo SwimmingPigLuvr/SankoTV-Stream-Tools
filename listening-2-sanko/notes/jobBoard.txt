@@ -8,6 +8,7 @@ create front end for users
       chat
       tts
 
+    complete ui
     wallet auth
     db holds user settings
     landing page
@@ -27,3 +28,4 @@ todo:
   drag and drop videos/ animations
 
 
+pop sound on chat

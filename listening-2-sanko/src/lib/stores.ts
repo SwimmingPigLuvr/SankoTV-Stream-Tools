@@ -6,6 +6,7 @@ export interface AlertConfig {
     alertVolume: number;
     animationIn: string;
     animationOut: string;
+    textAnimation: string;
     borderRadius: string;
     eventTrigger: string,
     specificAmount: number;
@@ -24,14 +25,15 @@ const defaultAlertConfig: AlertConfig = {
     alertVolume: 50, // 50%
     animationIn: "fade in",
     animationOut: "fade out",
+    textAnimation: "bounce",
     borderRadius: "0px",
     eventTrigger: "donation",
     specificAmount: 5,
-    fontFamily: "sans-serif",
-    fontSize: "1rem",
+    fontFamily: "coolfont-pix-outlined",
+    fontSize: "32px",
     fontWeight: "900",
-    textColor: "#32CD32",
-    highlightColor: "#000000",
+    textColor: "#FFFFFF",
+    highlightColor: "#32CD32",
     textTransform: "lowercase",
     letterSpacing: "-0.05em",
     textShadow: "none",
