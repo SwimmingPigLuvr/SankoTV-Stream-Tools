@@ -29,6 +29,31 @@
 }
 
 @font-face {
+    font-family: 'Coolfont-Cloud';
+    src: url('/fonts/COOLFONT-Cloud.otf') format('opentype');
+}
+
+@font-face {
+    font-family: 'Coolfont-Distorted';
+    src: url('/fonts/COOLFONT-Distorted.otf') format('opentype');
+}
+
+@font-face {
+    font-family: 'Coolfont-Fire';
+    src: url('/fonts/COOLFONT-Fire.otf') format('opentype');
+}
+
+@font-face {
+    font-family: 'Coolfont-Fluid';
+    src: url('/fonts/COOLFONT-Fluid.otf') format('opentype');
+}
+
+@font-face {
+    font-family: 'Coolfont-Goop';
+    src: url('/fonts/COOLFONT-Goop.otf') format('opentype');
+}
+
+@font-face {
     font-family: 'Coolfont-Pixel';
     src: url('/fonts/COOLFONT-Pixel.otf') format('opentype');
 }
@@ -36,6 +61,26 @@
 @font-face {
     font-family: 'Coolfont-Pix-Outlined';
     src: url('/fonts/COOLFONT-Pix-Outlined.otf') format('opentype');
+}
+
+@font-face {
+    font-family: 'Coolfont-Rough-Outlined';
+    src: url('/fonts/COOLFONT-Rough-Outlined.otf') format('opentype');
+}
+
+@font-face {
+    font-family: 'Coolfont-Simplified';
+    src: url('/fonts/COOLFONT-Simplified.otf') format('opentype');
+}
+
+@font-face {
+    font-family: 'Coolfont-Sketch';
+    src: url('/fonts/COOLFONT-Sketch.otf') format('opentype');
+}
+
+@font-face {
+    font-family: 'Coolfont-Structured';
+    src: url('/fonts/COOLFONT-Structured.otf') format('opentype');
 }
 
 @font-face {

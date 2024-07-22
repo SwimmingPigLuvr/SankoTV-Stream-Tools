@@ -9,6 +9,7 @@
     } from "../animations/constants";
     import * as easings from "svelte/easing";
     import { inConfig, outConfig } from "$lib/animations/stores";
+    import type { EasingFunction } from "svelte/transition";
 
     let showAdvanced = false;
 
@@ -32,8 +33,9 @@
         updates: Partial<AnimationConfig>,
     ) {
         config.update((curr) => {
+            console.log("Current config:", curr);
             // start with default config
-            let newConfig = { ...defaultConfigs[updates.type || curr.type] };
+            let newConfig = { ...curr };
 
             // apply updates
             newConfig = { ...newConfig, ...updates };
@@ -45,12 +47,19 @@
                     easings.linear;
             }
 
-            console.log("Current config:", curr);
             console.log("Updates to apply:", updates);
             console.log("New config:", newConfig); // Log new config after updates
 
             return newConfig;
         });
+    }
+
+    function getEasingName(easingFunction: EasingFunction) {
+        return (
+            Object.entries(easings).find(
+                ([, func]) => func === easingFunction,
+            )?.[0] || "linear"
+        );
     }
 
     function handleInputChange(
@@ -59,7 +68,14 @@
         event: Event,
     ) {
         const target = event.target as HTMLInputElement | HTMLSelectElement;
-        const value = target.type === "number" ? +target.value : target.value;
+        let value: string | number | EasingFunction = target.value;
+
+        if (param === "easing") {
+            value = easings[value as keyof typeof easings] || easings.linear;
+        } else if (target.type === "number") {
+            value = +value;
+        }
+
         updateConfig(config, { [param]: value });
     }
 
@@ -105,6 +121,9 @@
         "slide out up": { ...defaultConfigs.slide, y: -100 },
         "slide out down": { ...defaultConfigs.slide, y: 100 },
     };
+
+    $: currentInEasing = getEasingName($inConfig.easing as EasingFunction);
+    $: currentOutEasing = getEasingName($inConfig.easing as EasingFunction);
 </script>
 
 <div class="flex flex-col space-y-2">
@@ -142,7 +161,7 @@
                         <select
                             id={`in-${param}`}
                             class="custom-dropdown p-4 bg-slate-800"
-                            bind:value={$inConfig[param]}
+                            bind:value={currentInEasing}
                             on:change={(e) =>
                                 handleInputChange(inConfig, param, e)}
                         >
@@ -211,7 +230,7 @@
                         <select
                             class="custom-dropdown p-4 bg-slate-800"
                             id={`out-${param}`}
-                            bind:value={$outConfig[param]}
+                            bind:value={currentOutEasing}
                             on:change={(e) =>
                                 handleInputChange(outConfig, param, e)}
                         >

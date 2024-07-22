@@ -91,6 +91,7 @@
 	let showAudioUploadControls = false;
 	let showTemplateInfo = false;
 	let showBackgroundColorInfo = false;
+	let showWeightInfo = false;
 	let message: string;
 	let muted = false;
 
@@ -108,8 +109,17 @@
 		"anthem",
 		"cinema",
 		"coolfont",
+		"coolfont-cloud",
+		"coolfont-distorted",
+		"coolfont-fire",
+		"coolfont-fluid",
+		"coolfont-goop",
 		"coolfont-pixel",
 		"coolfont-pix-outlined",
+		"coolfont-rough-outlined",
+		"coolfont-simplified",
+		"coolfont-sketch",
+		"coolfont-structured",
 		"coolfont-trippy",
 		"sunny",
 		"sans-serif",
@@ -119,7 +129,7 @@
 		"fantasy",
 	];
 
-	let selectedFont = "coolfont-pix-outlined";
+	let selectedFont = "coolfont-trippy";
 	let selectedWeight = "normal";
 	let selectedTextTransform = "none";
 	let selectedTrigger = "donation";
@@ -595,7 +605,7 @@
 							{#if showBackgroundColorInfo}
 								<div
 									in:fly={{ y: 10 }}
-									class="absolute -top-36 -left-20 text-left w-48 z-20 p-3 bg-slate-300 text-slate-600"
+									class="absolute -top-40 -left-20 text-left w-48 z-20 p-3 bg-slate-300 text-slate-600"
 								>
 									This will not effect the background color of
 									the alert. This is just for preview
@@ -801,10 +811,21 @@
 				<div class="flex space-x-6 items-center">
 					<label for="template">Message Template</label>
 					<button
-						on:click={() => (showTemplateInfo = true)}
-						class="hover:bg-slate-400 hover:text-slate-900 rounded-full bg-slate-600 text-slate-400 w-4 h-4 text-xs"
-						>i</button
-					>
+						on:mouseenter={() => (showTemplateInfo = true)}
+						on:mouseleave={() => (showTemplateInfo = false)}
+						class="relative hover:bg-slate-400 hover:text-slate-900 rounded-full bg-slate-600 text-slate-400 w-4 h-4 text-xs"
+						>i
+						{#if showTemplateInfo}
+							<div
+								in:fly={{ y: 10 }}
+								class="absolute -top-40 -left-20 text-left w-48 z-20 p-3 bg-slate-300 text-slate-600"
+							>
+								Format your message with three possible
+								variables:
+								<p>sender, amount, & gift.</p>
+							</div>
+						{/if}
+					</button>
 				</div>
 
 				<!-- delete after we write this input correctly -->
@@ -960,7 +981,23 @@
 
 			<!-- weight -->
 			<div class="flex flex-col space-y-2">
-				<label for="fontweight">Weight</label>
+				<div class="space-x-2">
+					<label for="fontweight">Weight</label>
+					<button
+						on:mouseenter={() => (showWeightInfo = true)}
+						on:mouseleave={() => (showWeightInfo = false)}
+						class="relative hover:bg-slate-400 hover:text-slate-900 rounded-full bg-slate-600 text-slate-400 w-4 h-4 text-xs"
+						>i
+						{#if showWeightInfo}
+							<div
+								in:fly={{ y: 10 }}
+								class="absolute -top-20 -left-20 text-left w-48 z-20 p-3 bg-slate-300 text-slate-600"
+							>
+								Some fonts do not have variable weights
+							</div>
+						{/if}
+					</button>
+				</div>
 				<select
 					class="custom-dropdown p-4 bg-slate-800"
 					name="font"

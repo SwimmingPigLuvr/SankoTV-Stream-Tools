@@ -23,18 +23,18 @@ export interface AlertConfig {
 const defaultAlertConfig: AlertConfig = {
     alertDuration: 8, // 8s
     alertVolume: 50, // 50%
-    animationIn: "fade in",
+    animationIn: "fly in up",
     animationOut: "fade out",
     textAnimation: "bounce",
     borderRadius: "0px",
     eventTrigger: "donation",
     specificAmount: 5,
-    fontFamily: "coolfont-pix-outlined",
+    fontFamily: "coolfont-trippy",
     fontSize: "32px",
-    fontWeight: "900",
+    fontWeight: "400",
     textColor: "#FFFFFF",
     highlightColor: "#32CD32",
-    textTransform: "lowercase",
+    textTransform: "uppercase",
     letterSpacing: "-0.05em",
     textShadow: "none",
 };

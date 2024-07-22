@@ -81,3 +81,8 @@ duration number is weird to edit. can't type in 1000.
     because the 0 just sits there so i end up having to do 
     01000
     also can't input negative numbers but i can just hold the down arrow and lower the number 1 by 1
+
+july 22
+
+changing 1 param sets the rest of the params to the default values
+    there should be an easily fixable error in the update function
