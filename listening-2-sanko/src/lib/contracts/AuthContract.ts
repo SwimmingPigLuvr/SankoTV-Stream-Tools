@@ -12,4 +12,4 @@ export const AUTH_CONTRACT_ABI = [
     "function accessStreamingTools() public view returns (bool)"
 ];
 
-export const AUTH_CONTRACT_ADDRESS = "YOUR_DEPLOYED_CONTRACT_ADDRESS_HERE";
+export const AUTH_CONTRACT_ADDRESS = "0xF5bF55CF8da13e9a97B04048989ada6163b2E2A1";

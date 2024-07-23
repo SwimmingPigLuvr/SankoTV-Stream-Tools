@@ -14,13 +14,4 @@ contract AuthContract {
     function isAuthenticated(address user) public view returns (bool) {
         return authenticatedUsers[user];
     }
-
-    modifier onlyAuthenticated() {
-        require(authenticatedUsers[msg.sender], "Not authenticated");
-        _;
-    }
-
-
-
-
 }

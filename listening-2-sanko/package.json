@@ -7,8 +7,8 @@
 		"build": "vite build",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"chat-listener": "node sanko-chat-listener.js",
-		"dev:all": "concurrently \"npm run dev\" \"node sanko-chat-listener.js\"",
+		"dev:chat": "node scripts/sanko-chat-listener.js",
+		"dev:all": "concurrently \"npm run dev\" \"npm run dev:chat\"",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
 	},
 	"devDependencies": {
@@ -31,6 +31,8 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@web3modal/ethereum": "^2.7.1",
+		"@web3modal/html": "^2.7.1",
 		"node-fetch": "^3.3.2",
 		"ws": "^8.18.0"
 	}
