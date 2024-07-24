@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { browser } from "$app/environment";
     import { walletStore } from "$lib/contracts/walletStores";
     import { onMount } from "svelte";
 
@@ -7,7 +8,9 @@
     let error = "";
 
     onMount(() => {
-        checkConnection();
+        if (browser) {
+            checkConnection();
+        }
     });
 
     async function checkConnection() {
@@ -47,23 +50,25 @@
     }
 </script>
 
-{#if $walletStore.address}
-    <p>Connected: {$walletStore.address}</p>
-    {#if $walletStore.isAuthenticated}
-        <p>Authenticated</p>
+{#if browser}
+    {#if $walletStore.address}
+        <p>Connected: {$walletStore.address}</p>
+        {#if $walletStore.isAuthenticated}
+            <p>Authenticated</p>
+        {:else}
+            <button on:click={authenticateWallet} disabled={isAuthenticating}>
+                {isAuthenticating ? "Authenticating..." : "Authenticate"}
+            </button>
+        {/if}
     {:else}
-        <button on:click={authenticateWallet} disabled={isAuthenticating}>
-            {isAuthenticating ? "Authenticating..." : "Authenticate"}
+        <button on:click={connectWallet} disabled={isConnecting}>
+            {isConnecting ? "Connecting..." : "Connect Wallet"}
         </button>
     {/if}
-{:else}
-    <button on:click={connectWallet} disabled={isConnecting}>
-        {isConnecting ? "Connecting..." : "Connect Wallet"}
-    </button>
-{/if}
 
-{#if error}
-    <p class="error">{error}</p>
+    {#if error}
+        <p class="error">{error}</p>
+    {/if}
 {/if}
 
 <style>
