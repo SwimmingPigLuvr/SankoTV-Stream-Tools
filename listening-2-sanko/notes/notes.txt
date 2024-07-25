@@ -86,3 +86,37 @@ july 22
 
 changing 1 param sets the rest of the params to the default values
     there should be an easily fixable error in the update function
+
+
+july 24
+dashboard
+
+    // main sections
+    donation alerts
+    chat box
+    chat plays
+    theme library
+
+    // widgets
+    ai + text to speech
+    donation goals
+    donation lists
+    emotes
+    giveaway wheel
+    pin chat
+    top donations
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,4 +1,4 @@
-<!-- src/routes/settings/+page.svelte -->
+<!-- src/routes/donationAlerts/+page.svelte -->
 <script lang="ts">
 	import type { AnimationProps } from "$lib/types";
 	import { onMount } from "svelte";

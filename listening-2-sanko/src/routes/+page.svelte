@@ -1,16 +1,20 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 	import { walletStore } from "$lib/contracts/walletStores";
-	import { goto } from "$app/navigation";
 	import { browser } from "$app/environment";
+	import { truncateAddress } from "$lib/utils";
+	import { fly } from "svelte/transition";
+	import { isDarkMode } from "$lib/stores";
+
+	$: truncatedAddress = $walletStore.address
+		? truncateAddress($walletStore.address)
+		: "";
 
 	let isConnecting = false;
 	let error = "";
 
-	let isDarkMode = true;
-
 	function toggleDarkMode() {
-		isDarkMode = !isDarkMode;
+		isDarkMode.set(!$isDarkMode);
 	}
 
 	onMount(() => {
@@ -24,7 +28,7 @@
 			const result = await walletStore.connect();
 			if (result.success) {
 				// redirect to dashboard
-				goto("/settings");
+				// goto("/settings");
 			}
 		} catch (err) {
 			console.error("Failed to check connection:", err);
@@ -41,7 +45,7 @@
 				throw new Error(result.error || "Failed to connect wallet");
 			}
 			// redirect to dashboard
-			goto("/settings");
+			// goto("/settings");
 		} catch (err) {
 			console.error("Failed to connect wallet:", err);
 			error =
@@ -57,17 +61,17 @@
 <main>
 	<button
 		on:click={toggleDarkMode}
-		class="flex fixed top-2 left-2 p-2 hover:bg-slate-500 rounded-full"
+		class="flex fixed top-2 left-2 w-10 h-10 justify-center items-center p-2 hover:bg-slate-500 rounded-full"
 	>
-		{#if isDarkMode}
-			🌞
+		{#if $isDarkMode}
+			<p class="text-amber-300 text-3xl">☼</p>
 		{:else}
-			🌚
+			<p class="text-black">☾</p>
 		{/if}
 	</button>
 
 	<div
-		class="{isDarkMode
+		class="{$isDarkMode
 			? 'text-white'
 			: 'text-slate-800 bg-white'} items-center p-8 w-full h-screen flex flex-col justify-start"
 	>
@@ -76,7 +80,7 @@
 			<span class="text-blue-500">A</span>
 			<span class="text-lime-500">N</span>
 			<span class="text-yellow-400">K</span>
-			<span class={isDarkMode ? "text-white" : "text-slate-800"}>O</span>
+			<span class={$isDarkMode ? "text-white" : "text-slate-800"}>O</span>
 			<span class="text-lime-400 text-xl tracking-[0.1rem]">.tv</span>
 		</h2>
 
@@ -99,18 +103,33 @@
 		</div>
 
 		<!-- Wallet Connection and Authentication -->
-		<div class="m-auto flex flex-col items-center">
+		<div class="m-auto flex flex-col space-y-8 items-center">
 			{#if $walletStore.address}
-				<p>Connected to Sanko Testnet: {$walletStore.address}</p>
-				<button
-					class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-					on:click={() => walletStore.disconnect()}
+				<a
+					class="px-8 p-4 {$isDarkMode
+						? 'border-white'
+						: 'border-slate-800'} border-[1px] hover:text-lime-400 hover:bg-slate-950 rounded-full font-coolfont text-5xl"
+					href="/dashboard">Dashboard</a
 				>
-					Disconnect
-				</button>
+				<div
+					in:fly={{ y: -10 }}
+					class="rounded-full w-48 flex justify-between space-x-4 items-center {$isDarkMode
+						? 'bg-blue-700'
+						: 'bg-blue-300 text-slate-800'} px-4 p-2 font-mono text-xs -tracking-widest"
+				>
+					<button class="">
+						{truncatedAddress}
+					</button>
+					<button
+						class="font-bold"
+						on:click={() => walletStore.disconnect()}
+					>
+						Disconnect
+					</button>
+				</div>
 			{:else}
 				<button
-					class="w-48 bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-6 rounded"
+					class="bg-green-500 hover:bg-green-700 text-white font-bold p-2 px-4 rounded-full"
 					on:click={handleConnect}
 					disabled={isConnecting}
 				>
