@@ -58,7 +58,7 @@
 	<div
 		class="{$isDarkMode
 			? 'text-white'
-			: 'text-slate-800 bg-white'} items-center p-8 w-full h-screen flex flex-col justify-start"
+			: 'text-slate-800 bg-yellow-100'} items-center p-8 w-full h-screen flex flex-col justify-start"
 	>
 		<h2 class="text-3xl space-x-1 flex items-baseline font-coolfont-pixel">
 			<span class="text-red-500">S</span>
