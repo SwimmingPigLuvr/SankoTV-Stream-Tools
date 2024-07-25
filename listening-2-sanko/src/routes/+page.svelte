@@ -13,25 +13,6 @@
 	let isConnecting = false;
 	let error = "";
 
-	onMount(() => {
-		if (browser) {
-			checkConnection();
-		}
-	});
-
-	async function checkConnection() {
-		try {
-			const result = await walletStore.connect();
-			if (result.success) {
-				// redirect to dashboard
-				// goto("/settings");
-			}
-		} catch (err) {
-			console.error("Failed to check connection:", err);
-			error = "failed to check connection. please try again please.";
-		}
-	}
-
 	async function handleConnect() {
 		isConnecting = true;
 		error = "";

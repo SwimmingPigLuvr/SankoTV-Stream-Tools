@@ -56,21 +56,24 @@
 				{#each mainSections as section}
 					<button
 						on:click={() => showCurrentSection(section)}
-						class="rounded-none w-full px-4 p-2 text-left items-center justify-center hover:bg-amber-400 hover:bg-opacity-10 hover:border-amber-300 border-transparent border-2"
+						class="rounded-none w-full px-4 p-2 text-left items-center justify-center hover:bg-amber-400 hover:bg-opacity-10 hover:border-amber-300 border-transparent border-[1px]"
 					>
 						<span class="text-xl">{section}</span>
 					</button>
 					{#if activeSection === section}
 						<div
 							in:slide
-							class="px-8 flex flex-col items-start justify-start"
+							class="px-8 flex w-full flex-col items-start justify-start"
 						>
-							<button class="p-2 px-4 bg-lime-400"
-								>－create new</button
+							<a
+								href="/dashboard/donation-alerts"
+								class="w-full text-left hover:bg-amber-400 hover:bg-opacity-10 hover:border-amber-300 border-[1px] border-transparent p-2 px-4"
+								>create new</a
 							>
 							{#each sectionData as data}
-								<button class="p-2 px-4 bg-lime-400"
-									>－{data.name}</button
+								<button
+									class="w-full text-left hover:bg-amber-400 hover:bg-opacity-10 hover:border-amber-300 border-[1px] border-transparent p-2 px-4"
+									>{data.name}</button
 								>
 							{/each}
 						</div>

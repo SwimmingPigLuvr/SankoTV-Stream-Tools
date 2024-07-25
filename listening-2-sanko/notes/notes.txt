@@ -125,3 +125,19 @@ click section
 
 data or lack of data shows up
 list of saved alert names & create alert button
+
+
+notes july 25
+
+reconnect to wallet when applicable
+    put this in the layout so that it functions in the entire project
+
+when editing i need to be able to go back to the homepage
+
+so let's make a directory component that can sit on the left side of the sreen
+or on mobile it can be a modal that takes up the screen and otherwise is hidden
+keep the ui the same as the dashboard
+
+darkmode toggle can be out in the open on simple pages like the homepage but otherwise let's have it in a menu
+
+figure out how to save the users' data

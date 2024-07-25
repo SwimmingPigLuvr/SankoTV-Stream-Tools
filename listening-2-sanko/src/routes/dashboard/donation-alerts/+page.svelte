@@ -9,6 +9,7 @@
 	import AnimationControls from "$lib/components/AnimationControls.svelte";
 	import { inConfig, outConfig } from "$lib/animations/stores";
 	import * as easings from "svelte/easing";
+	import WalletAddress from "$lib/components/WalletAddress.svelte";
 
 	type Placeholder = "{sender}" | "{amount}" | "{gift}";
 
@@ -527,7 +528,9 @@
 <main
 	class="text-white w-full overflow-x-hidden bg-slate-900 font-mono p-4 pt-20"
 >
-	<div class=" alert-grid m-auto sm:text-sm text-xs">
+	<div class="absolute top-2 right-2"><WalletAddress /></div>
+
+	<div class=" alert-grid m-auto sm:text-sm text-xs max-w-[1080px]">
 		<h1
 			class="absolute top-10 font-cinema text-xl py-2 m-auto w-full text-left"
 		>
