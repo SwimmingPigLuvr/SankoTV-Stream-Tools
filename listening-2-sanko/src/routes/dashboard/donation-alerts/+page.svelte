@@ -530,7 +530,7 @@
 >
 	<div class="absolute top-2 right-2"><WalletAddress /></div>
 
-	<div class=" alert-grid m-auto sm:text-sm text-xs max-w-[1080px]">
+	<div class=" alert-grid m-auto sm:text-sm text-xs max-w-1080px]">
 		<h1
 			class="absolute top-10 font-cinema text-xl py-2 m-auto w-full text-left"
 		>

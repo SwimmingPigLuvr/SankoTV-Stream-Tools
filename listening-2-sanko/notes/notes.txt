@@ -141,3 +141,20 @@ keep the ui the same as the dashboard
 darkmode toggle can be out in the open on simple pages like the homepage but otherwise let's have it in a menu
 
 figure out how to save the users' data
+
+dashboard rn:
+    directory with completely blank screen on the right hand side
+    maybe dir can be in the middle with centered text then once a page is opened we scoot it to the left
+
+dashboard pages
+    dir left, content right
+    on small screen hide the dir
+
+
+create new alert
+    goto donation-alerts/+page.svelte
+    prompt user to name alert then save to db
+
+
+todo create user doc in db
+trim unnecessary items from folder
