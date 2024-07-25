@@ -1,8 +1,6 @@
 import { writable } from 'svelte/store';
 import { ethers } from 'ethers';
 import { browser } from '$app/environment';
-import Web3Modal from 'web3modal';
-import WalletConnectProvider from '@walletconnect/web3-provider';
 
 interface WalletStore {
     provider: ethers.providers.Web3Provider | null;
@@ -48,49 +46,38 @@ function createWalletStore() {
         chainId: null,
     });
 
-    let web3Modal: Web3Modal;
-
-    if (browser) {
-        web3Modal = new Web3Modal({
-            network: "custom",
-            cacheProvider: true,
-            providerOptions: {}
-        });
-    }
-
     return {
         subscribe,
         connect: async (): Promise<ConnectResult> => {
-            if (!browser) {
-                return { success: false, error: 'Not in browser environment' };
+            if (!browser || typeof window.ethereum === 'undefined') {
+                return { success: false, error: 'No Ethereum wallet found. Please install MetaMask.' };
             }
 
             try {
-                const instance = await web3Modal.connect();
-                const provider = new ethers.providers.Web3Provider(instance);
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send('eth_requestAccounts', []);
                 const signer = provider.getSigner();
                 const address = await signer.getAddress();
                 const network = await provider.getNetwork();
 
-                // check if sankotestnet
-                if (network.chainId !== SANKO_TESTNET.chainID) {
-                    // request to switch network
+                // Check if we're on the correct network
+                if (network.chainId !== SANKO_TESTNET.chainId) {
+                    // Request network switch
                     try {
                         await provider.send('wallet_switchEthereumChain', [{ chainId: ethers.utils.hexValue(SANKO_TESTNET.chainId) }]);
                     } catch (switchError: any) {
-                        // this error code indicates chain has not been added to metamask
+                        // This error code indicates that the chain has not been added to MetaMask.
                         if (switchError.code === 4902) {
                             try {
                                 await provider.send('wallet_addEthereumChain', [SANKO_TESTNET]);
                             } catch (addError) {
-                                throw new Error("failed to add Sanko Testnet to your wallet.");
+                                throw new Error("Failed to add the Sanko Testnet to your wallet.");
                             }
                         } else {
-                            throw new Error("failed to switch to the Sanko Testnet");
+                            throw new Error("Failed to switch to the Sanko Testnet.");
                         }
                     }
                 }
-
 
                 update(store => ({ 
                     ...store, 
@@ -101,7 +88,7 @@ function createWalletStore() {
                 }));
 
                 // Setup listeners
-                instance.on("accountsChanged", (accounts: string[]) => {
+                window.ethereum.on("accountsChanged", (accounts: string[]) => {
                     if (accounts.length === 0) {
                         this.disconnect();
                     } else {
@@ -109,11 +96,12 @@ function createWalletStore() {
                     }
                 });
 
-                instance.on("chainChanged", (chainId: number) => {
-                    if (chainId !== SANKO_TESTNET.chainId) {
+                window.ethereum.on("chainChanged", (chainId: string) => {
+                    const newChainId = parseInt(chainId, 16);
+                    if (newChainId !== SANKO_TESTNET.chainId) {
                         this.disconnect();
                     } else {
-                        update(store => ({ ...store, chainId }));
+                        update(store => ({ ...store, chainId: newChainId }));
                     }
                 });
 
@@ -123,10 +111,7 @@ function createWalletStore() {
                 return { success: false, error: error instanceof Error ? error.message : String(error) };
             }
         },
-        disconnect: async () => {
-            if (browser && web3Modal) {
-                web3Modal.clearCachedProvider();
-            }
+        disconnect: () => {
             set({
                 provider: null,
                 signer: null,
