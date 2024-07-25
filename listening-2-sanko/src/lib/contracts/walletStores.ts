@@ -1,6 +1,8 @@
 import { writable } from 'svelte/store';
 import { ethers } from 'ethers';
 import { browser } from '$app/environment';
+import { goto } from '$app/navigation';
+
 
 interface WalletStore {
     provider: ethers.providers.Web3Provider | null;
@@ -118,6 +120,7 @@ function createWalletStore() {
                 address: null,
                 chainId: null,
             });
+            goto('/');
         }
     };
 }
