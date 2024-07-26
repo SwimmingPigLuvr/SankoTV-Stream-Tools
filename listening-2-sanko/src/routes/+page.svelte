@@ -5,6 +5,7 @@
 	import { truncateAddress } from "$lib/utils";
 	import { fly } from "svelte/transition";
 	import { isDarkMode } from "$lib/stores";
+    import DarkMode from "$lib/components/DarkMode.svelte";
 
 	$: truncatedAddress = $walletStore.address
 		? truncateAddress($walletStore.address)
@@ -36,6 +37,12 @@
 </script>
 
 <main>
+
+
+	<div class="fixed top-2 left-2">
+		<DarkMode />
+	</div>
+
 	<div
 		class="{$isDarkMode
 			? 'text-white'

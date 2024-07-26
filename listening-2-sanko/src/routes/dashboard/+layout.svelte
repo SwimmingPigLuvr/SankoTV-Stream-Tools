@@ -3,7 +3,7 @@
 </script>
 
 <main class="flex justify-between w-full">
-	<div class="hidden md:block fixed w-1/4">
+	<div class="fixed w-1/4">
 		<Directory />
 	</div>
 	<div class="ml-auto w-full md:w-3/4">
