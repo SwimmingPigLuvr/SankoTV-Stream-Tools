@@ -1,8 +1,13 @@
 <script lang="ts">
 	import WalletAddress from "$lib/components/WalletAddress.svelte";
+	import { walletStore } from "$lib/contracts/walletStores";
 	import { isDarkMode } from "$lib/stores";
 	import { fly, slide } from "svelte/transition";
 
+	let userData: any;
+	walletStore.subscribe((store) => {
+		userData = store.userData;
+	});
 </script>
 
 <main
@@ -22,5 +27,7 @@
 		🧪
 	</h1>
 
-		
+	{#if userData}
+		<p class="text-lime-400">welcome {userData.wallet_address}</p>
+	{/if}
 </main>
