@@ -158,3 +158,6 @@ create new alert
 
 todo create user doc in db
 trim unnecessary items from folder
+
+animatino of beaker pouring into something then it explodes into a star
+

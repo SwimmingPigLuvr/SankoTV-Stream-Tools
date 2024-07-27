@@ -57,102 +57,86 @@ function createWalletStore() {
     }
 
     async function handleUserData(address: string): Promise<any> {
-        console.log('handleUserData called with address:', address);
-        
-        try {
-            // first, try to select the user
-            let { data: user, error } = await supabase
-                .from('users')
-                .select('*')
-                .eq('wallet_address', address.toLowerCase())
-                .single();
+    console.log('handleUserData called with address:', address);
+    
+    try {
+        // Attempt to select the user
+        let { data: user, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('wallet_address', address.toLowerCase())
+            .single();
 
-            if (error) {
-                if (error.code === 'PGRST116') {
-                    // if user not found create a new one
-                    console.log('user not found. creating new user');
-                    const { data: newUser, error: insertError } = await supabase
-                        .from('users')
-                        .insert([
-                            {
-                                wallet_address: address.toLowerCase(),
-                                created_at: new Date().toISOString(),
-                                last_connected: new Date().toISOString()
-                            }
-                        ])
-                        .single();
-
-                    if (insertError) {
-                        console.error('error creating new user:', insertError);
-                        throw insertError;
-                    }
-
-                    console.log('new user created:', newUser);
-                    user = newUser;
-                } else {
-                    console.error('error fetching user:', error);
-                    throw error;
-                }
-            } else {
-                // user found, update last_connected
-                console.log('updating existing user');
-                const { data: updatedUser, error: updateError } = await supabase
-                    .from('users')
-                    .update({ last_connected: new Date().toISOString() })
-                    .eq('wallet_address', address.toLowerCase())
-                    .single();
-
-                if (updateError) {
-                    console.error('error updating user:', updateError);
-                    throw updateError;
-                }
-
-                console.log('user updated:', updatedUser);
-                user = updatedUser;
-            }
-
-            if (!user) {
-                console.log('Creating new user');
-                const { data: newUser, error: insertError } = await supabase
-                    .from('users')
-                    .insert([
-                        { 
-                            wallet_address: address.toLowerCase(),
-                            created_at: new Date().toISOString(),
-                            last_connected: new Date().toISOString()
-                        }
-                    ])
-                    .single();
-
-                if (insertError) {
-                    throw insertError;
-                }
-
-                console.log('New user created:', newUser);
-                user = newUser;
-            } else {
-                console.log('Updating existing user');
-                const { data: updatedUser, error: updateError } = await supabase
-                    .from('users')
-                    .update({ last_connected: new Date().toISOString() })
-                    .eq('wallet_address', address.toLowerCase())
-                    .single();
-
-                if (updateError) {
-                    throw updateError;
-                }
-
-                console.log('User updated:', updatedUser);
-                user = updatedUser;
-            }
-
-            console.log('Returning user data:', user);
-            return user;
-        } catch (error) {
-            console.error('Error in handleUserData:', error);
+        // If there's an error but it's not a "not found" error, throw it
+        if (error && error.code !== 'PGRST116') {
+            console.error('Error fetching user:', error);
             throw error;
         }
+
+        if (!user) {
+            // User not found, attempt to create a new one
+            console.log('User not found. Attempting to create new user');
+            const { data: newUser, error: insertError } = await supabase
+                .from('users')
+                .insert([
+                    { 
+                        wallet_address: address.toLowerCase(),
+                        created_at: new Date().toISOString(),
+                        last_connected: new Date().toISOString()
+                    }
+                ])
+                .single();
+
+            if (insertError) {
+                // If we get a duplicate key error, the user was likely created in a race condition
+                // Try to fetch the user again
+                if (insertError.code === '23505') {
+                    console.log('User already exists. Fetching existing user.');
+                    const { data: existingUser, error: fetchError } = await supabase
+                        .from('users')
+                        .select('*')
+                        .eq('wallet_address', address.toLowerCase())
+                        .single();
+
+                    if (fetchError) {
+                        console.error('Error fetching existing user:', fetchError);
+                        throw fetchError;
+                    }
+
+                    user = existingUser;
+                } else {
+                    console.error('Error creating new user:', insertError);
+                    throw insertError;
+                }
+            } else {
+                console.log('New user created:', newUser);
+                user = newUser;
+            }
+        }
+
+        // User exists (either found initially or after insert attempt), update last_connected
+        console.log('Updating existing user');
+        const { data: updatedUser, error: updateError } = await supabase
+            .from('users')
+            .update({ last_connected: new Date().toISOString() })
+            .eq('wallet_address', address.toLowerCase())
+            .single();
+
+        if (updateError) {
+            console.error('Error updating user:', updateError);
+            throw updateError;
+        }
+
+        console.log('User updated:', updatedUser);
+        user = updatedUser;
+
+        console.log('Returning user data:', user);
+        return user;
+    } catch (error) {
+        console.error('Error in handleUserData:', error);
+        throw error;
     }
+}
 
     return {
         subscribe,

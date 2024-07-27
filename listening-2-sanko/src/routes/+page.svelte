@@ -56,7 +56,7 @@
 	>
 		{#if showTitle}
 			<div
-				class="fixed top-1/3 -translate-y-1/2 left-1/2 -translate-x-1/2 flex flex-col items-center scale-150"
+				class="fixed top-1/3 -translate-y-1/2 left-1/2 -translate-x-1/2 flex flex-col items-center"
 			>
 				<h2
 					in:fly={{
@@ -65,7 +65,7 @@
 						duration: 1500,
 						easing: backOut,
 					}}
-					class="translate-y-2 text-3xl space-x-1 flex items-baseline text-right font-coolfont-pixel"
+					class="translate-y-0 text-5xl space-x-2 flex items-baseline text-right font-coolfont-pixel"
 				>
 					<span class="text-red-500">S</span>
 					<span class="text-blue-500">A</span>
@@ -78,7 +78,7 @@
 				</h2>
 
 				<h1
-					class="font-coolfont-fluid text-2xl items-center flex space-x-1"
+					class="font-coolfont-pix-outlined {$isDarkMode ? 'text-yellow-100' : 'text-blue-700'} text-4xl items-center flex space-x-1"
 				>
 					<p
 						in:fly={{
@@ -98,7 +98,7 @@
 							duration: 1500,
 							easing: backOut,
 						}}
-						class="text-[3rem]">StarLabs</span
+						class="text-[6rem]">StarLabs</span
 					>
 					<p
 						in:fly={{
@@ -141,8 +141,9 @@
 					</button>
 				</div>
 			{:else}
+				<!-- connect wallet -->
 				<button
-					class="bg-green-500 hover:bg-green-700 text-white font-bold p-2 px-4 rounded-full"
+					class="bg-green-500 hover:bg-green-700 font-serif italic text-white text-xs p-2 px-6  rounded-full"
 					on:click={handleConnect}
 					disabled={isConnecting}
 				>
@@ -156,16 +157,16 @@
 	</div>
 	<div
 		in:slide={{ delay: 1500 }}
-		class=" text-white fixed bottom-2 left-1/2 -translate-x-1/2 items-center -translate-y-1 flex-col"
+		class=" text-white font-coolfont-pixel fixed bottom-2 left-1/2 -translate-x-1/2 items-center -translate-y-1 flex-col"
 	>
 		<a
 			target="_blank"
 			rel="noopener noreferrer"
 			href="https://x.com/SwimmingPigLuvr"
-			class="text-xs font-sans px-4 p-2 hover:bg-sky-800 rounded-xl"
+			class="text-xl px-4 p-2 hover:bg-sky-800 rounded-xl"
 		>
-			by <span class="text-sky-300 font-black">Swimming</span>
-			𓃟 ❤️ 'r
+			<span class="font-mono text-xs">by</span> <span class="text-sky-300 font-black">Swimming</span>
+			𓃟 ❤️ r
 		</a>
 	</div>
 </main>
