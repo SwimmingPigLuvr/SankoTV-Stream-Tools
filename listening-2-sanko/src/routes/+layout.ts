@@ -1,4 +1,4 @@
-import { walletStore } from "$lib/contracts/walletStores";
+import { walletStore } from "$lib/walletStores";
 import { redirect } from '@sveltejs/kit';
 import type { LayoutLoad } from './$types';
 

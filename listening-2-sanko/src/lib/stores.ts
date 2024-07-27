@@ -41,6 +41,6 @@ const defaultAlertConfig: AlertConfig = {
     textShadow: "none",
 };
 
-export const alertConfig = writable<DonationStyle>(defaultAlertConfig);
+export const alertConfig = writable<AlertConfig>(defaultAlertConfig);
 
 export const messageTemplate = writable<string>('{sender} donated {amount} {gift}!');

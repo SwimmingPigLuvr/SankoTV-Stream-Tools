@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { walletStore } from "$lib/contracts/walletStores";
+	import { walletStore } from "$lib/walletStores";
 	import { isDarkMode } from "$lib/stores";
 	import { onMount } from "svelte";
 	import "../app.css";

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import WalletAddress from "$lib/components/WalletAddress.svelte";
-	import { walletStore } from "$lib/contracts/walletStores";
+	import { walletStore } from "$lib/walletStores";
 	import { isDarkMode } from "$lib/stores";
 	import { fly, slide } from "svelte/transition";
 

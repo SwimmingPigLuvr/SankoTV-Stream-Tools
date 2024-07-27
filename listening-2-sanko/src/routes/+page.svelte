@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from "svelte";
-	import { walletStore } from "$lib/contracts/walletStores";
+	import { walletStore } from "$lib/walletStores";
 	import { browser } from "$app/environment";
 	import { truncateAddress } from "$lib/utils";
 	import { fly, slide } from "svelte/transition";

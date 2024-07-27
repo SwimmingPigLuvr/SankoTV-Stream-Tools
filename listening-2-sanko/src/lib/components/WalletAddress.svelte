@@ -1,5 +1,5 @@
 <script>
-    import { walletStore } from "$lib/contracts/walletStores";
+    import { walletStore } from "$lib/walletStores";
     import { isDarkMode } from "$lib/stores";
     import { truncateAddress } from "$lib/utils";
     import { fly } from "svelte/transition";
