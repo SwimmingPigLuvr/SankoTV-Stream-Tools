@@ -6,7 +6,14 @@
 	import { fly, slide } from "svelte/transition";
 	import { isDarkMode } from "$lib/stores";
 	import DarkMode from "$lib/components/DarkMode.svelte";
-	import { backOut } from "svelte/easing";
+	import {
+		backIn,
+		backInOut,
+		backOut,
+		cubicInOut,
+		cubicOut,
+	} from "svelte/easing";
+	import AnimatedText from "$lib/components/AnimatedText.svelte";
 
 	$: truncatedAddress = $walletStore.address
 		? truncateAddress($walletStore.address)
@@ -15,6 +22,7 @@
 	let isConnecting = false;
 	let error = "";
 	let showTitle = false;
+	let showConnect = false;
 
 	async function handleConnect() {
 		isConnecting = true;
@@ -41,6 +49,10 @@
 		setTimeout(() => {
 			showTitle = true;
 		}, 500);
+
+		setTimeout(() => {
+			showConnect = true;
+		}, 1500);
 	});
 </script>
 
@@ -59,11 +71,10 @@
 				class="fixed top-1/3 -translate-y-1/2 left-1/2 -translate-x-1/2 flex flex-col items-center"
 			>
 				<h2
-					in:fly={{
-						y: -50,
+					in:slide={{
 						delay: 0,
-						duration: 1500,
-						easing: backOut,
+						duration: 250,
+						easing: cubicOut,
 					}}
 					class="translate-y-0 text-5xl space-x-2 flex items-baseline text-right font-coolfont-pixel"
 				>
@@ -78,38 +89,36 @@
 				</h2>
 
 				<h1
-					class="font-coolfont-pix-outlined {$isDarkMode ? 'text-yellow-100' : 'text-blue-700'} text-4xl items-center flex space-x-1"
+					class="title-glow font-coolfont-pix-outlined {$isDarkMode
+						? 'text-yellow-100'
+						: 'text-blue-700'} text-4xl items-center flex space-x-0"
 				>
 					<p
+						class="animate-pulse"
 						in:fly={{
-							y: 20,
-							x: -20,
-							duration: 500,
-							delay: 1000,
-							easing: backOut,
-						}}
-					>
-						✨
-					</p>
-					<span
-						in:fly={{
-							delay: 50,
-							y: 40,
-							duration: 1500,
-							easing: backOut,
-						}}
-						class="text-[6rem]">StarLabs</span
-					>
-					<p
-						in:fly={{
-							delay: 1150,
 							y: 10,
-							x: 10,
+							x: 500,
+							duration: 1000,
+							delay: 0,
+							easing: backOut,
+						}}
+					>
+						⭐️
+					</p>
+					<p class="title-glow text-[6rem]">
+						<AnimatedText text="StarLabs" />
+					</p>
+					<p
+						class="animate-pulse"
+						in:fly={{
+							delay: 250,
+							y: 10,
+							x: -500,
 							duration: 1000,
 							easing: backOut,
 						}}
 					>
-						✨
+						⭐️
 					</p>
 				</h1>
 			</div>
@@ -142,13 +151,16 @@
 				</div>
 			{:else}
 				<!-- connect wallet -->
-				<button
-					class="bg-green-500 hover:bg-green-700 font-serif italic text-white text-xs p-2 px-6  rounded-full"
-					on:click={handleConnect}
-					disabled={isConnecting}
-				>
-					{isConnecting ? "Connecting..." : "Connect Wallet"}
-				</button>
+				{#if showConnect}
+					<button
+						in:slide={{ easing: cubicInOut }}
+						class="bg-green-500 hover:bg-green-700 font-serif italic text-white text-xs p-2 px-6 rounded-full"
+						on:click={handleConnect}
+						disabled={isConnecting}
+					>
+						{isConnecting ? "Connecting..." : "Connect Wallet"}
+					</button>
+				{/if}
 			{/if}
 			{#if error}
 				<p class="text-red-500 mt-2">{error}</p>
@@ -165,8 +177,24 @@
 			href="https://x.com/SwimmingPigLuvr"
 			class="text-xl px-4 p-2 hover:bg-sky-800 rounded-xl"
 		>
-			<span class="font-mono text-xs">by</span> <span class="text-sky-300 font-black">Swimming</span>
+			<span class="font-mono text-xs">by</span>
+			<span class="text-sky-300 font-black">Swimming</span>
 			𓃟 ❤️ r
 		</a>
 	</div>
 </main>
+
+<style>
+	/* Create a dreamy text glow effect */
+	.title-glow {
+		text-shadow:
+			0 0 5px rgba(255, 255, 255, 0.5),
+			0 0 10px rgba(255, 255, 255, 0.5),
+			0 0 15px rgba(255, 255, 255, 0.5),
+			0 0 20px rgba(255, 255, 255, 0.5),
+			/* Add a hint of color */ 0 0 30px rgba(255, 255, 255, 0.5),
+			0 0 40px rgba(255, 255, 255, 0.5),
+			0 0 50px rgba(255, 255, 255, 0.5),
+			0 0 75px rgba(255, 255, 255, 0.5); /* More intense glow further out */
+	}
+</style>

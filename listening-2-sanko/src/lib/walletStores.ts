@@ -56,87 +56,87 @@ function createWalletStore() {
         return true;
     }
 
+    //
     async function handleUserData(address: string): Promise<any> {
-    console.log('handleUserData called with address:', address);
-    
-    try {
-        // Attempt to select the user
-        let { data: user, error } = await supabase
-            .from('users')
-            .select('*')
-            .eq('wallet_address', address.toLowerCase())
-            .single();
-
-        // If there's an error but it's not a "not found" error, throw it
-        if (error && error.code !== 'PGRST116') {
-            console.error('Error fetching user:', error);
-            throw error;
-        }
-
-        if (!user) {
-            // User not found, attempt to create a new one
-            console.log('User not found. Attempting to create new user');
-            const { data: newUser, error: insertError } = await supabase
+        console.log('handleUserData called with address:', address);
+        
+        try {
+            // Attempt to select the user
+            let { data: users, error } = await supabase
                 .from('users')
-                .insert([
-                    { 
-                        wallet_address: address.toLowerCase(),
-                        created_at: new Date().toISOString(),
-                        last_connected: new Date().toISOString()
-                    }
-                ])
-                .single();
+                .select('*')
+                .eq('wallet_address', address.toLowerCase());
 
-            if (insertError) {
-                // If we get a duplicate key error, the user was likely created in a race condition
-                // Try to fetch the user again
-                if (insertError.code === '23505') {
-                    console.log('User already exists. Fetching existing user.');
-                    const { data: existingUser, error: fetchError } = await supabase
-                        .from('users')
-                        .select('*')
-                        .eq('wallet_address', address.toLowerCase())
-                        .single();
+            console.log('Select query result:', { data: users, error });
 
-                    if (fetchError) {
-                        console.error('Error fetching existing user:', fetchError);
-                        throw fetchError;
-                    }
+            if (error) {
+                console.error('Error fetching user:', error);
+                throw error;
+            }
 
-                    user = existingUser;
-                } else {
+            let user = users && users.length > 0 ? users[0] : null;
+
+            if (!user) {
+                // User not found, attempt to create a new one
+                console.log('User not found. Attempting to create new user');
+                const now = new Date().toISOString();
+                const { data: newUsers, error: insertError } = await supabase
+                    .from('users')
+                    .insert([
+                        { 
+                            wallet_address: address.toLowerCase(),
+                            created_at: now,
+                            updated_at: now,
+                            data: {},
+                            last_connected: now
+                        }
+                    ])
+                    .select();
+
+                console.log('Insert query result:', { data: newUsers, error: insertError });
+
+                if (insertError) {
                     console.error('Error creating new user:', insertError);
                     throw insertError;
                 }
-            } else {
-                console.log('New user created:', newUser);
-                user = newUser;
+
+                user = newUsers && newUsers.length > 0 ? newUsers[0] : null;
             }
+
+            if (!user) {
+                throw new Error('Failed to create or fetch user');
+            }
+
+            // User exists, update last_connected and updated_at
+            console.log('Updating existing user');
+            const now = new Date().toISOString();
+            const { data: updatedUsers, error: updateError } = await supabase
+                .from('users')
+                .update({ 
+                    last_connected: now,
+                    updated_at: now
+                })
+                .eq('wallet_address', address.toLowerCase())
+                .select();
+
+            console.log('Update user result:', { data: updatedUsers, error: updateError });
+
+            if (updateError) {
+                console.error('Error updating user:', updateError);
+                throw updateError;
+            }
+
+            user = updatedUsers && updatedUsers.length > 0 ? updatedUsers[0] : user;
+
+            console.log('Returning user data:', user);
+            return user;
+        } catch (error) {
+            console.error('Error in handleUserData:', error);
+            throw error;
         }
-
-        // User exists (either found initially or after insert attempt), update last_connected
-        console.log('Updating existing user');
-        const { data: updatedUser, error: updateError } = await supabase
-            .from('users')
-            .update({ last_connected: new Date().toISOString() })
-            .eq('wallet_address', address.toLowerCase())
-            .single();
-
-        if (updateError) {
-            console.error('Error updating user:', updateError);
-            throw updateError;
-        }
-
-        console.log('User updated:', updatedUser);
-        user = updatedUser;
-
-        console.log('Returning user data:', user);
-        return user;
-    } catch (error) {
-        console.error('Error in handleUserData:', error);
-        throw error;
     }
-}
+        // end handleuserdata
+
 
     return {
         subscribe,
