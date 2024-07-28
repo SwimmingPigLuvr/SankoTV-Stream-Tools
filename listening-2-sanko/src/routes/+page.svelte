@@ -3,7 +3,7 @@
 	import { walletStore } from "$lib/walletStores";
 	import { browser } from "$app/environment";
 	import { truncateAddress } from "$lib/utils";
-	import { fly, slide } from "svelte/transition";
+	import { blur, fade, fly, slide } from "svelte/transition";
 	import { isDarkMode } from "$lib/stores";
 	import DarkMode from "$lib/components/DarkMode.svelte";
 	import {
@@ -68,7 +68,7 @@
 	>
 		{#if showTitle}
 			<div
-				class="fixed top-1/3 -translate-y-1/2 left-1/2 -translate-x-1/2 flex flex-col items-center"
+				class="fixed top-20 -translate-y-1/2 left-1/2 -translate-x-1/2 flex flex-col items-center"
 			>
 				<h2
 					in:slide={{
@@ -89,12 +89,11 @@
 				</h2>
 
 				<h1
-					class="title-glow font-coolfont-pix-outlined {$isDarkMode
-						? 'text-yellow-100'
-						: 'text-blue-700'} text-4xl items-center flex space-x-0"
+					class=" font-coolfont-pix-outlined {$isDarkMode
+						? 'title-glow text-yellow-100'
+						: 'text-white'} text-4xl items-center flex space-x-0"
 				>
 					<p
-						class="animate-pulse"
 						in:fly={{
 							y: 10,
 							x: 500,
@@ -109,7 +108,6 @@
 						<AnimatedText text="StarLabs" />
 					</p>
 					<p
-						class="animate-pulse"
 						in:fly={{
 							delay: 250,
 							y: 10,
@@ -153,8 +151,12 @@
 				<!-- connect wallet -->
 				{#if showConnect}
 					<button
-						in:slide={{ easing: cubicInOut }}
-						class="bg-green-500 hover:bg-green-700 font-serif italic text-white text-xs p-2 px-6 rounded-full"
+						in:slide={{
+							easing: backOut,
+							delay: 1000,
+							duration: 1000,
+						}}
+						class="bg-blue-500 hover:bg-green-700 font-serif italic text-white text-xl p-4 -tracking-wide px-8 rounded-full"
 						on:click={handleConnect}
 						disabled={isConnecting}
 					>
@@ -188,12 +190,12 @@
 	/* Create a dreamy text glow effect */
 	.title-glow {
 		text-shadow:
-			0 0 5px rgba(255, 255, 255, 0.5),
-			0 0 10px rgba(255, 255, 255, 0.5),
-			0 0 15px rgba(255, 255, 255, 0.5),
-			0 0 20px rgba(255, 255, 255, 0.5),
-			/* Add a hint of color */ 0 0 30px rgba(255, 255, 255, 0.5),
-			0 0 40px rgba(255, 255, 255, 0.5),
+			0 0 5px rgba(255, 255, 0, 0.5),
+			0 0 10px rgba(255, 255, 0, 0.5),
+			0 0 15px rgba(255, 255, 0, 0.5),
+			0 0 20px rgba(255, 255, 0, 0.5),
+			/* Add a hint of color */ 0 0 30px rgba(255, 255, 0, 0.5),
+			0 0 40px rgba(255, 255, 0, 0.5),
 			0 0 50px rgba(255, 255, 255, 0.5),
 			0 0 75px rgba(255, 255, 255, 0.5); /* More intense glow further out */
 	}
