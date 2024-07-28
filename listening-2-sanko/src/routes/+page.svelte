@@ -156,16 +156,16 @@
 							delay: 1000,
 							duration: 1000,
 						}}
-						class="bg-blue-500 hover:bg-green-700 font-serif italic text-white text-xl p-4 -tracking-wide px-8 rounded-full"
+						class="border-blue-500 border-[1px] fixed top-2 right-2 hover:bg-blue-700 font-serif italic text-white text-xs p-1 -tracking-wider px-3 rounded-none"
 						on:click={handleConnect}
 						disabled={isConnecting}
 					>
-						{isConnecting ? "Connecting..." : "Connect Wallet"}
+						{isConnecting ? "Connecting..." : "Connect"}
 					</button>
 				{/if}
 			{/if}
 			{#if error}
-				<p class="text-red-500 mt-2">{error}</p>
+				<p class="p-1 px-3 border-red-600 border-[1px] text-white font-mono -tracking-widest mt-2">🚨{error}🚨</p>
 			{/if}
 		</div>
 	</div>
