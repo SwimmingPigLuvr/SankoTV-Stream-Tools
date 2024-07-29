@@ -7,6 +7,8 @@ export default {
         'amsterdam': ['Amsterdam', 'sans-serif'],
         'amsterdam-display': ['Amsterdam-Display', 'sans-serif'],
         'anthem': ['Anthem', 'sans-serif'],
+        'badger': ['Badger', 'sans-serif'],
+        'botch': ['Botch', 'sans-serif'],
         'cinema': ['Cinema', 'sans-serif'],
         'coolfont': ['Coolfont', 'sans-serif'],
         'coolfont-cloud': ['Coolfont-Cloud', 'sans-serif'],

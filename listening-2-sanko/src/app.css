@@ -19,6 +19,16 @@
 }
 
 @font-face {
+    font-family: 'Badger';
+    src: url('/fonts/Badger.otf') format('opentype');
+}
+
+@font-face {
+    font-family: 'Botch';
+    src: url('/fonts/Botch.otf') format('opentype');
+}
+
+@font-face {
     font-family: 'Cinema';
     src: url('/fonts/Cinema.otf') format('opentype');
 }

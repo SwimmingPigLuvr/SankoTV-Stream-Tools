@@ -76,7 +76,7 @@
 						duration: 250,
 						easing: cubicOut,
 					}}
-					class="translate-y-0 text-5xl space-x-2 flex items-baseline text-right font-coolfont-pixel"
+					class="translate-y-0 text-5xl space-x-0 flex items-baseline text-right font-badger"
 				>
 					<span class="text-red-500">S</span>
 					<span class="text-blue-500">A</span>
@@ -156,7 +156,7 @@
 							delay: 1000,
 							duration: 1000,
 						}}
-						class="border-blue-500 border-[1px] fixed top-2 right-2 hover:bg-blue-700 font-serif italic text-white text-xs p-1 -tracking-wider px-3 rounded-none"
+						class="border-blue-500 border-[1px] hover:bg-blue-700 font-serif italic text-white p-2 -tracking-wider px-4 rounded-full"
 						on:click={handleConnect}
 						disabled={isConnecting}
 					>
@@ -165,23 +165,26 @@
 				{/if}
 			{/if}
 			{#if error}
-				<p class="p-1 px-3 border-red-600 border-[1px] text-white font-mono -tracking-widest mt-2">🚨{error}🚨</p>
+				<p
+					class="p-1 px-3 border-red-600 border-[1px] text-white font-mono -tracking-widest mt-2"
+				>
+					🚨{error}🚨
+				</p>
 			{/if}
 		</div>
 	</div>
 	<div
 		in:slide={{ delay: 1500 }}
-		class=" text-white font-coolfont-pixel fixed bottom-2 left-1/2 -translate-x-1/2 items-center -translate-y-1 flex-col"
+		class=" text-white font-amsterdam-display fixed bottom-2 left-1/2 -translate-x-1/2 items-center -translate-y-1 flex-col"
 	>
 		<a
 			target="_blank"
 			rel="noopener noreferrer"
 			href="https://x.com/SwimmingPigLuvr"
-			class="text-xl px-4 p-2 hover:bg-sky-800 rounded-xl"
+			class="text-xl flex-col text-center text-sky-700 flex p-2 hover:border-blue-700 border-[1px] border-transparent leading-5 rounded-xl"
 		>
-			<span class="font-mono text-xs">by</span>
-			<span class="text-sky-300 font-black">Swimming</span>
-			𓃟 ❤️ r
+			<span class="">Swimming</span>
+			<span class="">𓃟🩵r</span>
 		</a>
 	</div>
 </main>

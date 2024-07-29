@@ -58,83 +58,48 @@ function createWalletStore() {
 
     //
     async function handleUserData(address: string): Promise<any> {
-        console.log('handleUserData called with address:', address);
-        
-        try {
-            // Attempt to select the user
-            let { data: users, error } = await supabase
-                .from('users')
-                .select('*')
-                .eq('wallet_address', address.toLowerCase());
+       console.log('handleUserData called with address:', address);
+       
+       try {
+           const now = new Date().toISOString();
+           const { data: user, error } = await supabase
+               .from('users')
+               .upsert(
+                   { 
+                       wallet_address: address.toLowerCase(),
+                       created_at: now,
+                       updated_at: now,
+                       data: {},
+                       last_connected: now
+                   },
+                   { 
+                       onConflict: 'wallet_address',
+                       update: { last_connected: now, updated_at: now }
+                   }
+               )
+               .select()
+               .single();
 
-            console.log('Select query result:', { data: users, error });
+           console.log('Upsert result:', { data: user, error });
 
-            if (error) {
-                console.error('Error fetching user:', error);
-                throw error;
-            }
+           if (error) {
+               console.error('Error upserting user:', error);
+               console.error('Error details:', JSON.stringify(error, null, 2));
+               throw error;
+           }
 
-            let user = users && users.length > 0 ? users[0] : null;
+           if (!user) {
+               throw new Error('Failed to create or fetch user');
+           }
 
-            if (!user) {
-                // User not found, attempt to create a new one
-                console.log('User not found. Attempting to create new user');
-                const now = new Date().toISOString();
-                const { data: newUsers, error: insertError } = await supabase
-                    .from('users')
-                    .insert([
-                        { 
-                            wallet_address: address.toLowerCase(),
-                            created_at: now,
-                            updated_at: now,
-                            data: {},
-                            last_connected: now
-                        }
-                    ])
-                    .select();
-
-                console.log('Insert query result:', { data: newUsers, error: insertError });
-
-                if (insertError) {
-                    console.error('Error creating new user:', insertError);
-                    throw insertError;
-                }
-
-                user = newUsers && newUsers.length > 0 ? newUsers[0] : null;
-            }
-
-            if (!user) {
-                throw new Error('Failed to create or fetch user');
-            }
-
-            // User exists, update last_connected and updated_at
-            console.log('Updating existing user');
-            const now = new Date().toISOString();
-            const { data: updatedUsers, error: updateError } = await supabase
-                .from('users')
-                .update({ 
-                    last_connected: now,
-                    updated_at: now
-                })
-                .eq('wallet_address', address.toLowerCase())
-                .select();
-
-            console.log('Update user result:', { data: updatedUsers, error: updateError });
-
-            if (updateError) {
-                console.error('Error updating user:', updateError);
-                throw updateError;
-            }
-
-            user = updatedUsers && updatedUsers.length > 0 ? updatedUsers[0] : user;
-
-            console.log('Returning user data:', user);
-            return user;
-        } catch (error) {
-            console.error('Error in handleUserData:', error);
-            throw error;
-        }
-    }
+           console.log('Returning user data:', user);
+           return user;
+       } catch (error) {
+           console.error('Error in handleUserData:', error);
+           console.error('Error details:', JSON.stringify(error, null, 2));
+           throw error;
+       }
+   }
         // end handleuserdata
 
 
