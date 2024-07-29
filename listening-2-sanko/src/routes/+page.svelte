@@ -90,8 +90,8 @@
 
 				<h1
 					class=" font-coolfont-pix-outlined {$isDarkMode
-						? 'title-glow text-yellow-100'
-						: 'text-white'} text-4xl items-center flex space-x-0"
+						? 'text-yellow-100  title-glow'
+						: 'text-white title-glow-blue'} text-4xl items-center flex space-x-0"
 				>
 					<p
 						in:fly={{
@@ -104,7 +104,7 @@
 					>
 						⭐️
 					</p>
-					<p class="title-glow text-[6rem]">
+					<p class="text-[6rem]">
 						<AnimatedText text="StarLabs" />
 					</p>
 					<p
@@ -156,7 +156,9 @@
 							delay: 1000,
 							duration: 1000,
 						}}
-						class="border-blue-500 border-[1px] hover:bg-blue-700 font-serif italic text-white p-2 -tracking-wider px-4 rounded-full"
+						class="transform transition-all duration-100 ease-[backOut] border-blue-700 border-[1px] {$isDarkMode
+							? 'text-white hover:bg-blue-900'
+							: 'text-blue-700 bg-white hover:bg-blue-700 hover:text-white'} font-serif italic p-2 -tracking-wider px-4 rounded-full"
 						on:click={handleConnect}
 						disabled={isConnecting}
 					>
@@ -166,31 +168,30 @@
 			{/if}
 			{#if error}
 				<p
-					class="p-1 px-3 border-red-600 border-[1px] text-white font-mono -tracking-widest mt-2"
+					class="p-1 px-3 border-red-600 rounded border-b-8 border-[1px] text-red-600 font-coolfont-pixel mt-2"
 				>
-					🚨{error}🚨
+					error: {error}
 				</p>
 			{/if}
 		</div>
 	</div>
 	<div
 		in:slide={{ delay: 1500 }}
-		class=" text-white font-amsterdam-display fixed bottom-2 left-1/2 -translate-x-1/2 items-center -translate-y-1 flex-col"
+		class=" text-white font-amsterdam-display fixed bottom-2 left-2 items-center -translate-y-1 flex-col"
 	>
 		<a
 			target="_blank"
 			rel="noopener noreferrer"
 			href="https://x.com/SwimmingPigLuvr"
-			class="text-xl flex-col text-center text-sky-700 flex p-2 hover:border-blue-700 border-[1px] border-transparent leading-5 rounded-xl"
+			class="text-xl flex-col text-center text-sky-300 flex p-2 hover:border-blue-700 border-[1px] border-transparent leading-5 rounded-xl"
 		>
 			<span class="">Swimming</span>
-			<span class="">𓃟🩵r</span>
+			<span class="font-botch">𓃟🩵r</span>
 		</a>
 	</div>
 </main>
 
 <style>
-	/* Create a dreamy text glow effect */
 	.title-glow {
 		text-shadow:
 			0 0 5px rgba(255, 255, 0, 0.5),
@@ -201,5 +202,17 @@
 			0 0 40px rgba(255, 255, 0, 0.5),
 			0 0 50px rgba(255, 255, 255, 0.5),
 			0 0 75px rgba(255, 255, 255, 0.5); /* More intense glow further out */
+	}
+
+	.title-glow-blue {
+		text-shadow:
+			0 0 5px rgba(255, 0, 255, 0.5),
+			0 0 10px rgba(255, 0, 255, 0.5),
+			0 0 15px rgba(255, 0, 255, 0.5),
+			0 0 20px rgba(255, 0, 255, 0.5),
+			0 0 30px rgba(255, 0, 255, 0.5),
+			0 0 40px rgba(255, 0, 255, 0.5),
+			0 0 50px rgba(255, 0, 255, 0.5),
+			0 0 75px rgba(255, 0, 255, 0.5);
 	}
 </style>
