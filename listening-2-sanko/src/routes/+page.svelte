@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 	import { walletStore } from "$lib/walletStores";
+	import type { RequestHandler } from "@sveltejs/kit";
 	import { browser } from "$app/environment";
 	import { truncateAddress } from "$lib/utils";
 	import { blur, fade, fly, slide } from "svelte/transition";
