@@ -3,6 +3,9 @@ import { ethers } from 'ethers';
 import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
 import { supabase } from '$lib/supabaseClient';
+import { sign } from 'jsonwebtoken';
+
+const secret = 'your-secret-key';
 
 interface WalletStore {
     provider: ethers.providers.Web3Provider | null;
@@ -53,7 +56,8 @@ function createWalletStore() {
         }
         
         console.log('Wallet authenticated successfully');
-        return true;
+        const token = sign({ sub: address.toLowerCase() }, secret, { expiresIn: '1d'});
+        return token;
     }
 
     //
@@ -62,6 +66,11 @@ function createWalletStore() {
        
        try {
            const now = new Date().toISOString();
+            const token = await authenticateWallet(provider, address);
+
+            // set the JWT in the supabase client
+            supabase.auth.setAuth(token);
+
            const { data: user, error } = await supabase
                .from('users')
                .upsert(
