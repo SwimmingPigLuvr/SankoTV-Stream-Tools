@@ -3,12 +3,6 @@ import { ethers } from 'ethers';
 import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
 import { supabase } from '$lib/supabaseClient';
-import jwt from 'jsonwebtoken';
-import { JWT_TOKEN } from '$env/static/private'
-
-const { sign } = jwt;
-
-const secret = JWT_TOKEN;
 
 interface WalletStore {
     provider: ethers.providers.Web3Provider | null;
@@ -61,12 +55,26 @@ function createWalletStore() {
         console.log('Wallet authenticated successfully');
 
         // generate jwt
-        const token = sign({ sub: address.toLowerCase() }, secret, { expiresIn: '1d'});
+        const response = await fetch('/api/auth/jwt', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ address }),
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('server response:', response.status, errorText);
+            throw new Error(`Failed to generate JWT: ${errorText || 'Unknown error'}`);
+        }
+
+        const { token } = await response.json();
         return token;
     }
 
     //
-    async function handleUserData(address: string): Promise<any> {
+    async function handleUserData(provider: ethers.providers.Web3Provider, address: string): Promise<any> {
        console.log('handleUserData called with address:', address);
        
        try {
@@ -160,7 +168,7 @@ function createWalletStore() {
 
                 // Handle user data in Supabase
                 console.log('Handling user data');
-                const userData = await handleUserData(address);
+                const userData = await handleUserData(provider, address);
 
                 update(store => ({ 
                     ...store, 
@@ -182,7 +190,7 @@ function createWalletStore() {
                         console.log('New account detected. Re-authenticating and updating user data.');
                         const newProvider = new ethers.providers.Web3Provider(window.ethereum);
                         await authenticateWallet(newProvider, accounts[0]);
-                        const userData = await handleUserData(accounts[0]);
+                        const userData = await handleUserData(newProvider, accounts[0]);
                         update(store => ({ 
                             ...store, 
                             provider: newProvider, 
@@ -204,7 +212,7 @@ function createWalletStore() {
                         const newProvider = new ethers.providers.Web3Provider(window.ethereum);
                         const newAddress = await newProvider.getSigner().getAddress();
                         await authenticateWallet(newProvider, newAddress);
-                        const userData = await handleUserData(newAddress);
+                        const userData = await handleUserData(newProvider, newAddress);
                         update(store => ({ 
                             ...store, 
                             provider: newProvider, 

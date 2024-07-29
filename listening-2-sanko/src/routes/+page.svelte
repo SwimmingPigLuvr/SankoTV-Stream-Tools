@@ -74,10 +74,10 @@
 				<h2
 					in:slide={{
 						delay: 0,
-						duration: 250,
+						duration: 300,
 						easing: cubicOut,
 					}}
-					class="translate-y-0 text-5xl space-x-0 flex items-baseline text-right font-badger"
+					class="translate-y-0 text-3xl space-x-0 flex items-baseline text-right font-badger"
 				>
 					<span class="text-red-500">S</span>
 					<span class="text-blue-500">A</span>
@@ -86,12 +86,12 @@
 					<span class={$isDarkMode ? "text-white" : "text-slate-800"}
 						>O</span
 					>
-					<span class="text-lime-400 tracking-[0.1rem]">.tv</span>
+					<span class="text-lime-400 tracking-[0.1rem]">.TV</span>
 				</h2>
 
 				<h1
 					class=" font-coolfont-pix-outlined {$isDarkMode
-						? 'text-yellow-100  title-glow'
+						? 'text-yellow-100  '
 						: 'text-white title-glow-blue'} text-4xl items-center flex space-x-0"
 				>
 					<p

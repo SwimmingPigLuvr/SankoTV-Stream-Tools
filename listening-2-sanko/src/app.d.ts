@@ -10,4 +10,8 @@ declare global {
 	}
 }
 
+declare module '$env/static/private' {
+    export const JWT_TOKEN: string;
+}
+
 export {};
