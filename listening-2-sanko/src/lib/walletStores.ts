@@ -81,9 +81,6 @@ function createWalletStore() {
            const now = new Date().toISOString();
             const token = await authenticateWallet(provider, address);
 
-            // set the JWT in the supabase client
-            supabase.auth.setAuth(token);
-
            const { data: user, error } = await supabase
                .from('users')
                .upsert(
@@ -127,6 +124,39 @@ function createWalletStore() {
 
     return {
         subscribe,
+        checkConnection: async (): Promise<boolean> => {
+            if (!browser || typeof window.ethereum === 'undefined') {
+                return false;
+            }
+
+            try {
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const accounts = await provider.listAccounts();
+                
+                if (accounts.length > 0) {
+                    const address = accounts[0];
+                    const network = await provider.getNetwork();
+
+                    if (network.chainId === SANKO_TESTNET.chainId) {
+                        // User is connected and on the correct network
+                        const userData = await handleUserData(provider, address);
+                        update(store => ({
+                            ...store,
+                            provider,
+                            signer: provider.getSigner(),
+                            address,
+                            chainId: network.chainId,
+                            userData
+                        }));
+                        return true;
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking connection:', error);
+            }
+
+            return false;
+        },
         connect: async (): Promise<ConnectResult> => {
             console.log('Connect method called');
             if (!browser || typeof window.ethereum === 'undefined') {
@@ -164,11 +194,22 @@ function createWalletStore() {
                 }
 
                 // Authenticate wallet
-                await authenticateWallet(provider, address);
+                const token = await authenticateWallet(provider, address);
 
                 // Handle user data in Supabase
                 console.log('Handling user data');
                 const userData = await handleUserData(provider, address);
+
+                // Set the session in Supabase
+                const { error: sessionError } = await supabase.auth.setSession({
+                    access_token: token,
+                    refresh_token: token, // Adjust if your JWT structure is different
+                });
+
+                if (sessionError) {
+                    console.error('Error setting Supabase session:', sessionError);
+                    throw sessionError;
+                }
 
                 update(store => ({ 
                     ...store, 
@@ -181,6 +222,8 @@ function createWalletStore() {
                 console.log('Store updated with user data');
 
                 // Setup listeners
+                window.ethereum.removeAllListeners(); // Remove any existing listeners to avoid duplicates
+
                 window.ethereum.on("accountsChanged", async (accounts: string[]) => {
                     console.log('Accounts changed:', accounts);
                     if (accounts.length === 0) {
@@ -188,16 +231,7 @@ function createWalletStore() {
                         this.disconnect();
                     } else {
                         console.log('New account detected. Re-authenticating and updating user data.');
-                        const newProvider = new ethers.providers.Web3Provider(window.ethereum);
-                        await authenticateWallet(newProvider, accounts[0]);
-                        const userData = await handleUserData(newProvider, accounts[0]);
-                        update(store => ({ 
-                            ...store, 
-                            provider: newProvider, 
-                            signer: newProvider.getSigner(), 
-                            address: accounts[0], 
-                            userData 
-                        }));
+                        await this.connect(); // Re-run the connect process
                     }
                 });
 
@@ -209,18 +243,7 @@ function createWalletStore() {
                         this.disconnect();
                     } else {
                         console.log('Correct chain. Re-authenticating and updating store.');
-                        const newProvider = new ethers.providers.Web3Provider(window.ethereum);
-                        const newAddress = await newProvider.getSigner().getAddress();
-                        await authenticateWallet(newProvider, newAddress);
-                        const userData = await handleUserData(newProvider, newAddress);
-                        update(store => ({ 
-                            ...store, 
-                            provider: newProvider, 
-                            signer: newProvider.getSigner(), 
-                            address: newAddress, 
-                            chainId: newChainId,
-                            userData 
-                        }));
+                        await this.connect(); // Re-run the connect process
                     }
                 });
 
