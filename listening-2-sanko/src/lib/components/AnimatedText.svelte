@@ -2,6 +2,7 @@
     import { tweened, type Tweened } from "svelte/motion";
     import { backOut, cubicInOut, elasticIn, elasticOut } from "svelte/easing";
     import { fly } from "svelte/transition";
+    import { isDarkMode } from "$lib/stores";
 
     export let text: string = "";
     export let duration: number = 500;
@@ -33,7 +34,9 @@
     {#each letters as letter, i}
         {#if i < position}
             <span
-                class="letter title-glow"
+                class="letter {$isDarkMode
+                    ? 'title-glow'
+                    : 'title-glow-blue'} title-glow"
                 in:fly={{
                     easing: backOut,
                     delay: (i / text.length) * duration,
@@ -63,6 +66,18 @@
             0 0 40px rgba(255, 255, 0, 0.5),
             0 0 50px rgba(255, 255, 255, 0.5),
             0 0 75px rgba(255, 255, 255, 0.5); /* More intense glow further out */
+    }
+
+    .title-glow-blue {
+        text-shadow:
+            0 0 5px rgba(255, 0, 255, 0.5),
+            0 0 10px rgba(255, 0, 255, 0.5),
+            0 0 15px rgba(255, 0, 255, 0.5),
+            0 0 20px rgba(255, 0, 255, 0.5),
+            0 0 30px rgba(255, 0, 255, 0.5),
+            0 0 40px rgba(255, 0, 255, 0.5),
+            0 0 50px rgba(255, 0, 255, 0.5),
+            0 0 75px rgba(255, 0, 255, 0.5);
     }
 
     .text-container {

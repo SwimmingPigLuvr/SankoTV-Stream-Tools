@@ -1,19 +1,27 @@
-import { JWT_TOKEN } from '$env/static/private';
-import { json } from '@sveltejs/kit';
-import type { RequestHandler } from "@sveltejs/kit";
+import { ethers } from 'ethers';
 import jwt from 'jsonwebtoken';
+import { JWT_SECRET } from '$env/static/private';
+import type { RequestHandler } from '@sveltejs/kit';
 
 export const POST: RequestHandler = async ({ request }) => {
-  const { address } = await request.json();
+    const { address, message, signature } = await request.json();
 
-  if (!address) {
-    return json({ error: 'address required'}, { status: 400 });
-  }
-  try {
-    const token = jwt.sign({ sub: address.toLowerCase() }, JWT_TOKEN, { expiresIn: '1d' });
-    return json({ token });
-  } catch (error) {
-    console.error('Error generating JWT:', error);
-    return json({ error: 'Failed to generate token' }, { status: 500 });
-  }
-}
+    // Verify the signature
+    const signerAddress = ethers.utils.verifyMessage(message, signature);
+    
+    if (signerAddress.toLowerCase() !== address.toLowerCase()) {
+        return new Response(JSON.stringify({ error: 'Invalid signature' }), { status: 401 });
+    }
+
+    // Generate JWT
+    const token = jwt.sign({
+        aud: 'authenticated',
+        role: 'authenticated',
+        sub: address,
+        exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24), // 24 hours from now
+    }, JWT_SECRET);
+
+    return new Response(JSON.stringify({ token }), {
+        headers: { 'Content-Type': 'application/json' }
+    });
+};

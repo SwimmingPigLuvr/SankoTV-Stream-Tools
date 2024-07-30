@@ -30,7 +30,6 @@
 </script>
 
 <body class="bg-slate-900">
-
 	<slot />
 
 	<footer>

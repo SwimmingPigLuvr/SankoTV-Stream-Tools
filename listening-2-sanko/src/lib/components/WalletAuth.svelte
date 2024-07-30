@@ -32,7 +32,12 @@
                     const { token } = await response.json();
 
                     // Set Supabase session
-                    await supabase.auth.setSession(token);
+                    const { error } = await supabase.auth.setSession({
+                        access_token: token,
+                        refresh_token: token,
+                    });
+
+                    if (error) throw error;
 
                     isConnected = true;
                 } else {
@@ -53,7 +58,9 @@
     }
 
     onMount(async () => {
-        const session = await supabase.auth.getSession();
+        const {
+            data: { session },
+        } = await supabase.auth.getSession();
         if (session) {
             isConnected = true;
             address = session.user.id; // Assuming user.id is the wallet address

@@ -92,7 +92,7 @@
 				<h1
 					class=" font-coolfont-pix-outlined {$isDarkMode
 						? 'text-yellow-100  '
-						: 'text-white title-glow-blue'} text-4xl items-center flex space-x-0"
+						: 'text-white'} text-4xl items-center flex space-x-0"
 				>
 					<p
 						in:fly={{
@@ -193,27 +193,4 @@
 </main>
 
 <style>
-	.title-glow {
-		text-shadow:
-			0 0 5px rgba(255, 255, 0, 0.5),
-			0 0 10px rgba(255, 255, 0, 0.5),
-			0 0 15px rgba(255, 255, 0, 0.5),
-			0 0 20px rgba(255, 255, 0, 0.5),
-			/* Add a hint of color */ 0 0 30px rgba(255, 255, 0, 0.5),
-			0 0 40px rgba(255, 255, 0, 0.5),
-			0 0 50px rgba(255, 255, 255, 0.5),
-			0 0 75px rgba(255, 255, 255, 0.5); /* More intense glow further out */
-	}
-
-	.title-glow-blue {
-		text-shadow:
-			0 0 5px rgba(255, 0, 255, 0.5),
-			0 0 10px rgba(255, 0, 255, 0.5),
-			0 0 15px rgba(255, 0, 255, 0.5),
-			0 0 20px rgba(255, 0, 255, 0.5),
-			0 0 30px rgba(255, 0, 255, 0.5),
-			0 0 40px rgba(255, 0, 255, 0.5),
-			0 0 50px rgba(255, 0, 255, 0.5),
-			0 0 75px rgba(255, 0, 255, 0.5);
-	}
 </style>
