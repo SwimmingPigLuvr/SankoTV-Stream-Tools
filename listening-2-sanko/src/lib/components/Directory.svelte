@@ -1,30 +1,15 @@
 <script lang="ts">
     import WalletAddress from "$lib/components/WalletAddress.svelte";
-    import { isDarkMode } from "$lib/stores";
+    import { isDarkMode, showDirectory } from "$lib/stores";
     import { onMount } from "svelte";
     import { cubicInOut } from "svelte/easing";
     import { fade, fly, slide } from "svelte/transition";
     import DarkMode from "./DarkMode.svelte";
+    import { page } from "$app/stores";
+
+    export let isMobile: boolean = false;
 
     let sectionData = [{ name: "zyn" }, { name: "top donation" }];
-
-    let windowWidth: number;
-
-    const MOBILE_BREAKPOINT = 768;
-
-    $: isMobile = windowWidth <= MOBILE_BREAKPOINT;
-
-    function handleResize() {
-        windowWidth = window.innerWidth;
-    }
-
-    onMount(() => {
-        windowWidth = window.innerWidth;
-        window.addEventListener("resize", handleResize);
-        return () => {
-            window.removeEventListener("resize", handleResize);
-        };
-    });
 
     const widgets = [
         "AI + Text to Speech",
@@ -49,21 +34,18 @@
     function showCurrentSection(section: string) {
         activeSection = activeSection === section ? null : section;
     }
+
+    $: showDirectory.set($page.url.pathname === "/dashboard");
 </script>
 
-<main
-    class="w-full {isMobile
-        ? 'fixed w-full top-0 left-0'
-        : ''} p-4 min-h-screen font-mono {$isDarkMode
-        ? 'text-white'
-        : 'text-slate-800'}"
->
-    {#if isMobile}
-        <button
-            class="fixed top-2 left-2 p-2 w-8 h-8 flex items-center text-center hover:bg-slate-700 rounded-full"
-            >🧪</button
-        >
-    {:else}
+{#if $showDirectory}
+    <main
+        class="w-full {isMobile
+            ? 'fixed w-full top-0 left-0'
+            : ''} p-4 min-h-screen font-mono {$isDarkMode
+            ? 'text-white'
+            : 'text-slate-800'}"
+    >
         <div
             class="mt-16 flex flex-col space-y-8 items-start justify-center m-auto font-mono"
         >
@@ -122,10 +104,10 @@
                 </div>
             </div>
         </div>
-    {/if}
-    {#if !isMobile}
-        <div class="fixed bottom-2 left-2">
-            <DarkMode />
-        </div>
-    {/if}
-</main>
+        {#if !isMobile}
+            <div class="fixed bottom-2 left-2">
+                <DarkMode />
+            </div>
+        {/if}
+    </main>
+{/if}

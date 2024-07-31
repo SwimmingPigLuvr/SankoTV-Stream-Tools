@@ -1,12 +1,15 @@
 <!-- src/lib/components/Nav.svelte -->
 <script lang="ts">
-    import { isDarkMode } from "$lib/stores";
+    import { isDarkMode, showDirectory } from "$lib/stores";
     import { user } from "$lib/stores/authStore";
     import { supabase } from "$lib/supabaseClient";
     import { backOut } from "svelte/easing";
     import { fly } from "svelte/transition";
     import AnimatedText from "./AnimatedText.svelte";
     import WalletAddress from "$lib/components/WalletAddress.svelte";
+
+    export let isMobile: boolean;
+
 
     let isLoading = false;
     let error: string | null = null;
@@ -39,17 +42,26 @@
             isLoading = false;
         }
     }
+
+    function toggleDir() {
+        showDirectory.set(!$showDirectory);
+    }
 </script>
 
-<nav class="text-white bg-lime-400">
+<nav class="text-white z-20">
     <div class="w-full mx-auto flex justify-between items-center">
+        <button on:click={toggleDir} class="fixed top-2 left-2">menu</button>
         <a
             href="/"
-            class="fixed top-2 left-4 font-coolfont-pix-outlined {$isDarkMode
+            class="fixed top-2 {isMobile
+                ? 'left-1/2 -translate-x-1/2'
+                : 'left-4'} font-coolfont-pix-outlined {$isDarkMode
                 ? 'text-yellow-100 title-glow-hover '
                 : 'text-white title-glow-blue-hover'} text-xl items-center flex space-x-0"
         >
-            <p class="text-[1.5rem]">StarLabs <span class="text-[1rem]">⭐️🧪</span></p>
+            <p class="text-[1.5rem]">
+                StarLabs <span class="text-[1rem]">⭐️🧪</span>
+            </p>
         </a>
 
         <div>

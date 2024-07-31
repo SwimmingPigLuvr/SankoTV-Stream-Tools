@@ -296,3 +296,9 @@ heres the old one so i don't lose it
 	</div>
 </main>
 
+great work today. let's keep it up
+
+for tomorrow:
+
+make the mobile look nice and organized
+finish the db setup: blank data obj etc.
