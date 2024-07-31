@@ -238,7 +238,7 @@ save the connect button for the wallet auth because i really like the way i desi
 						{isConnecting ? "Connecting..." : "Connect"}
 					</button>
 
-                    if connected
+				    if connected
 					<!-- wallet address + disconnect button -->
 					<div
 						in:fly={{ y: -10 }}
@@ -257,3 +257,16 @@ save the connect button for the wallet auth because i really like the way i desi
 						</button>
 					</div>
 
+we don't need to show the user a sign out button asap
+
+so how about we have some sort of acknowledgment that they're signed in
+
+if authed by google but no wallet and or username
+
+signed in as {username ? username : 'anon'}
+if wallet.address
+    trucated address + disconnect button
+if no wallet.address
+    connect button
+
+instead of making the user go to the dashboard we should get their wallet right away
