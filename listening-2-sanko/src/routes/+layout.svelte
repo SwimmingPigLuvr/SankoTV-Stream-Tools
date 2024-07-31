@@ -5,6 +5,7 @@
 	import "../app.css";
 	import { browser } from "$app/environment";
 	import DarkMode from "$lib/components/DarkMode.svelte";
+	import { user } from "$lib/stores/authStore";
 
 	let isConnecting = false;
 	let error = "";

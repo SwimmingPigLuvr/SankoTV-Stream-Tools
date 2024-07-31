@@ -183,3 +183,14 @@ walletstores.ts should be refactored
 components should be made where necessary
 
 my typing feels slow so im going to practice a bit 
+
+
+well i have the google sign in working.
+
+so now we have some questions / decisions to make about ux
+
+go straight to dashboard?
+or show a dashboard button? i think show a dashboard button so they know
+what the f is happening.
+
+
