@@ -194,3 +194,66 @@ or show a dashboard button? i think show a dashboard button so they know
 what the f is happening.
 
 
+
+
+need to dump some thoughts so that i can handle the outline of the homepage ux
+
+if $user
+    show:
+    dashboard button
+    signout button
+else
+    show:
+    google sign in
+
+signout button should just live in the google auth component
+
+so google auth is always shown so it looks like
+
+if $user
+    show:
+    dashboard button
+else
+    dont show:
+    dashboard button
+
+google auth component
+
+save the connect button for the wallet auth because i really like the way i designed it
+
+
+				<!-- connect wallet -->
+					<button
+						in:slide={{
+							easing: backOut,
+							delay: 1000,
+							duration: 1000,
+						}}
+						class="transform transition-all duration-100 ease-[backOut] border-blue-700 border-[1px] {$isDarkMode
+							? 'text-white hover:bg-blue-900'
+							: 'text-blue-700 bg-white hover:bg-blue-700 hover:text-white'} font-serif italic p-2 -tracking-wider px-4 rounded-full"
+						on:click={() => (showGoogleAuthButton = true)}
+						disabled={isConnecting}
+					>
+						{isConnecting ? "Connecting..." : "Connect"}
+					</button>
+
+                    if connected
+					<!-- wallet address + disconnect button -->
+					<div
+						in:fly={{ y: -10 }}
+						class="rounded-full w-48 flex justify-between space-x-4 items-center {$isDarkMode
+							? 'bg-blue-700'
+							: 'bg-blue-300 text-slate-800'} px-4 p-2 font-mono text-xs -tracking-widest"
+					>
+						<button class="">
+							{truncatedAddress}
+						</button>
+						<button
+							class="font-bold"
+							on:click={() => walletStore.disconnect()}
+						>
+							Disconnect
+						</button>
+					</div>
+

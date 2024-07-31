@@ -1,32 +1,58 @@
+<!-- $lib/components/GoogleSignIn.svelte -->
 <script lang="ts">
     import { supabase } from "$lib/supabaseClient";
-    import { goto } from "$app/navigation";
+    import { user } from "$lib/stores/authStore";
 
-    // Function to sign in using Google OAuth
+    let isLoading = false;
+    let error: string | null = null;
+
     async function signInWithGoogle() {
-        const { data, error } = await supabase.auth.signInWithOAuth({
-            provider: "google",
-            options: {
-                redirectTo: "http://localhost:5173/dashboard",
-            },
-        });
-
-        if (error) {
-            console.error("Error signing in with Google:", error);
-            // Handle error (e.g., show error message to user)
-        } else {
-            // Handle successful sign-in (e.g., redirect to dashboard)
-            console.log("Signed in successfully:", data);
-            goto("/dashboard");
+        isLoading = true;
+        error = null;
+        const { data, error: signInError } =
+            await supabase.auth.signInWithOAuth({
+                provider: "google",
+                options: {
+                    redirectTo: "http://localhost:5173/auth/callback",
+                },
+            });
+        if (signInError) {
+            console.error("Error signing in with Google:", signInError);
+            error = signInError.message;
         }
+        isLoading = false;
+    }
+
+    async function signOut() {
+        isLoading = true;
+        error = null;
+        const { error: signOutError } = await supabase.auth.signOut();
+        if (signOutError) {
+            console.error("Error signing out:", signOutError);
+            error = signOutError.message;
+        }
+        isLoading = false;
     }
 </script>
 
-<!-- Buttons for user actions -->
-<button
-    on:click={signInWithGoogle}
-    class="bg-white items-center text-left flex justify-start hover:bg-black hover:text-white text-black font-bold font-mono -tracking-wide p-2 px-4 rounded-full"
->
-    <img class="h-4" src="/logos/google_g_logo.svg" alt="" />
-    <p class="pl-2">Sign in with Google</p>
-</button>
+{#if $user}
+    <button
+        on:click={signOut}
+        class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+        disabled={isLoading}
+    >
+        {isLoading ? "Signing out..." : "Sign out"}
+    </button>
+{:else}
+    <button
+        on:click={signInWithGoogle}
+        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        disabled={isLoading}
+    >
+        {isLoading ? "Signing in..." : "Sign in with Google"}
+    </button>
+{/if}
+
+{#if error}
+    <p class="text-red-500 mt-2">{error}</p>
+{/if}

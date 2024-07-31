@@ -16,6 +16,7 @@
 	} from "svelte/easing";
 	import AnimatedText from "$lib/components/AnimatedText.svelte";
 	import GoogleAuth from "$lib/components/GoogleAuth.svelte";
+	import { user } from "$lib/stores/authStore";
 
 	$: truncatedAddress = $walletStore.address
 		? truncateAddress($walletStore.address)
@@ -26,6 +27,8 @@
 	let showTitle = false;
 	let showConnect = false;
 	let showGoogleAuthButton = false;
+
+	let showUx = false;
 
 	async function handleConnect() {
 		isConnecting = true;
@@ -54,7 +57,7 @@
 		}, 500);
 
 		setTimeout(() => {
-			showConnect = true;
+			showUx = true;
 		}, 1500);
 	});
 </script>
@@ -125,63 +128,29 @@
 			</div>
 		{/if}
 
-		<!-- Wallet Connection and Authentication -->
-		<div class="m-auto flex flex-col space-y-8 items-center">
-			{#if $walletStore.address}
-				<a
-					class="px-4 p-2 {$isDarkMode
-						? 'border-white'
-						: 'border-slate-800'} border-[1px] hover:text-lime-400 hover:bg-slate-950 rounded-full font-coolfont text-xl"
-					href="/dashboard">Dashboard</a
-				>
-				<div
-					in:fly={{ y: -10 }}
-					class="rounded-full w-48 flex justify-between space-x-4 items-center {$isDarkMode
-						? 'bg-blue-700'
-						: 'bg-blue-300 text-slate-800'} px-4 p-2 font-mono text-xs -tracking-widest"
-				>
-					<button class="">
-						{truncatedAddress}
-					</button>
-					<button
-						class="font-bold"
-						on:click={() => walletStore.disconnect()}
+		{#if showUx}
+			<!-- Wallet Connection and Authentication -->
+			<div class="m-auto flex flex-col space-y-8 items-center">
+				{#if $user}
+					<a
+						class="px-4 p-2 {$isDarkMode
+							? 'border-white'
+							: 'border-slate-800'} border-[1px] hover:text-lime-400 hover:bg-slate-950 rounded-full font-coolfont text-xl"
+						href="/dashboard">Dashboard</a
 					>
-						Disconnect
-					</button>
-				</div>
-			{:else}
-				<!-- connect wallet -->
-				{#if showConnect}
-					<button
-						in:slide={{
-							easing: backOut,
-							delay: 1000,
-							duration: 1000,
-						}}
-						class="transform transition-all duration-100 ease-[backOut] border-blue-700 border-[1px] {$isDarkMode
-							? 'text-white hover:bg-blue-900'
-							: 'text-blue-700 bg-white hover:bg-blue-700 hover:text-white'} font-serif italic p-2 -tracking-wider px-4 rounded-full"
-						on:click={() => (showGoogleAuthButton = true)}
-						disabled={isConnecting}
-					>
-						{isConnecting ? "Connecting..." : "Connect"}
-					</button>
-					{#if showGoogleAuthButton}
-						<div>
-							<GoogleAuth />
-						</div>
-					{/if}
 				{/if}
-			{/if}
-			{#if error}
-				<p
-					class="p-1 px-3 border-red-600 rounded border-b-8 border-[1px] text-red-600 font-coolfont-pixel mt-2"
-				>
-					error: {error}
-				</p>
-			{/if}
-		</div>
+				{#if error}
+					<p
+						class="p-1 px-3 border-red-600 rounded border-b-8 border-[1px] text-red-600 font-coolfont-pixel mt-2"
+					>
+						error: {error}
+					</p>
+				{/if}
+			</div>
+			<div>
+				<GoogleAuth />
+			</div>
+		{/if}
 	</div>
 	<div
 		in:slide={{ delay: 1500 }}
