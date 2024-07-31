@@ -41,7 +41,7 @@
     }
 </script>
 
-<nav class="text-white p-4">
+<nav class="text-white bg-lime-400">
     <div class="w-full mx-auto flex justify-between items-center">
         <a
             href="/"
@@ -49,7 +49,7 @@
                 ? 'text-yellow-100 title-glow-hover '
                 : 'text-white title-glow-blue-hover'} text-xl items-center flex space-x-0"
         >
-            <p class="text-[1.5rem]">StarLabs</p>
+            <p class="text-[1.5rem]">StarLabs <span class="text-[1rem]">⭐️🧪</span></p>
         </a>
 
         <div>

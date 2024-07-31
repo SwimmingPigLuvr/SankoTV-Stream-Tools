@@ -107,6 +107,8 @@
 		"amsterdam",
 		"amsterdam-display",
 		"anthem",
+		"badger",
+		"botch",
 		"cinema",
 		"coolfont",
 		"coolfont-cloud",

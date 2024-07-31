@@ -69,7 +69,9 @@
         >
             <!-- Main Sections -->
             <div class="w-full">
-                <div class="flex flex-col items-center justify-center text-center w-full">
+                <div
+                    class="flex flex-col items-center justify-center text-center w-full"
+                >
                     {#each mainSections as section}
                         <button
                             on:click={() => showCurrentSection(section)}
