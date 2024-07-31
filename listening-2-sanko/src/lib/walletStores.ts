@@ -41,7 +41,7 @@ const SANKO_MAINNET = {
     blockExplorerUrls: ["https://explorer.sanko.xyz/"]
 };
 
-unction createWalletStore() {
+function createWalletStore() {
     const { subscribe, set, update } = writable<WalletStore>({
         provider: null,
         signer: null,

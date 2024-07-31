@@ -1,4 +1,5 @@
 gift data
+
     data: {eventHash: "0x6f73448519db18b34a25e02b434b96880d0181f81de5e6fef185e6ffdd8c8319", eventType: "GIFT",…}
         event: {eventName: "app:GIFT_MINTED",…}
             attributes: {hostId: "did:privy:clqztr27000ahjp0f8grn1tof", privyI: "did:privy:clolmnbmg02b9jq0fk2mrmwtv",…}
@@ -278,3 +279,20 @@ also need to edit the auth policies because the wallet should be connected to th
 so google creates auth.uid (main auth for supabase user)
 wallet_address validates that they are allowed to make changes
 both need to be true
+
+8:44pm
+test a new layout option
+heres the old one so i don't lose it
+<script>
+	import Directory from "$lib/components/Directory.svelte";
+</script>
+
+<main class="flex justify-between w-full">
+	<div class="fixed w-1/4">
+		<Directory />
+	</div>
+	<div class="ml-auto w-full md:w-3/4">
+		<slot />
+	</div>
+</main>
+

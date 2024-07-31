@@ -19,15 +19,4 @@
 		<WalletAddress />
 	</div>
 
-	<h1
-		class="fixed top-2 left-1/2 -translate-x-1/2 font-serif italic -tracking-widest -translate-y-1 items-center flex space-x-2"
-	>
-		⭐️
-		<span class="text-[2rem] p-2">StarLabs</span>
-		🧪
-	</h1>
-
-	{#if userData}
-		<p class="text-lime-400">welcome {userData.wallet_address}</p>
-	{/if}
 </main>
