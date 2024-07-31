@@ -37,6 +37,7 @@
             isConnecting = false;
         }
     }
+
 </script>
 
 <div>
@@ -69,7 +70,7 @@
             on:click={handleConnect}
             disabled={isConnecting}
         >
-            {isConnecting ? "Connecting..." : "Connect"}
+            {isConnecting ? "Connecting..." : "Connect Wallet"}
         </button>
     {/if}
 </div>

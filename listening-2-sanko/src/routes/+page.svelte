@@ -102,10 +102,10 @@
 		{/if}
 
 		{#if showUx}
-			<div class="fixed top-1/2">
+			<div class="fixed top-1/2 flex flex-col space-y-2">
 				<!-- Wallet Connection and Authentication -->
 				<div
-					in:slide={{ duration: 500, easing: backOut, delay: 2500 }}
+					in:slide={{ duration: 500, easing: backOut }}
 					class="m-auto flex flex-col space-y-8 items-center"
 				>
 					{#if $user}
@@ -124,9 +124,10 @@
 						</p>
 					{/if}
 				</div>
-				<GoogleAuth />
 				{#if $user}
 					<WalletAuth />
+				{:else}
+					<GoogleAuth />
 				{/if}
 			</div>
 		{/if}

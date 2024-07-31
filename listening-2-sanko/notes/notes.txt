@@ -270,3 +270,11 @@ if no wallet.address
     connect button
 
 instead of making the user go to the dashboard we should get their wallet right away
+
+need to change the connect functions because the wallet is NOT handling supabase auth!
+
+also need to edit the auth policies because the wallet should be connected to the right address on the user account
+
+so google creates auth.uid (main auth for supabase user)
+wallet_address validates that they are allowed to make changes
+both need to be true
