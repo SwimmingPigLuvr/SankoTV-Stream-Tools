@@ -161,3 +161,25 @@ trim unnecessary items from folder
 
 animatino of beaker pouring into something then it explodes into a star
 
+
+july 30 notes
+
+spent the morning coding at anns and it was very relaxing and peaceful. 
+that lazy boy is ideal for having my feet up but still being up right
+
+the key takeaways
+
+need traditional auth to add users to my supabase db
+going to use google because it is probably the most common denominator
+besides sanko.tv uses a normal auth along with a wallet.
+
+so here's how it looks like:
+users auth with google => account gets created in the db
+users connect their wallet => can start saving data in db
+
+right now my supabase and google are already set up for success i just need to refactor my code to do this new auth flow
+
+walletstores.ts should be refactored
+components should be made where necessary
+
+my typing feels slow so im going to practice a bit 

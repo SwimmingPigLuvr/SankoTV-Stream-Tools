@@ -15,6 +15,7 @@
 		cubicOut,
 	} from "svelte/easing";
 	import AnimatedText from "$lib/components/AnimatedText.svelte";
+	import GoogleAuth from "$lib/components/GoogleAuth.svelte";
 
 	$: truncatedAddress = $walletStore.address
 		? truncateAddress($walletStore.address)
@@ -24,6 +25,7 @@
 	let error = "";
 	let showTitle = false;
 	let showConnect = false;
+	let showGoogleAuthButton = false;
 
 	async function handleConnect() {
 		isConnecting = true;
@@ -160,11 +162,16 @@
 						class="transform transition-all duration-100 ease-[backOut] border-blue-700 border-[1px] {$isDarkMode
 							? 'text-white hover:bg-blue-900'
 							: 'text-blue-700 bg-white hover:bg-blue-700 hover:text-white'} font-serif italic p-2 -tracking-wider px-4 rounded-full"
-						on:click={handleConnect}
+						on:click={() => (showGoogleAuthButton = true)}
 						disabled={isConnecting}
 					>
 						{isConnecting ? "Connecting..." : "Connect"}
 					</button>
+					{#if showGoogleAuthButton}
+						<div>
+							<GoogleAuth />
+						</div>
+					{/if}
 				{/if}
 			{/if}
 			{#if error}
