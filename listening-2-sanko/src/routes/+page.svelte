@@ -127,9 +127,8 @@
 				</div>
 				{#if $user}
 					<WalletAuth />
-				{:else}
-					<GoogleAuth />
 				{/if}
+				<GoogleAuth />
 			</div>
 		{/if}
 	</div>

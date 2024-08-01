@@ -38,17 +38,19 @@
 {#if $user}
     <button
         on:click={signOut}
-        class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+        class="bg-black flex items-center space-x-4 hover:bg-red-900 text-red-500 font-bold font-mono w-40 m-auto border-red-500 border-[1px] hover:text-white py-2 px-4 rounded-full"
         disabled={isLoading}
     >
+        <img class="h-4 pr-4" src="logos/google_g_logo.svg" alt="">
         {isLoading ? "Signing out..." : "Sign out"}
     </button>
 {:else}
     <button
         on:click={signInWithGoogle}
-        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        class="bg-white text-black flex items-center hover:bg-blue-700 font-mono font-bold py-2 px-4 rounded-full"
         disabled={isLoading}
     >
+        <img class="h-4 pr-4" src="logos/google_g_logo.svg" alt="">
         {isLoading ? "Signing in..." : "Sign in with Google"}
     </button>
 {/if}

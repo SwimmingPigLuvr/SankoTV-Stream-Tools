@@ -4,12 +4,14 @@
     import { user } from "$lib/stores/authStore";
     import { supabase } from "$lib/supabaseClient";
     import { backOut } from "svelte/easing";
-    import { fly } from "svelte/transition";
+    import { fade, fly, slide } from "svelte/transition";
     import AnimatedText from "./AnimatedText.svelte";
     import WalletAddress from "$lib/components/WalletAddress.svelte";
     import { page } from "$app/stores";
 
     export let isMobile: boolean;
+
+    let showMenuToolTip = false;
 
     let isUrlDashboard: boolean;
     $: isUrlDashboard = $page.url.pathname === "/dashboard";
@@ -52,16 +54,26 @@
 </script>
 
 <nav class="text-white z-20">
-    <div class="w-full mx-auto flex justify-between items-center">
+    <div class="w-full text-xl mx-auto flex justify-between items-center">
         {#if !isUrlDashboard}
             <button
+                on:mouseenter={() => (showMenuToolTip = true)}
+                on:mouseleave={() => (showMenuToolTip = false)}
                 on:click={toggleDir}
-                class="{isMobile ? '' : 'hidden'} fixed top-2 left-2"
+                class="{isMobile ? '' : 'hidden'} p-2 fixed top-0 left-0"
             >
                 {#if $showDirectory}
-                    close
+                    ❎
                 {:else}
-                    menu
+                    🔬
+                {/if}
+                {#if showMenuToolTip}
+                    <div
+                        in:slide
+                        class="absolute top-1/2 -translate-y-1/2 left-9 font-bold text-xs bg-slate-300 text-slate-600 p-1 px-3 rounded-full"
+                    >
+                        <p>{$showDirectory ? "close" : "menu"}</p>
+                    </div>
                 {/if}
             </button>
         {/if}
