@@ -37,22 +37,22 @@
 </script>
 
 <main class="flex justify-between w-full">
-<Nav isMobile={$isMobile} />
+	<div class="z-40">
+		<Nav isMobile={$isMobile} />
+	</div>
 	{#if browser}
 		<div
 			class={centered
 				? "mx-auto w-1/2"
 				: $isMobile
-					? "w-full"
+					? "w-full z-30"
 					: "fixed w-1/4"}
 		>
 			<Directory isMobile={$isMobile} />
 		</div>
-		{#if !centered && !$isMobile}
-			<div class="ml-auto w-full md:w-3/4">
-				<slot />
-			</div>
-		{/if}
+		<div class="ml-auto w-full md:w-3/4">
+			<slot />
+		</div>
 	{/if}
 </main>
 

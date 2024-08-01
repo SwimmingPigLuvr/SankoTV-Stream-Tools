@@ -35,12 +35,26 @@
         activeSection = activeSection === section ? null : section;
     }
 
-    $: showDirectory.set($page.url.pathname === "/dashboard");
+    $: if ($page.url.pathname === "/dashboard") {
+        showDirectory.set(true);
+    }
+    $: if (!isMobile) {
+        showDirectory.set(true);
+    }
+
+    function handleGoToDonationAlerts() {
+        if (isMobile) {
+            showDirectory.set(false);
+        } else if (!isMobile) {
+            showDirectory.set(true);
+        }
+    }
 </script>
 
 {#if $showDirectory}
     <main
-        class="w-full {isMobile
+        in:slide
+        class="w-full bg-slate-800 h-screen {isMobile
             ? 'fixed w-full top-0 left-0'
             : ''} p-4 min-h-screen font-mono {$isDarkMode
             ? 'text-white'
@@ -52,12 +66,12 @@
             <!-- Main Sections -->
             <div class="w-full">
                 <div
-                    class="flex flex-col items-center justify-center text-center w-full"
+                    class="flex flex-col items-center justify-center text-left w-full"
                 >
                     {#each mainSections as section}
                         <button
                             on:click={() => showCurrentSection(section)}
-                            class="rounded-none w-full p-2 text-center items-center justify-center hover:bg-amber-400 hover:bg-opacity-10 hover:border-amber-300 border-transparent border-[1px]"
+                            class="rounded-none w-full p-2 text-left items-center justify-center hover:bg-amber-400 hover:bg-opacity-10 hover:border-amber-300 border-transparent border-[1px]"
                         >
                             <span class="text-xl">{section}</span>
                         </button>
@@ -72,12 +86,13 @@
                             >
                                 <a
                                     href="/dashboard/donation-alerts"
-                                    class="w-full text-center hover:text-amber-400 p-2"
+                                    on:click={handleGoToDonationAlerts}
+                                    class="w-full text-left hover:text-amber-400 p-2"
                                     >create new</a
                                 >
                                 {#each sectionData as data}
                                     <button
-                                        class="w-full text-center hover:text-amber-400 p-2"
+                                        class="w-full text-left hover:text-amber-400 p-2"
                                         >{data.name}</button
                                     >
                                 {/each}
@@ -89,14 +104,14 @@
 
             <!-- Widgets -->
             <div class="w-full">
-                <h2 class="text-2xl p-2 text-center">Widgets</h2>
+                <h2 class="text-2xl p-2 text-left">Widgets</h2>
                 <div class="flex flex-col">
                     {#each widgets as widget}
                         <a
                             href="/dashboard/{widget
                                 .toLowerCase()
                                 .replace(' ', '-')}"
-                            class="rounded-none hover:bg-amber-400 hover:bg-opacity-10 hover:border-amber-300 border-transparent border-2 p-2 text-center"
+                            class="rounded-none hover:bg-amber-400 hover:bg-opacity-10 hover:border-amber-300 border-transparent border-2 p-2 text-left"
                         >
                             <span class="text-">{widget}</span>
                         </a>

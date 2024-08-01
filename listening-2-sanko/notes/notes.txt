@@ -279,7 +279,7 @@ also need to edit the auth policies because the wallet should be connected to th
 so google creates auth.uid (main auth for supabase user)
 wallet_address validates that they are allowed to make changes
 both need to be true
-
+ 
 8:44pm
 test a new layout option
 heres the old one so i don't lose it
@@ -302,3 +302,12 @@ for tomorrow:
 
 make the mobile look nice and organized
 finish the db setup: blank data obj etc.
+
+july 31
+
+directory on mobile:
+    if url is dashboard/donation-alerts
+	if isMobile
+	    the menu button should appear 
+	    the directory should be able to be toggled
+	else if notMobile

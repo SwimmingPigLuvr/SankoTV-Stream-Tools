@@ -7,9 +7,12 @@
     import { fly } from "svelte/transition";
     import AnimatedText from "./AnimatedText.svelte";
     import WalletAddress from "$lib/components/WalletAddress.svelte";
+    import { page } from "$app/stores";
 
     export let isMobile: boolean;
 
+    let isUrlDashboard: boolean;
+    $: isUrlDashboard = $page.url.pathname === "/dashboard";
 
     let isLoading = false;
     let error: string | null = null;
@@ -50,7 +53,18 @@
 
 <nav class="text-white z-20">
     <div class="w-full mx-auto flex justify-between items-center">
-        <button on:click={toggleDir} class="fixed top-2 left-2">menu</button>
+        {#if !isUrlDashboard}
+            <button
+                on:click={toggleDir}
+                class="{isMobile ? '' : 'hidden'} fixed top-2 left-2"
+            >
+                {#if $showDirectory}
+                    close
+                {:else}
+                    menu
+                {/if}
+            </button>
+        {/if}
         <a
             href="/"
             class="fixed top-2 {isMobile
