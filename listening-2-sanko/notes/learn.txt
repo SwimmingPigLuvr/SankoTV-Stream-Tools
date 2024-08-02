@@ -1,0 +1,4 @@
+things that i dont know
+
+postGres
+sql

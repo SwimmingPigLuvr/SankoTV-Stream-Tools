@@ -71,25 +71,8 @@
         const {
             data: { session },
         } = await supabase.auth.getSession();
-        if (session) {
-            // check if user exists in the users table
-            const { data, error: userError } = await supabase
-                .from("users")
-                .select("id")
-                .eq("id", session.user.id)
-                .single();
-
-            if (userError || !data) {
-                // if user does not exist create a new record
-                const { error: insertError } = await supabase
-                    .from("users")
-                    .insert({ id: session.user.id, email: session.user.email });
-
-                if (insertError) {
-                    console.error("error creating user record:", insertError);
-                    error = "failed to create user record";
-                }
-            }
+        if (session?.user) {
+            await handleNewUser(session.user.id, session.user.email || "");
         }
     });
 </script>
