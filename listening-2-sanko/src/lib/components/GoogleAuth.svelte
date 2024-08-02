@@ -2,6 +2,7 @@
 <script lang="ts">
     import { supabase } from "$lib/supabaseClient";
     import { user } from "$lib/stores/authStore";
+    import { blur } from "svelte/transition";
 
     let isLoading = false;
     let error: string | null = null;
@@ -38,7 +39,7 @@
 {#if $user}
     <button
         on:click={signOut}
-        class="bg-black flex items-center space-x-4 hover:bg-red-900 text-red-500 font-bold font-mono w-40 m-auto border-red-500 border-[1px] hover:text-white py-2 px-4 rounded-full"
+        class="flex items-center space-x-4 hover:bg-red-900 text-red-500 font-bold font-mono w-40 m-auto border-red-500 border-[1px] hover:text-white py-2 px-4 rounded-full"
         disabled={isLoading}
     >
         <img class="h-4 pr-4" src="logos/google_g_logo.svg" alt="">
@@ -46,6 +47,7 @@
     </button>
 {:else}
     <button
+        in:blur
         on:click={signInWithGoogle}
         class="bg-white text-black flex items-center hover:bg-blue-700 font-mono font-bold py-2 px-4 rounded-full"
         disabled={isLoading}

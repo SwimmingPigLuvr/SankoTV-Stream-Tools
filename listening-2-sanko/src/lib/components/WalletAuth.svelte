@@ -10,10 +10,14 @@
     import { fly, slide } from "svelte/transition";
     import { backOut } from "svelte/easing";
 
+    export let isNav: boolean = false;
+
     let isConnected = false;
     let address: string | null = null;
     let error: string | null = null;
     let isConnecting = false;
+
+    let showDisconnect = false;
 
     $: truncatedAddress = $walletStore.address
         ? truncateAddress($walletStore.address)
@@ -38,24 +42,33 @@
         }
     }
 
+    function handleClickAddress() {
+
+    }
 </script>
 
-<div>
+<div class="m-auto">
     {#if $walletStore.address}
         <!-- wallet address + disconnect button -->
-        <div
+        <button
+            on:click={() => showDisconnect = true}
             in:fly={{ y: -10 }}
-            class="rounded-full w-48 flex justify-between space-x-4 items-center {$isDarkMode
+            class="rounded-full flex justify-between space-x-4 items-center {$isDarkMode
                 ? 'bg-blue-700'
                 : 'bg-blue-300 text-slate-800'} px-4 p-2 font-mono text-xs -tracking-widest"
         >
             <button class="">
                 {truncatedAddress}
             </button>
-            <button class="font-bold" on:click={() => walletStore.disconnect()}>
-                Disconnect
-            </button>
-        </div>
+            {#if showDisconnect}
+                <button
+                    class="font-bold"
+                    on:click={() => walletStore.disconnect()}
+                >
+                    Disconnect
+                </button>
+            {/if}
+        </button>
     {:else}
         <!-- connect wallet -->
         <button
@@ -66,7 +79,7 @@
             }}
             class="transform transition-all duration-100 ease-[backOut] border-blue-700 border-[1px] {$isDarkMode
                 ? 'text-white hover:bg-blue-900'
-                : 'text-blue-700 bg-white hover:bg-blue-700 hover:text-white'} font-serif italic p-2 -tracking-wider px-4 rounded-full"
+                : 'text-blue-700 bg-white hover:bg-blue-700 hover:text-white'} {isNav ? 'text-xs' : 'text-md'} font-serif italic p-2 -tracking-wider px-4 rounded-full"
             on:click={handleConnect}
             disabled={isConnecting}
         >

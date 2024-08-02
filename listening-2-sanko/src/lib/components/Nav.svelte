@@ -8,6 +8,7 @@
     import AnimatedText from "./AnimatedText.svelte";
     import WalletAddress from "$lib/components/WalletAddress.svelte";
     import { page } from "$app/stores";
+    import WalletAuth from "./WalletAuth.svelte";
 
     export let isMobile: boolean;
 
@@ -90,24 +91,7 @@
             </p>
         </a>
 
-        <div>
-            <div class="absolute top-2 right-2"><WalletAddress /></div>
-            {#if showMoreAuth}
-                <button
-                    on:click={handleAuth}
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                    disabled={isLoading}
-                >
-                    {#if isLoading}
-                        Processing...
-                    {:else if $user}
-                        Log Out
-                    {:else}
-                        Log In
-                    {/if}
-                </button>
-            {/if}
-        </div>
+            <div class="absolute top-2 right-2"><WalletAuth isNav={true} /></div>
     </div>
 </nav>
 

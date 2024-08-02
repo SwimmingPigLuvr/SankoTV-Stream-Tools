@@ -37,7 +37,7 @@
 </script>
 
 <main class="flex justify-between w-full">
-	<div class="z-40">
+	<div class="z-40 text-xs">
 		<Nav isMobile={$isMobile} />
 	</div>
 	{#if browser}

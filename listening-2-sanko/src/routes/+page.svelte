@@ -83,8 +83,8 @@
 					>
 						⭐️
 					</p>
-					<p class="text-[6rem]">
-						<AnimatedText text="StarLabs" />
+					<p class="text-[5rem] sm:text-[6rem]">
+						<AnimatedText text="starlabs" />
 					</p>
 					<p
 						in:fly={{
@@ -103,7 +103,7 @@
 		{/if}
 
 		{#if showUx}
-			<div class="fixed top-1/2 flex flex-col space-y-2">
+			<div class="fixed top-1/2 -translate-y-1/2 scale-100 flex flex-col space-y-2">
 				<!-- Wallet Connection and Authentication -->
 				<div
 					in:slide={{ duration: 500, easing: backOut }}

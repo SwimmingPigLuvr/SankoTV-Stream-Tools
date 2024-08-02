@@ -17,8 +17,5 @@
 		? 'bg-slate-900 text-white'
 		: 'bg-yellow-100 text-slate-800'}"
 >
-	<div class="fixed top-2 right-2">
-		<WalletAddress />
-	</div>
 
 </main>

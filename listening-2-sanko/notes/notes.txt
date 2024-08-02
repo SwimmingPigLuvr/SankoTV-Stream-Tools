@@ -311,3 +311,20 @@ directory on mobile:
 	    the menu button should appear 
 	    the directory should be able to be toggled
 	else if notMobile
+
+august 1st notes
+
+walletauth flow
+
+need to ask which account to signin
+if i click disconnect that means i expect to be disconnected.
+right now if i connect again it will instantly show that we are connected to the last wallet which should not be true
+hide disconnect button after a second or two
+
+implement total light and dark modes
+
+users are in with google so let's start getting some data
+
+show that features are coming soon so that i can ship an MVP
+
+
