@@ -129,6 +129,7 @@ function createWalletStore() {
                 address: null,
                 chainId: null,
             });
+            goto("/");
         }
     };
 }

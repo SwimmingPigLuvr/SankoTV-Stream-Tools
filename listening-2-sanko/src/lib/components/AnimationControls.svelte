@@ -10,6 +10,7 @@
     import * as easings from "svelte/easing";
     import { inConfig, outConfig } from "$lib/animations/stores";
     import type { EasingFunction } from "svelte/transition";
+    import { isDarkMode } from "$lib/stores";
 
     let showAdvanced = false;
 
@@ -145,7 +146,9 @@
             {#if showAdvanced}
                 <select
                     id="animationIn"
-                    class="custom-dropdown p-4 bg-slate-800"
+                    class="custom-dropdown p-4 {$isDarkMode
+                        ? 'bg-slate-800'
+                        : 'bg-lime-200'}"
                     bind:value={$inConfig.type}
                     on:change={() =>
                         updateConfig(inConfig, defaultConfigs[$inConfig.type])}
@@ -160,7 +163,9 @@
                     {#if param === "easing"}
                         <select
                             id={`in-${param}`}
-                            class="custom-dropdown p-4 bg-slate-800"
+                            class="custom-dropdown p-4 {$isDarkMode
+                                ? 'bg-slate-800'
+                                : 'bg-lime-200'}"
                             bind:value={currentInEasing}
                             on:change={(e) =>
                                 handleInputChange(inConfig, param, e)}
@@ -172,7 +177,9 @@
                     {:else if param === "axis"}
                         <select
                             id={`in-${param}`}
-                            class="custom-dropdown p-4 bg-slate-800"
+                            class="custom-dropdown p-4 {$isDarkMode
+                                ? 'bg-slate-800'
+                                : 'bg-lime-200'}"
                             bind:value={$inConfig[param]}
                             on:change={(e) =>
                                 handleInputChange(inConfig, param, e)}
@@ -182,7 +189,9 @@
                         </select>
                     {:else}
                         <input
-                            class="custom-dropdown p-4 bg-slate-800"
+                            class="custom-dropdown p-4 {$isDarkMode
+                                ? 'bg-slate-800'
+                                : 'bg-lime-200'}"
                             type="number"
                             id={`in-${param}`}
                             bind:value={$inConfig[param]}
@@ -194,7 +203,9 @@
             {:else}
                 <select
                     id="animationIn"
-                    class="custom-dropdown p-4 bg-slate-800"
+                    class="custom-dropdown p-4 {$isDarkMode
+                        ? 'bg-slate-800'
+                        : 'bg-lime-200'}"
                     on:change={(e) =>
                         handlePremadeAnimationChange(inConfig, e, "in")}
                 >
@@ -211,7 +222,9 @@
             {#if showAdvanced}
                 <select
                     id="animationOut"
-                    class="custom-dropdown p-4 bg-slate-800"
+                    class="custom-dropdown p-4 {$isDarkMode
+                        ? 'bg-slate-800'
+                        : 'bg-lime-200'}"
                     bind:value={$outConfig.type}
                     on:change={() =>
                         updateConfig(
@@ -228,7 +241,9 @@
                     <label for={`out-${param}`}>{param}</label>
                     {#if param === "easing"}
                         <select
-                            class="custom-dropdown p-4 bg-slate-800"
+                            class="custom-dropdown p-4 {$isDarkMode
+                                ? 'bg-slate-800'
+                                : 'bg-lime-200'}"
                             id={`out-${param}`}
                             bind:value={currentOutEasing}
                             on:change={(e) =>
@@ -241,7 +256,9 @@
                     {:else if param === "axis"}
                         <select
                             id={`out-${param}`}
-                            class="custom-dropdown p-4 bg-slate-800"
+                            class="custom-dropdown p-4 {$isDarkMode
+                                ? 'bg-slate-800'
+                                : 'bg-lime-200'}"
                             bind:value={$outConfig[param]}
                             on:change={(e) =>
                                 handleInputChange(outConfig, param, e)}
@@ -251,7 +268,9 @@
                         </select>
                     {:else}
                         <input
-                            class="custom-dropdown p-4 bg-slate-800"
+                            class="custom-dropdown p-4 {$isDarkMode
+                                ? 'bg-slate-800'
+                                : 'bg-lime-200'}"
                             type="number"
                             id={`out-${param}`}
                             placeholder="500"
@@ -264,7 +283,9 @@
             {:else}
                 <select
                     id="animationOut"
-                    class="custom-dropdown p-4 bg-slate-800"
+                    class="custom-dropdown p-4 {$isDarkMode
+                        ? 'bg-slate-800'
+                        : 'bg-lime-200'}"
                     on:change={(e) =>
                         handlePremadeAnimationChange(outConfig, e, "out")}
                 >
