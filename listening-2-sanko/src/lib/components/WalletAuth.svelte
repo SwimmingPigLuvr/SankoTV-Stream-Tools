@@ -1,3 +1,4 @@
+<!-- lib/components/WalletAuth.svelte -->
 <script lang="ts">
     import { ethers } from "ethers";
     import { onMount } from "svelte";

@@ -332,3 +332,11 @@ fix the hover button ui for the directory it feels weird
 something simple like a star that appears would even work
 
 we can make the directory way skinnier
+
+
+august 2nd
+
+focus:
+make sure auth is flawless
+make sure db access is flawless
+make sure ui is flawless

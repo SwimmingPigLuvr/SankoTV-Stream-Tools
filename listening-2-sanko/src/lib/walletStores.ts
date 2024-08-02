@@ -1,3 +1,4 @@
+// lib/walletStores.ts
 import { writable } from 'svelte/store';
 import { ethers } from 'ethers';
 import { browser } from '$app/environment';

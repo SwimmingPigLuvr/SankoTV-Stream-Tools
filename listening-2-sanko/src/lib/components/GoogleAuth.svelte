@@ -3,9 +3,41 @@
     import { supabase } from "$lib/supabaseClient";
     import { user } from "$lib/stores/authStore";
     import { blur } from "svelte/transition";
+    import { onMount } from "svelte";
 
     let isLoading = false;
     let error: string | null = null;
+
+    async function handleNewUser(userId: string, userEmail: string) {
+        try {
+            const { data, error: checkError } = await supabase
+                .from("users")
+                .select("id")
+                .eq("id", userId)
+                .single();
+
+            if (checkError && checkError.code !== "PGRST116") {
+                console.error("error checking for existing user:", checkError);
+                throw checkError;
+            }
+
+            if (!data) {
+                const { error: insertError } = await supabase
+                    .from("users")
+                    .insert({ id: userId, email: userEmail });
+
+                if (insertError) {
+                    console.error("error inserting new user:", insertError);
+                    throw insertError;
+                }
+            }
+
+            console.log("user record ensured in the database");
+        } catch (err) {
+            console.error("failed to ahndle new user:", err);
+            error = "failed to create user record";
+        }
+    }
 
     async function signInWithGoogle() {
         isLoading = true;
@@ -34,6 +66,32 @@
         }
         isLoading = false;
     }
+
+    onMount(async () => {
+        const {
+            data: { session },
+        } = await supabase.auth.getSession();
+        if (session) {
+            // check if user exists in the users table
+            const { data, error: userError } = await supabase
+                .from("users")
+                .select("id")
+                .eq("id", session.user.id)
+                .single();
+
+            if (userError || !data) {
+                // if user does not exist create a new record
+                const { error: insertError } = await supabase
+                    .from("users")
+                    .insert({ id: session.user.id, email: session.user.email });
+
+                if (insertError) {
+                    console.error("error creating user record:", insertError);
+                    error = "failed to create user record";
+                }
+            }
+        }
+    });
 </script>
 
 {#if $user}
@@ -42,7 +100,7 @@
         class="flex items-center space-x-4 hover:bg-red-900 text-red-500 font-bold font-mono w-40 m-auto border-red-500 border-[1px] hover:text-white py-2 px-4 rounded-full"
         disabled={isLoading}
     >
-        <img class="h-4 pr-4" src="logos/google_g_logo.svg" alt="">
+        <img class="h-4 pr-4" src="logos/google_g_logo.svg" alt="" />
         {isLoading ? "Signing out..." : "Sign out"}
     </button>
 {:else}
@@ -52,7 +110,7 @@
         class="bg-white text-black flex items-center hover:bg-blue-700 font-mono font-bold py-2 px-4 rounded-full"
         disabled={isLoading}
     >
-        <img class="h-4 pr-4" src="logos/google_g_logo.svg" alt="">
+        <img class="h-4 pr-4" src="logos/google_g_logo.svg" alt="" />
         {isLoading ? "Signing in..." : "Sign in with Google"}
     </button>
 {/if}
