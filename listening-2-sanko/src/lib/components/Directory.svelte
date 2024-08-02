@@ -22,14 +22,6 @@
         "Top Donations",
     ];
 
-    // mainSections array
-    const mainSections = [
-        "Donation Alerts",
-        "Chat Box",
-        "Chat Plays",
-        "Theme Library",
-    ];
-
     let activeSection: string | null = null;
 
     function showCurrentSection(section: string) {
@@ -50,6 +42,33 @@
             showDirectory.set(true);
         }
     }
+
+    // mainSections array
+    const mainSections = [
+        "donation alerts",
+        "chat box",
+        "chat plays",
+        "theme library",
+    ];
+
+    let currentUrlAsSection = "";
+
+    $: {
+        const path = $page.url.pathname;
+        currentUrlAsSection = path
+            .toLowerCase()
+            .replace(/-/g, " ")
+            .replace("/dashboard/", "");
+
+        console.log("current url", path);
+        console.log("current url as section", currentUrlAsSection);
+    }
+
+    const getSectionClass = (section: string) => {
+        return currentUrlAsSection === section
+            ? "title-glow"
+            : "title-glow-light";
+    };
 </script>
 
 {#if $showDirectory}
@@ -72,7 +91,11 @@
                     {#each mainSections as section}
                         <button
                             on:click={() => showCurrentSection(section)}
-                            class="rounded-none w-full p-2 text-left items-center justify-center hover:bg-amber-400 hover:bg-opacity-10 hover:border-amber-300 border-transparent border-[1px]"
+                            class="
+                            {getSectionClass(section)}
+                            {$isDarkMode
+                                ? 'title-glow-hover'
+                                : 'title-glow-light-hover'} rounded-none w-full p-2 text-left items-center justify-center"
                         >
                             <span class="text-xl">{section}</span>
                         </button>
@@ -88,12 +111,16 @@
                                 <a
                                     href="/dashboard/donation-alerts"
                                     on:click={handleGoToDonationAlerts}
-                                    class="w-full text-left hover:text-amber-400 p-2"
+                                    class="w-full text-left {$isDarkMode
+                                        ? 'title-glow-hover'
+                                        : 'title-glow-light-hover'} p-2"
                                     >create new</a
                                 >
                                 {#each sectionData as data}
                                     <button
-                                        class="w-full text-left hover:text-amber-400 p-2"
+                                        class="w-full text-left {$isDarkMode
+                                            ? 'title-glow-hover'
+                                            : 'title-glow-light-hover'} p-2"
                                         >{data.name}</button
                                     >
                                 {/each}
@@ -112,7 +139,9 @@
                             href="/dashboard/{widget
                                 .toLowerCase()
                                 .replace(' ', '-')}"
-                            class="rounded-none hover:bg-amber-400 hover:bg-opacity-10 hover:border-amber-300 border-transparent border-2 p-2 text-left"
+                            class="rounded-none {$isDarkMode
+                                ? 'title-glow-hover'
+                                : 'title-glow-light-hover'} p-2 text-left"
                         >
                             <span class="text-">{widget}</span>
                         </a>

@@ -86,8 +86,8 @@
                 ? 'text-yellow-100 title-glow-hover '
                 : 'text-white title-glow-blue-hover'} text-xl items-center flex space-x-0"
         >
-            <p class="text-[1.5rem]">
-                StarLabs <span class="text-[1rem]">⭐️🧪</span>
+            <p class="text-[1rem] items-baseline flex">
+                ⭐️<span class="text-[1.5rem]">StarLabs</span>🧪
             </p>
         </a>
 
