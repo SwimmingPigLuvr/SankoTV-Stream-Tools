@@ -51,23 +51,22 @@
         "theme library",
     ];
 
-    let currentUrlAsSection = "";
+    let path = "";
 
-    $: {
-        const path = $page.url.pathname;
-        currentUrlAsSection = path
-            .toLowerCase()
-            .replace(/-/g, " ")
-            .replace("/dashboard/", "");
+    $: path = $page.url.pathname
+        .toLowerCase()
+        .replace(/-/g, " ")
+        .replace("/dashboard/", "");
 
-        console.log("current url", path);
-        console.log("current url as section", currentUrlAsSection);
-    }
+    console.log("current url", $page.url.pathname);
+    console.log("current url as section", path);
 
     const getSectionClass = (section: string) => {
-        return currentUrlAsSection === section
-            ? "title-glow"
-            : "title-glow-light";
+        if ($isDarkMode) {
+            return path === section ? "title-glow" : "";
+        } else {
+            return path === section ? "title-glow-light" : "";
+        }
     };
 </script>
 
