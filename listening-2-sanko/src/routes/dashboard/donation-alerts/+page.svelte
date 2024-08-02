@@ -4,7 +4,7 @@
 	import { onMount } from "svelte";
 	import { writable } from "svelte/store";
 	import { browser } from "$app/environment";
-	import { alertConfig, messageTemplate } from "$lib/stores";
+	import { alertConfig, isDarkMode, messageTemplate } from "$lib/stores";
 	import { fade, fly, slide, scale, draw, blur } from "svelte/transition";
 	import AnimationControls from "$lib/components/AnimationControls.svelte";
 	import { inConfig, outConfig } from "$lib/animations/stores";
@@ -86,6 +86,8 @@
 	}
 
 	let currentBackgroundColor = "#000000";
+
+	$: currentBackgroundColor = $isDarkMode ? "#000000" : "#ffffff";
 
 	let showImgUploadControls = false;
 	let showAudioUploadControls = false;
@@ -527,10 +529,11 @@
 </svelte:head>
 
 <main
-	class="text-white w-full overflow-x-hidden bg-slate-900 font-mono p-4 pt-20"
+	class="{$isDarkMode
+		? 'bg-slate-900 text-white'
+		: 'bg-lime-100 text-slate-800'} w-full overflow-x-hidden font-mono p-4 pt-20"
 >
-
-	<div class=" alert-grid m-auto sm:text-sm text-xs max-w-1080px]">
+	<div class="alert-grid m-auto sm:text-sm text-xs max-w-1080px]">
 		<h1
 			class="absolute top-10 font-cinema text-xl py-2 m-auto w-full text-left"
 		>
@@ -592,7 +595,9 @@
 				</div>
 			{/if}
 			<div
-				class="absolute bg-slate-900 z-20 bottom-0 w-full p-4 flex space-x-2 justify-end items-center"
+				class="absolute {$isDarkMode
+					? 'bg-slate-900'
+					: 'bg-lime-200'} z-20 bottom-0 w-full p-4 flex space-x-2 justify-end items-center"
 			>
 				<!-- background color -->
 				<div class="flex mr-auto space-x-4 items-center">
@@ -603,12 +608,16 @@
 								(showBackgroundColorInfo = true)}
 							on:mouseleave={() =>
 								(showBackgroundColorInfo = false)}
-							class="relative hover:bg-slate-400 hover:text-slate-900 rounded-full bg-slate-600 text-slate-400 w-4 h-4 text-xs"
+							class="{$isDarkMode
+								? 'bg-slate-600 text-slate-400 hover:bg-slate-400 hover:text-slate-900'
+								: 'bg-lime-600 text-white hover:bg-lime-400 hover:text-black'} relative rounded-full w-4 h-4 text-xs"
 							>i
 							{#if showBackgroundColorInfo}
 								<div
 									in:fly={{ y: 10 }}
-									class="absolute -top-40 -left-20 text-left w-48 z-20 p-3 bg-slate-300 text-slate-600"
+									class="absolute rounded-xl border-[1px] -top-40 -left-20 text-left w-48 z-20 p-3 {$isDarkMode
+										? 'bg-slate-300 text-slate-600'
+										: 'bg-lime-400 text-black border-black'}"
 								>
 									This will not effect the background color of
 									the alert. This is just for preview
@@ -630,7 +639,9 @@
 				<!-- mute button -->
 				<button
 					on:click={() => toggleMute()}
-					class="px-3 p-2 text-xl hover:bg-slate-800"
+					class="px-3 p-2 text-xl rounded-full {$isDarkMode
+						? 'hover:bg-slate-800'
+						: 'hover:bg-lime-300'} hover:bg-slate-800"
 				>
 					{#if muted}
 						🔇
@@ -642,9 +653,11 @@
 				<button
 					on:click={handleDonationPreview}
 					disabled={isPreviewPlaying}
-					class="text-xs ml-auto text-right p-4 bg-slate-800 {isPreviewPlaying
+					class="text-xs ml-auto text-right p-4 {$isDarkMode
+						? 'bg-slate-800 hover:bg-slate-600'
+						: 'bg-lime-400 hover:bg-lime-600 hover:text-lime-100'} {isPreviewPlaying
 						? 'cursor-not-allowed'
-						: 'hover:bg-slate-600'} text-white">preview</button
+						: ''} ">preview</button
 				>
 			</div>
 		</div>
@@ -652,7 +665,9 @@
 		<!-- alert config -->
 		<div class="alert-grid-container relative">
 			<div
-				class="bg-black border-b-white border-b-[1px] z-20 p-4 absolute top-0 w-full left-0 flex justify-between"
+				class="{$isDarkMode
+					? 'bg-black border-b-white'
+					: 'bg-white border-b-black'}  border-b-[1px] z-20 p-4 absolute top-0 w-full left-0 flex justify-between"
 			>
 				<!-- alert name -->
 				<div class="flex flex-col space-y-2 w-[70%]">

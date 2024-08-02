@@ -327,4 +327,8 @@ users are in with google so let's start getting some data
 
 show that features are coming soon so that i can ship an MVP
 
+fix the hover button ui for the directory it feels weird
 
+something simple like a star that appears would even work
+
+we can make the directory way skinnier
