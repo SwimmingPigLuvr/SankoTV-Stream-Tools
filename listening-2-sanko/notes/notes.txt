@@ -313,7 +313,7 @@ directory on mobile:
 	else if notMobile
 
 august 1st notes
-
+  
 walletauth flow
 
 need to ask which account to signin
@@ -340,3 +340,9 @@ focus:
 make sure auth is flawless
 make sure db access is flawless
 make sure ui is flawless
+
+right now we ahve placeholder data that needs to be the user's data
+the placeholder data right now is just two objects with name fields
+
+we need to have the relevant data to each section
+sorting them by name

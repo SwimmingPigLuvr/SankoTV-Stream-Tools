@@ -9,6 +9,7 @@
 
     export let isMobile: boolean = false;
 
+    // placeholder data
     let sectionData = [{ name: "zyn" }, { name: "top donation" }];
 
     const widgets = [
