@@ -39,7 +39,7 @@ const defaultAlertConfig: AlertConfig = {
     fontFamily: "coolfont-trippy",
     fontSize: "32px",
     fontWeight: "400",
-    textColor: "#FFFFFF",
+    textColor: "",
     highlightColor: "#32CD32",
     textTransform: "uppercase",
     letterSpacing: "-0.05em",

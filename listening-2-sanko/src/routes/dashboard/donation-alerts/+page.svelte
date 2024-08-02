@@ -856,8 +856,8 @@
 						on:mouseenter={() => (showTemplateInfo = true)}
 						on:mouseleave={() => (showTemplateInfo = false)}
 						class="{$isDarkMode
-								? 'bg-slate-600 text-slate-400 hover:bg-slate-400 hover:text-slate-900'
-								: 'bg-lime-600 text-white hover:bg-lime-400 hover:text-black'} relative rounded-full w-4 h-4 text-xs"
+							? 'bg-slate-600 text-slate-400 hover:bg-slate-400 hover:text-slate-900'
+							: 'bg-lime-600 text-white hover:bg-lime-400 hover:text-black'} relative rounded-full w-4 h-4 text-xs"
 						>i
 						{#if showTemplateInfo}
 							<div
@@ -882,7 +882,9 @@
 					on:change={() => messageTemplate.set(message)}
 					name="template"
 					id="template"
-					class="flex space-x-4 p-4 {$isDarkMode ? 'bg-slate-800' : 'bg-lime-200'}"
+					class="flex space-x-4 p-4 {$isDarkMode
+						? 'bg-slate-800'
+						: 'bg-lime-200'}"
 					type="text"
 				/>
 			</div>
@@ -890,9 +892,8 @@
 			<!-- alert duration -->
 			<div class="flex flex-col space-y-2">
 				<div class="flex space-x-6">
-					<label
-						class="block text-slate-200 font-bold mb-2"
-						for="alertduration">Alert Duration</label
+					<label class="block mb-2" for="alertduration"
+						>Alert Duration</label
 					>
 					<p>{alertDuration}s</p>
 				</div>
@@ -918,7 +919,9 @@
 				<label for="sound">Sound</label>
 				<!-- sound upload -->
 				<button
-					class="relative flex items-center space-x-4 p-4 bg-slate-800"
+					class="relative flex items-center space-x-4 p-4 {$isDarkMode
+						? 'bg-slate-800'
+						: 'bg-lime-200'}"
 					name="sound"
 					id="sound"
 				>
@@ -932,23 +935,33 @@
 					<button
 						on:mouseenter={() => (showAudioUploadControls = true)}
 						on:mouseleave={() => (showAudioUploadControls = false)}
-						class="text-xs z-20 bg-slate-800 flex space-x-0 absolute right-2"
+						class="text-xs z-20 {$isDarkMode
+							? 'bg-slate-800'
+							: 'bg-lime-200'} flex space-x-0 absolute right-2"
 					>
 						{#if showAudioUploadControls}
 							<!-- link image url -->
-							<button class="hover:bg-slate-600 p-2 px-4"
+							<button
+								class="{$isDarkMode
+									? 'hover:bg-slate-600'
+									: 'hover:bg-lime-400'} p-2 px-4"
 								>link</button
 							>
 							<!-- delete -->
 							{#if currentAudioSrc}
 								<button
 									on:click={handleRemoveCurrentAudio}
-									class="hover:bg-slate-600 p-2 px-4"
+									class="{$isDarkMode
+										? 'hover:bg-slate-600'
+										: 'hover:bg-lime-400'} p-2 px-4"
 									>remove</button
 								>
 							{/if}
 							<!-- upload -->
-							<button class="hover:bg-slate-600 p-2 px-4"
+							<button
+								class="{$isDarkMode
+									? 'hover:bg-slate-600'
+									: 'hover:bg-lime-400'} p-2 px-4"
 								>upload</button
 							>
 						{:else}
@@ -961,10 +974,7 @@
 			<!-- alert volume -->
 			<div class="flex flex-col space-y-2">
 				<div class="flex space-x-6">
-					<label
-						class="block text-slate-200 font-bold mb-2"
-						for="volume">Volume</label
-					>
+					<label class="block mb-2" for="volume">Volume</label>
 					<p>{volumePercent}%</p>
 				</div>
 				<!-- volume slider -->
@@ -990,7 +1000,9 @@
 			<div class="flex flex-col space-y-2">
 				<label for="font">Font</label>
 				<select
-					class="custom-dropdown p-4 bg-slate-800"
+					class="custom-dropdown p-4 {$isDarkMode
+						? 'bg-slate-800'
+						: 'bg-lime-200'}"
 					name="font"
 					id="font"
 					bind:value={selectedFont}
@@ -1007,10 +1019,7 @@
 			<!-- size -->
 			<div class="flex flex-col space-y-2">
 				<div class="flex space-x-6">
-					<label
-						class="block text-slate-200 font-bold mb-2"
-						for="font">Size</label
-					>
+					<label class="block mb-2" for="font">Size</label>
 					<p>{fontSize}px</p>
 				</div>
 				<!-- font size slider -->
@@ -1032,12 +1041,16 @@
 					<button
 						on:mouseenter={() => (showWeightInfo = true)}
 						on:mouseleave={() => (showWeightInfo = false)}
-						class="relative hover:bg-slate-400 hover:text-slate-900 rounded-full bg-slate-600 text-slate-400 w-4 h-4 text-xs"
+						class="relative {$isDarkMode
+							? 'bg-slate-600 hover:bg-slate-400 text-slate-400 hover:text-slate-900'
+							: 'bg-lime-600 text-white hover:bg-lime-400 hover:text-black'} rounded-full w-4 h-4 text-xs"
 						>i
 						{#if showWeightInfo}
 							<div
 								in:fly={{ y: 10 }}
-								class="absolute -top-20 -left-20 text-left w-48 z-20 p-3 bg-slate-300 text-slate-600"
+								class="absolute border-[1px] -top-20 -left-20 text-left w-48 z-20 p-3 {$isDarkMode
+									? 'bg-slate-300 text-slate-600'
+									: 'bg-lime-400 text-black border-black'}"
 							>
 								Some fonts do not have variable weights
 							</div>
@@ -1045,7 +1058,7 @@
 					</button>
 				</div>
 				<select
-					class="custom-dropdown p-4 bg-slate-800"
+					class="custom-dropdown p-4 {$isDarkMode ? 'bg-slate-800' : 'bg-lime-200'}"
 					name="font"
 					id="font"
 					bind:value={selectedWeight}
@@ -1065,7 +1078,7 @@
 			<div class="flex flex-col space-y-2">
 				<div class="flex space-x-6">
 					<label
-						class="block text-slate-200 font-bold mb-2"
+						class="block mb-2"
 						for="letterspacing">Letter Spacing</label
 					>
 					<p>{letterSpacing}em</p>
@@ -1113,7 +1126,7 @@
 			<div class="flex flex-col space-y-2">
 				<label for="texttransform">Text Transform</label>
 				<select
-					class="custom-dropdown p-4 bg-slate-800"
+					class="custom-dropdown p-4 {$isDarkMode ? 'bg-slate-800' : 'bg-lime-200'}"
 					name="texttransform"
 					id="texttransform"
 					bind:value={selectedTextTransform}
