@@ -615,7 +615,7 @@
 							{#if showBackgroundColorInfo}
 								<div
 									in:fly={{ y: 10 }}
-									class="absolute rounded-xl border-[1px] -top-40 -left-20 text-left w-48 z-20 p-3 {$isDarkMode
+									class="absolute border-[1px] -top-40 -left-20 text-left w-48 z-20 p-3 {$isDarkMode
 										? 'bg-slate-300 text-slate-600'
 										: 'bg-lime-400 text-black border-black'}"
 								>
@@ -677,7 +677,9 @@
 						bind:value={alertName}
 						name="alertName"
 						id="alertName"
-						class=" flex space-x-4 p-4 bg-slate-800"
+						class=" flex space-x-4 p-4 {$isDarkMode
+							? 'bg-slate-800'
+							: 'bg-lime-200'}"
 						type="text"
 					/>
 				</div>
@@ -691,7 +693,9 @@
 						name="active"
 						id="active"
 						on:click={() => toggleAlert()}
-						class="max-w-20 px-3 p-2 text-xl hover:bg-slate-800"
+						class="p-1 px-2 rounded-full flex items-center text-xl {$isDarkMode
+							? 'hover:bg-slate-800'
+							: 'hover:bg-lime-200'}"
 					>
 						{#if alertActive}
 							✅
@@ -706,7 +710,9 @@
 			<div class="flex flex-col space-y-2 mt-28">
 				<label for="eventtrigger">Event Trigger</label>
 				<select
-					class="custom-dropdown p-4 bg-slate-800"
+					class="custom-dropdown p-4 {$isDarkMode
+						? 'bg-slate-800'
+						: 'bg-lime-200'}"
 					name="eventtrigger"
 					id="eventtrigger"
 					bind:value={selectedTrigger}
@@ -730,7 +736,9 @@
 				<div class="flex flex-col space-y-2">
 					<label for="gift">Gift</label>
 					<select
-						class="custom-dropdown p-4 bg-slate-800"
+						class="custom-dropdown p-4 {$isDarkMode
+							? 'bg-slate-800'
+							: 'bg-lime-200'}"
 						name="gift"
 						id="gift"
 						bind:value={specificGift}
@@ -749,7 +757,9 @@
 					<label for="donationamount">Donation Amount</label>
 					<input
 						type="number"
-						class="custom-dropdown p-4 bg-slate-800"
+						class="custom-dropdown p-4 {$isDarkMode
+							? 'bg-slate-800'
+							: 'bg-lime-200'}"
 						name="donationamount"
 						id="donationamount"
 						bind:value={specificDonationAmount}
@@ -762,7 +772,9 @@
 			<div class="flex flex-col space-y-2">
 				<label for="layout">Layout</label>
 				<select
-					class="custom-dropdown p-4 bg-slate-800"
+					class="custom-dropdown p-4 {$isDarkMode
+						? 'bg-slate-800'
+						: 'bg-lime-200'}"
 					name="layout"
 					id="layout"
 				>
@@ -779,7 +791,9 @@
 
 				<!-- image upload -->
 				<button
-					class="relative flex items-center space-x-4 p-4 bg-slate-800"
+					class="relative flex items-center space-x-4 p-4 {$isDarkMode
+						? 'bg-slate-800'
+						: 'bg-lime-200'}"
 					name="image"
 					id="image"
 				>
@@ -798,23 +812,33 @@
 					<button
 						on:mouseenter={() => (showImgUploadControls = true)}
 						on:mouseleave={() => (showImgUploadControls = false)}
-						class="text-xs flex bg-slate-800 space-x-0 absolute right-2"
+						class="text-xs flex {$isDarkMode
+							? 'bg-slate-800'
+							: 'bg-lime-200'} space-x-0 absolute right-2"
 					>
 						{#if showImgUploadControls}
 							<!-- link image url -->
-							<button class="hover:bg-slate-600 p-2 px-4"
+							<button
+								class="{$isDarkMode
+									? 'hover:bg-slate-600'
+									: 'hover:bg-lime-400'} p-2 px-4"
 								>link</button
 							>
 							<!-- delete -->
 							{#if currentMediaSrc}
 								<button
 									on:click={handleRemoveCurrentMedia}
-									class="hover:bg-slate-600 p-2 px-4"
+									class="{$isDarkMode
+										? 'hover:bg-slate-600'
+										: 'hover:bg-lime-400'} p-2 px-4"
 									>remove</button
 								>
 							{/if}
 							<!-- upload -->
-							<button class="hover:bg-slate-600 p-2 px-4"
+							<button
+								class="{$isDarkMode
+									? 'hover:bg-slate-600'
+									: 'hover:bg-lime-400'} p-2 px-4"
 								>upload</button
 							>
 						{:else}
@@ -831,16 +855,20 @@
 					<button
 						on:mouseenter={() => (showTemplateInfo = true)}
 						on:mouseleave={() => (showTemplateInfo = false)}
-						class="relative hover:bg-slate-400 hover:text-slate-900 rounded-full bg-slate-600 text-slate-400 w-4 h-4 text-xs"
+						class="{$isDarkMode
+								? 'bg-slate-600 text-slate-400 hover:bg-slate-400 hover:text-slate-900'
+								: 'bg-lime-600 text-white hover:bg-lime-400 hover:text-black'} relative rounded-full w-4 h-4 text-xs"
 						>i
 						{#if showTemplateInfo}
 							<div
 								in:fly={{ y: 10 }}
-								class="absolute -top-40 -left-20 text-left w-48 z-20 p-3 bg-slate-300 text-slate-600"
+								class="{$isDarkMode
+									? 'bg-slate-300 text-slate-600'
+									: 'bg-lime-400 text-black border-black'} border-[1px] absolute -top-28 -left-20 text-left w-48 z-20 p-3"
 							>
 								Format your message with three possible
 								variables:
-								<p>sender, amount, & gift.</p>
+								<p>SENDER, AMOUNT, & GIFT.</p>
 							</div>
 						{/if}
 					</button>
@@ -854,7 +882,7 @@
 					on:change={() => messageTemplate.set(message)}
 					name="template"
 					id="template"
-					class="flex space-x-4 p-4 bg-slate-800"
+					class="flex space-x-4 p-4 {$isDarkMode ? 'bg-slate-800' : 'bg-lime-200'}"
 					type="text"
 				/>
 			</div>
