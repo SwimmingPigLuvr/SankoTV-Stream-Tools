@@ -9,18 +9,14 @@
     let isLoading = false;
     let error: string | null = null;
 
-    async function handleNewUser(
-        userId: string,
-        userEmail: string,
-        fullName: string,
-    ) {
+    async function handleNewUser(userId: string) {
         try {
+            console.log("Attempting to upsert user:", { userId });
             const { data, error: upsertError } = await supabase
                 .from("users")
                 .upsert({
                     id: userId,
-                    email: userEmail,
-                    username: fullName || userEmail.split("@")[0],
+                    data: {},
                 })
                 .single();
 
@@ -29,8 +25,8 @@
                 throw upsertError;
             }
 
-            console.log("User record ensured in the database");
-            await userData.fetch(); // Fetch updated user data
+            console.log("User record ensured in the database:", data);
+            await userData.fetch();
         } catch (err) {
             console.error("Failed to handle new user:", err);
             error = "Failed to create/update user record";
@@ -82,21 +78,13 @@
             data: { session },
         } = await supabase.auth.getSession();
         if (session?.user) {
-            await handleNewUser(
-                session.user.id,
-                session.user.email || "",
-                session.user.user_metadata.full_name || "",
-            );
+            await handleNewUser(session.user.id);
         }
     });
 
     // Ensure user data is updated after successful sign-in
     $: if ($user && !$userData) {
-        handleNewUser(
-            $user.id,
-            $user.email || "",
-            $user.user_metadata.full_name || "",
-        );
+        handleNewUser($user.id);
     }
 </script>
 
