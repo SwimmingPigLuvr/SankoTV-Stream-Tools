@@ -2,7 +2,7 @@
     import { createEventDispatcher } from "svelte";
     import { supabase } from "$lib/supabaseClient";
     import { user } from "$lib/stores/authStore";
-    import { alertConfig } from "$lib/stores";
+    import { alertConfig } from "$lib/stores/alertConfigStore";
 
     const dispatch = createEventDispatcher();
 

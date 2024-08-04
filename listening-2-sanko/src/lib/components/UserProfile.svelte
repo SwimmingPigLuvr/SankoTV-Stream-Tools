@@ -1,20 +1,20 @@
 <script lang="ts">
+    import { isDarkMode } from "$lib/stores";
     import { userData } from "$lib/stores/userDataStore";
-
-    function updateUsername(newUsername: string) {
-        userData.updateUserData({ username: newUsername });
-    }
-
-    function handleInput(event: Event) {
-        const target = event.target as HTMLInputElement;
-        updateUsername(target.value);
-    }
+    import GoogleAuth from "./GoogleAuth.svelte";
+    import WalletAuth from "./WalletAuth.svelte";
 </script>
 
 {#if $userData}
-    <h1>Welcome, {$userData.username}!</h1>
-    <p>Email: {$userData.email}</p>
-    <input type="text" value={$userData.username} on:input={handleInput} />
+    <h1 class="font-botch text-xl">Welcome, {$userData.username ?? "anon"}!</h1>
+    <a
+        class="px-4 p-2 {$isDarkMode
+            ? 'border-white'
+            : 'border-slate-800'} border-[1px] hover:text-lime-400 hover:bg-slate-950 rounded-full font-coolfont text-xl"
+        href="/dashboard">Dashboard</a
+    >
+    <WalletAuth />
+    <GoogleAuth />
 {:else}
     <p>Loading user data...</p>
 {/if}

@@ -6,11 +6,26 @@
     import { fade, fly, slide } from "svelte/transition";
     import DarkMode from "./DarkMode.svelte";
     import { page } from "$app/stores";
+    import { userData } from "$lib/stores/userDataStore";
+    import { user } from "$lib/stores/authStore";
 
     export let isMobile: boolean = false;
 
+
+    onMount(() => {
+        if ($user) {
+            userData.fetch();
+        }
+    })
+
     // placeholder data
-    let sectionData = [{ name: "zyn" }, { name: "top donation" }];
+    let donationAlerts = [{ name: "zyn" }, { name: "top donation" }];
+    let chatBoxes = [{ name: "zyn" }, { name: "top donation" }];
+
+    let showDonationAlerts = false;
+    let showChatBoxes = false;
+    let showChatPlays = false;
+    let showThemeLibrary = false;
 
     const widgets = [
         "AI + Text to Speech",
@@ -68,6 +83,23 @@
             return path === section ? "title-glow-light" : "";
         }
     };
+
+    function toggleDonationAlerts() {
+        showDonationAlerts = !showDonationAlerts;
+    }
+
+    function toggleChatBoxes() {
+        showChatBoxes = !showChatBoxes;
+    }
+
+    function toggleChatPlays() {
+        showChatPlays = !showChatPlays;
+    }
+
+    function toggleThemeLibrary() {
+        showThemeLibrary = !showThemeLibrary;
+    }
+
 </script>
 
 {#if $showDirectory}
@@ -80,25 +112,26 @@
             : 'text-slate-800 bg-blue-200'}"
     >
         <div
-            class="mt-16 flex flex-col space-y-8 items-start justify-center m-auto font-mono"
+            class="mt-16 flex flex-col space-y-2 items-start justify-center m-auto font-mono"
         >
-            <!-- Main Sections -->
+
+            <h1>{$userData?.data}</h1>
+
+            <!-- Donation alerts -->
             <div class="w-full">
                 <div
                     class="flex flex-col items-center justify-center text-left w-full"
                 >
-                    {#each mainSections as section}
                         <button
-                            on:click={() => showCurrentSection(section)}
+                            on:click={toggleDonationAlerts}
                             class="
-                            {getSectionClass(section)}
                             {$isDarkMode
                                 ? 'title-glow-hover'
                                 : 'title-glow-light-hover'} rounded-none w-full p-2 text-left items-center justify-center"
                         >
-                            <span class="text-xl">{section}</span>
+                            <span class="text-xl font-black">Donation Alerts</span>
                         </button>
-                        {#if activeSection === section}
+                        {#if showDonationAlerts}
                             <div
                                 in:slide={{ easing: cubicInOut, duration: 250 }}
                                 out:slide={{
@@ -115,19 +148,67 @@
                                         : 'title-glow-light-hover'} p-2"
                                     >create new</a
                                 >
-                                {#each sectionData as data}
+                                {#each donationAlerts as alert}
                                     <button
                                         class="w-full text-left {$isDarkMode
                                             ? 'title-glow-hover'
                                             : 'title-glow-light-hover'} p-2"
-                                        >{data.name}</button
+                                        >{alert.name}</button
                                     >
                                 {/each}
                             </div>
                         {/if}
-                    {/each}
                 </div>
             </div>
+
+            <!-- Chat Box -->
+            <div class="w-full">
+                <div
+                    class="flex flex-col items-center justify-center text-left w-full"
+                >
+                        <button
+                            on:click={toggleChatBoxes}
+                            class="
+                            {$isDarkMode
+                                ? 'title-glow-hover'
+                                : 'title-glow-light-hover'} rounded-none w-full p-2 text-left items-center justify-center"
+                        >
+                            <span class="text-xl font-black">Chat Boxes</span>
+                        </button>
+                        {#if showChatBoxes}
+                            <div
+                                in:slide={{ easing: cubicInOut, duration: 250 }}
+                                out:slide={{
+                                    easing: cubicInOut,
+                                    duration: 250,
+                                }}
+                                class="flex w-full flex-col items-center justify-center"
+                            >
+                                <a
+                                    href="/dashboard/chat-boxes"
+                                    on:click={handleGoToDonationAlerts}
+                                    class="w-full text-left {$isDarkMode
+                                        ? 'title-glow-hover'
+                                        : 'title-glow-light-hover'} p-2"
+                                    >create new</a
+                                >
+                                {#each chatBoxes as chatBox}
+                                    <button
+                                        class="w-full text-left {$isDarkMode
+                                            ? 'title-glow-hover'
+                                            : 'title-glow-light-hover'} p-2"
+                                        >{chatBox.name}</button
+                                    >
+                                {/each}
+                            </div>
+                        {/if}
+                </div>
+            </div>
+
+
+
+
+
 
             <!-- Widgets -->
             <div class="w-full">

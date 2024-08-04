@@ -4,7 +4,8 @@
 	import { onMount } from "svelte";
 	import { writable } from "svelte/store";
 	import { browser } from "$app/environment";
-	import { alertConfig, isDarkMode, messageTemplate } from "$lib/stores";
+	import { isDarkMode } from "$lib/stores";
+	import { alertConfig, messageTemplate } from "$lib/stores/alertConfigStore";
 	import { fade, fly, slide, scale, draw, blur } from "svelte/transition";
 	import AnimationControls from "$lib/components/AnimationControls.svelte";
 	import { inConfig, outConfig } from "$lib/animations/stores";
@@ -1058,7 +1059,9 @@
 					</button>
 				</div>
 				<select
-					class="custom-dropdown p-4 {$isDarkMode ? 'bg-slate-800' : 'bg-lime-200'}"
+					class="custom-dropdown p-4 {$isDarkMode
+						? 'bg-slate-800'
+						: 'bg-lime-200'}"
 					name="font"
 					id="font"
 					bind:value={selectedWeight}
@@ -1077,9 +1080,8 @@
 			<!-- tracking -->
 			<div class="flex flex-col space-y-2">
 				<div class="flex space-x-6">
-					<label
-						class="block mb-2"
-						for="letterspacing">Letter Spacing</label
+					<label class="block mb-2" for="letterspacing"
+						>Letter Spacing</label
 					>
 					<p>{letterSpacing}em</p>
 				</div>
@@ -1126,7 +1128,9 @@
 			<div class="flex flex-col space-y-2">
 				<label for="texttransform">Text Transform</label>
 				<select
-					class="custom-dropdown p-4 {$isDarkMode ? 'bg-slate-800' : 'bg-lime-200'}"
+					class="custom-dropdown p-4 {$isDarkMode
+						? 'bg-slate-800'
+						: 'bg-lime-200'}"
 					name="texttransform"
 					id="texttransform"
 					bind:value={selectedTextTransform}

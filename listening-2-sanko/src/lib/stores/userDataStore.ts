@@ -1,10 +1,11 @@
-<!-- lib/stores/userDataStore.ts -->
+// lib/stores/userDataStore.ts
 import { writable, get } from 'svelte/store';
 import { supabase } from '$lib/supabaseClient';
 import { user } from './authStore';
 
 interface UserData {
     id: string;
+    username: string | null;
     wallet_address: string | null;
     data: Record<string, any>;
     created_at: string;
