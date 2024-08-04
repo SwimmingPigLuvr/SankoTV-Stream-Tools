@@ -1,70 +1,80 @@
-<!-- $lib/components/GoogleSignIn.svelte -->
+<!-- $lib/components/GoogleAuth.svelte -->
 <script lang="ts">
     import { supabase } from "$lib/supabaseClient";
     import { user } from "$lib/stores/authStore";
+    import { userData } from "$lib/stores/userDataStore";
     import { blur } from "svelte/transition";
     import { onMount } from "svelte";
 
     let isLoading = false;
     let error: string | null = null;
 
-    async function handleNewUser(userId: string, userEmail: string) {
+    async function handleNewUser(
+        userId: string,
+        userEmail: string,
+        fullName: string,
+    ) {
         try {
-            const { data, error: checkError } = await supabase
+            const { data, error: upsertError } = await supabase
                 .from("users")
-                .select("id")
-                .eq("id", userId)
+                .upsert({
+                    id: userId,
+                    email: userEmail,
+                    username: fullName || userEmail.split("@")[0],
+                })
                 .single();
 
-            if (checkError && checkError.code !== "PGRST116") {
-                console.error("error checking for existing user:", checkError);
-                throw checkError;
+            if (upsertError) {
+                console.error("Error upserting user:", upsertError);
+                throw upsertError;
             }
 
-            if (!data) {
-                const { error: insertError } = await supabase
-                    .from("users")
-                    .insert({ id: userId, email: userEmail });
-
-                if (insertError) {
-                    console.error("error inserting new user:", insertError);
-                    throw insertError;
-                }
-            }
-
-            console.log("user record ensured in the database");
+            console.log("User record ensured in the database");
+            await userData.fetch(); // Fetch updated user data
         } catch (err) {
-            console.error("failed to ahndle new user:", err);
-            error = "failed to create user record";
+            console.error("Failed to handle new user:", err);
+            error = "Failed to create/update user record";
         }
     }
 
     async function signInWithGoogle() {
         isLoading = true;
         error = null;
-        const { data, error: signInError } =
-            await supabase.auth.signInWithOAuth({
-                provider: "google",
-                options: {
-                    redirectTo: "http://localhost:5173/auth/callback",
-                },
-            });
-        if (signInError) {
-            console.error("Error signing in with Google:", signInError);
-            error = signInError.message;
+        try {
+            const { data, error: signInError } =
+                await supabase.auth.signInWithOAuth({
+                    provider: "google",
+                    options: {
+                        redirectTo: "http://localhost:5173/auth/callback",
+                    },
+                });
+            if (signInError) throw signInError;
+        } catch (err) {
+            console.error("Error signing in with Google:", err);
+            error =
+                err instanceof Error
+                    ? err.message
+                    : "An error occurred during sign in";
+        } finally {
+            isLoading = false;
         }
-        isLoading = false;
     }
 
     async function signOut() {
         isLoading = true;
         error = null;
-        const { error: signOutError } = await supabase.auth.signOut();
-        if (signOutError) {
-            console.error("Error signing out:", signOutError);
-            error = signOutError.message;
+        try {
+            const { error: signOutError } = await supabase.auth.signOut();
+            if (signOutError) throw signOutError;
+        } catch (err) {
+            console.error("Error signing out:", err);
+            error =
+                err instanceof Error
+                    ? err.message
+                    : "An error occurred during sign out";
+        } finally {
+            isLoading = false;
         }
-        isLoading = false;
     }
 
     onMount(async () => {
@@ -72,9 +82,22 @@
             data: { session },
         } = await supabase.auth.getSession();
         if (session?.user) {
-            await handleNewUser(session.user.id, session.user.email || "");
+            await handleNewUser(
+                session.user.id,
+                session.user.email || "",
+                session.user.user_metadata.full_name || "",
+            );
         }
     });
+
+    // Ensure user data is updated after successful sign-in
+    $: if ($user && !$userData) {
+        handleNewUser(
+            $user.id,
+            $user.email || "",
+            $user.user_metadata.full_name || "",
+        );
+    }
 </script>
 
 {#if $user}
