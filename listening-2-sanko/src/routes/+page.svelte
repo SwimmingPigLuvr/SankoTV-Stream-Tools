@@ -18,6 +18,7 @@
 	import GoogleAuth from "$lib/components/GoogleAuth.svelte";
 	import { user } from "$lib/stores/authStore";
 	import WalletAuth from "$lib/components/WalletAuth.svelte";
+    import UserProfile from "$lib/components/UserProfile.svelte";
 
 	let error = "";
 	let showTitle = false;
@@ -110,6 +111,7 @@
 					class="m-auto flex flex-col space-y-8 items-center"
 				>
 					{#if $user}
+						<UserProfile />
 						<a
 							class="px-4 p-2 {$isDarkMode
 								? 'border-white'

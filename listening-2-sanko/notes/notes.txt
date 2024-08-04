@@ -346,3 +346,7 @@ the placeholder data right now is just two objects with name fields
 
 we need to have the relevant data to each section
 sorting them by name
+
+
+user gets to dashboard clicks donation alerts create new then is 
+prompted to name it then it's saved as a default alert in the db then it can be edited and all changed instantly save to the db
