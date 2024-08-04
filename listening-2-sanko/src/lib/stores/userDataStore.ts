@@ -15,7 +15,6 @@ function createUserDataStore() {
     return {
         subscribe,
         set,
-        update,
         async fetch() {
             const userId = user.get()?.id;
             if (!userId) return;
@@ -31,9 +30,9 @@ function createUserDataStore() {
                 return;
             }
 
-            set(data);
+            set(data as UserData);
         },
-        async update(updates: Partial<UserData>) {
+        async updateUserData(updates: Partial<UserData>) {
             const userId = user.get()?.id;
             if (!userId) return;
 
@@ -48,7 +47,11 @@ function createUserDataStore() {
                 return;
             }
 
-            set(data);
+            if (data) {
+                update(currentData => {
+                    return { ...currentData, ...data } as UserData;
+                });
+            }
         }
     };
 }
