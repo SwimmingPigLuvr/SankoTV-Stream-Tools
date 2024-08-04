@@ -11,21 +11,22 @@
 
     export let isMobile: boolean = false;
 
-
     onMount(() => {
         if ($user) {
             userData.fetch();
         }
-    })
+    });
 
-    // placeholder data
-    let donationAlerts = [{ name: "zyn" }, { name: "top donation" }];
     let chatBoxes = [{ name: "zyn" }, { name: "top donation" }];
 
     let showDonationAlerts = false;
     let showChatBoxes = false;
     let showChatPlays = false;
     let showThemeLibrary = false;
+
+    let showNameAlert = false;
+
+    $: donationAlerts = $userData?.data.donationAlerts || [];
 
     const widgets = [
         "AI + Text to Speech",
@@ -88,18 +89,18 @@
         showDonationAlerts = !showDonationAlerts;
     }
 
-    function toggleChatBoxes() {
-        showChatBoxes = !showChatBoxes;
+    function handleCreateNewAlert() {
+        showNameAlert = true;
     }
 
-    function toggleChatPlays() {
-        showChatPlays = !showChatPlays;
+    function handleAlertCreated(event: Event) {
+        // if alert has been created and added to userData in the CreateNew component
+        showNameAlert = false;
     }
 
-    function toggleThemeLibrary() {
-        showThemeLibrary = !showThemeLibrary;
+    function handleCloseNameAlert() {
+        showNameAlert = false;
     }
-
 </script>
 
 {#if $showDirectory}
@@ -114,7 +115,6 @@
         <div
             class="mt-16 flex flex-col space-y-2 items-start justify-center m-auto font-mono"
         >
-
             <h1>{$userData?.data}</h1>
 
             <!-- Donation alerts -->
@@ -122,42 +122,42 @@
                 <div
                     class="flex flex-col items-center justify-center text-left w-full"
                 >
-                        <button
-                            on:click={toggleDonationAlerts}
-                            class="
+                    <button
+                        on:click={toggleDonationAlerts}
+                        class="
                             {$isDarkMode
-                                ? 'title-glow-hover'
-                                : 'title-glow-light-hover'} rounded-none w-full p-2 text-left items-center justify-center"
+                            ? 'title-glow-hover'
+                            : 'title-glow-light-hover'} rounded-none w-full p-2 text-left items-center justify-center"
+                    >
+                        <span class="text-xl font-black">Donation Alerts</span>
+                    </button>
+                    {#if showDonationAlerts}
+                        <div
+                            in:slide={{ easing: cubicInOut, duration: 250 }}
+                            out:slide={{
+                                easing: cubicInOut,
+                                duration: 250,
+                            }}
+                            class="flex w-full flex-col items-center justify-center"
                         >
-                            <span class="text-xl font-black">Donation Alerts</span>
-                        </button>
-                        {#if showDonationAlerts}
-                            <div
-                                in:slide={{ easing: cubicInOut, duration: 250 }}
-                                out:slide={{
-                                    easing: cubicInOut,
-                                    duration: 250,
-                                }}
-                                class="flex w-full flex-col items-center justify-center"
+                            <button
+                                on:click={handleCreateNewAlert}
+                                class="w-full text-left {$isDarkMode
+                                    ? 'title-glow-hover'
+                                    : 'title-glow-light-hover'} p-2"
+                                >create new</button
                             >
+                            {#each donationAlerts as alert}
                                 <a
-                                    href="/dashboard/donation-alerts"
-                                    on:click={handleGoToDonationAlerts}
+                                    href="/donation-alerts/{alert.id}"
                                     class="w-full text-left {$isDarkMode
                                         ? 'title-glow-hover'
                                         : 'title-glow-light-hover'} p-2"
-                                    >create new</a
+                                    >{alert.name}</a
                                 >
-                                {#each donationAlerts as alert}
-                                    <button
-                                        class="w-full text-left {$isDarkMode
-                                            ? 'title-glow-hover'
-                                            : 'title-glow-light-hover'} p-2"
-                                        >{alert.name}</button
-                                    >
-                                {/each}
-                            </div>
-                        {/if}
+                            {/each}
+                        </div>
+                    {/if}
                 </div>
             </div>
 
@@ -166,49 +166,44 @@
                 <div
                     class="flex flex-col items-center justify-center text-left w-full"
                 >
-                        <button
-                            on:click={toggleChatBoxes}
-                            class="
+                    <button
+                        on:click={toggleChatBoxes}
+                        class="
                             {$isDarkMode
-                                ? 'title-glow-hover'
-                                : 'title-glow-light-hover'} rounded-none w-full p-2 text-left items-center justify-center"
+                            ? 'title-glow-hover'
+                            : 'title-glow-light-hover'} rounded-none w-full p-2 text-left items-center justify-center"
+                    >
+                        <span class="text-xl font-black">Chat Boxes</span>
+                    </button>
+                    {#if showChatBoxes}
+                        <div
+                            in:slide={{ easing: cubicInOut, duration: 250 }}
+                            out:slide={{
+                                easing: cubicInOut,
+                                duration: 250,
+                            }}
+                            class="flex w-full flex-col items-center justify-center"
                         >
-                            <span class="text-xl font-black">Chat Boxes</span>
-                        </button>
-                        {#if showChatBoxes}
-                            <div
-                                in:slide={{ easing: cubicInOut, duration: 250 }}
-                                out:slide={{
-                                    easing: cubicInOut,
-                                    duration: 250,
-                                }}
-                                class="flex w-full flex-col items-center justify-center"
+                            <a
+                                href="/dashboard/chat-boxes"
+                                on:click={handleGoToDonationAlerts}
+                                class="w-full text-left {$isDarkMode
+                                    ? 'title-glow-hover'
+                                    : 'title-glow-light-hover'} p-2"
+                                >create new</a
                             >
-                                <a
-                                    href="/dashboard/chat-boxes"
-                                    on:click={handleGoToDonationAlerts}
+                            {#each chatBoxes as chatBox}
+                                <button
                                     class="w-full text-left {$isDarkMode
                                         ? 'title-glow-hover'
                                         : 'title-glow-light-hover'} p-2"
-                                    >create new</a
+                                    >{chatBox.name}</button
                                 >
-                                {#each chatBoxes as chatBox}
-                                    <button
-                                        class="w-full text-left {$isDarkMode
-                                            ? 'title-glow-hover'
-                                            : 'title-glow-light-hover'} p-2"
-                                        >{chatBox.name}</button
-                                    >
-                                {/each}
-                            </div>
-                        {/if}
+                            {/each}
+                        </div>
+                    {/if}
                 </div>
             </div>
-
-
-
-
-
 
             <!-- Widgets -->
             <div class="w-full">

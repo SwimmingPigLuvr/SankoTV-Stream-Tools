@@ -1,37 +1,40 @@
 <script lang="ts">
     import { createEventDispatcher } from "svelte";
-    import { supabase } from "$lib/supabaseClient";
-    import { user } from "$lib/stores/authStore";
-    import { alertConfig } from "$lib/stores/alertConfigStore";
+    import { alertConfig, type AlertConfig } from "$lib/stores/alertConfig";
+    import { userData } from "$lib/stores/userDataStore";
 
-    const dispatch = createEventDispatcher();
+    const dispatch = createEventDispatcher<{
+        close: void;
+        alertCreated: { name: string; config: AlertConfig };
+    }>();
 
     let alertName = "";
     let error = "";
 
-    async function handleSubmit() {
+    function handleSubmit() {
         if (!alertName.trim()) {
             error = "Please enter a name for your alert.";
             return;
         }
 
-        try {
-            const { data, error: insertError } = await supabase
-                .from("user_alerts")
-                .insert({
-                    user_id: $user?.id,
-                    name: alertName,
-                    config: $alertConfig,
-                })
-                .single();
+        // Create a new alert with the default config
+        const newAlert = {
+            name: alertName,
+            config: $alertConfig,
+        };
 
-            if (insertError) throw insertError;
+        // Update user data
+        userData.updateDataField("donationAlerts", [
+            ...($userData?.data.donationAlerts || []),
+            newAlert,
+        ]);
 
-            dispatch("alertCreated", data);
-        } catch (err) {
-            console.error("Error creating alert:", err);
-            error = "Failed to create alert. Please try again.";
-        }
+        dispatch("alertCreated", newAlert);
+        dispatch("close");
+    }
+
+    function handleClose() {
+        dispatch("close");
     }
 </script>
 
@@ -49,11 +52,19 @@
         {#if error}
             <p class="text-red-500 mb-4">{error}</p>
         {/if}
-        <button
-            on:click={handleSubmit}
-            class="bg-blue-500 text-white px-4 py-2 rounded"
-        >
-            Create Alert
-        </button>
+        <div class="flex justify-between">
+            <button
+                on:click={handleSubmit}
+                class="bg-blue-500 text-white px-4 py-2 rounded"
+            >
+                Create Alert
+            </button>
+            <button
+                on:click={handleClose}
+                class="bg-gray-300 text-black px-4 py-2 rounded"
+            >
+                Cancel
+            </button>
+        </div>
     </div>
 </div>
