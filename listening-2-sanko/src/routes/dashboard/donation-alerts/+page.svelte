@@ -19,7 +19,9 @@
 	import { currentAlert, type Alert } from "$lib/stores/currentAlert";
 	import { page } from "$app/stores";
 	import { userData } from "$lib/stores/userDataStore";
-	import { debounce } from "lodash";
+	import lodash from "lodash";
+
+	const { debounce } = lodash;
 
 	let alerts: Alert[] = [];
 	let nice = false;
@@ -559,6 +561,13 @@
 
 	$: if ($currentAlert) {
 		debouncedUpdateAlert($currentAlert);
+		alertName = $currentAlert.name;
+	}
+
+	function updateAlertName() {
+		if ($currentAlert) {
+			currentAlert.update((alert) => ({ ...alert, name: alertName }));
+		}
 	}
 
 	const debouncedUpdateAlert = debounce((alert: Alert) => {
@@ -779,6 +788,7 @@
 					<!-- text input -->
 					<input
 						bind:value={alertName}
+						on:input={updateAlertName}
 						name="alertName"
 						id="alertName"
 						class=" flex space-x-4 p-4 {$isDarkMode

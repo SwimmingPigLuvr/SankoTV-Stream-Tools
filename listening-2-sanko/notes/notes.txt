@@ -350,3 +350,11 @@ sorting them by name
 
 user gets to dashboard clicks donation alerts create new then is 
 prompted to name it then it's saved as a default alert in the db then it can be edited and all changed instantly save to the db
+
+new alerts are looking good
+
+successfully added to the db instantly nice nice
+showing in the directory --- taking a little too long so let's make that instant
+need to show the user that we have the correct alert loaded as soon as we get to the donation-alerts page
+
+let's get the directory list updated instantly and the name in the alert config showing sf
