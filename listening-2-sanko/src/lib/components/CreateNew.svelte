@@ -6,6 +6,7 @@
     } from "$lib/stores/alertConfigStore";
     import { userData } from "$lib/stores/userDataStore";
     import { isDarkMode } from "$lib/stores";
+    import { v4 as uuidv4 } from "uuid";
 
     const dispatch = createEventDispatcher<{
         close: void;
@@ -45,9 +46,19 @@
 <div
     class="z-40 fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center"
 >
-    <div class="z-50 {$isDarkMode ? 'bg-slate-800 text-slate-200' : 'bg-blue-200 text-blue-800'} p-6 rounded-none border-[1px] max-w-md w-full">
+    <div
+        class="z-50 {$isDarkMode
+            ? 'bg-slate-800 text-slate-200'
+            : 'bg-blue-200 text-blue-800'} p-6 rounded-none border-[1px] max-w-md w-full"
+    >
         <h2 class="text-2xl">Name Your Alert</h2>
-        <h3 class="text-xs {$isDarkMode ? 'text-slate-400' : 'text-blue-600'} mb-4">(you can change this later)</h3>
+        <h3
+            class="text-xs {$isDarkMode
+                ? 'text-slate-400'
+                : 'text-blue-600'} mb-4"
+        >
+            (you can change this later)
+        </h3>
         <input
             bind:value={alertName}
             type="text"
