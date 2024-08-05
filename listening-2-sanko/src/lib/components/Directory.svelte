@@ -1,6 +1,6 @@
 <script lang="ts">
     import WalletAddress from "$lib/components/WalletAddress.svelte";
-    import { isDarkMode, showDirectory } from "$lib/stores";
+    import { isDarkMode, showDirectory, showNameAlert } from "$lib/stores";
     import { onMount } from "svelte";
     import { cubicInOut } from "svelte/easing";
     import { fade, fly, slide } from "svelte/transition";
@@ -8,6 +8,8 @@
     import { page } from "$app/stores";
     import { userData } from "$lib/stores/userDataStore";
     import { user } from "$lib/stores/authStore";
+    import CreateNew from "./CreateNew.svelte";
+    import { goto } from "$app/navigation";
 
     export let isMobile: boolean = false;
 
@@ -17,14 +19,14 @@
         }
     });
 
+    let comingSoon = false;
+    let widgetsComingSoon = true;
     let chatBoxes = [{ name: "zyn" }, { name: "top donation" }];
 
     let showDonationAlerts = false;
     let showChatBoxes = false;
     let showChatPlays = false;
     let showThemeLibrary = false;
-
-    let showNameAlert = false;
 
     $: donationAlerts = $userData?.data.donationAlerts || [];
 
@@ -90,16 +92,8 @@
     }
 
     function handleCreateNewAlert() {
-        showNameAlert = true;
-    }
-
-    function handleAlertCreated(event: Event) {
-        // if alert has been created and added to userData in the CreateNew component
-        showNameAlert = false;
-    }
-
-    function handleCloseNameAlert() {
-        showNameAlert = false;
+        goto("/dashboard/donation-alerts");
+        showNameAlert.set(true);
     }
 </script>
 
@@ -167,13 +161,20 @@
                     class="flex flex-col items-center justify-center text-left w-full"
                 >
                     <button
-                        on:click={toggleChatBoxes}
+                        on:mouseenter={() => (comingSoon = true)}
+                        on:mouseleave={() => (comingSoon = false)}
                         class="
                             {$isDarkMode
                             ? 'title-glow-hover'
                             : 'title-glow-light-hover'} rounded-none w-full p-2 text-left items-center justify-center"
                     >
-                        <span class="text-xl font-black">Chat Boxes</span>
+                        <span class="text-xl font-black"
+                            >{#if comingSoon}
+                                <span class="font-serif">⚠️Coming Soon⚠️</span>
+                            {:else}
+                                Chat Boxes
+                            {/if}</span
+                        >
                     </button>
                     {#if showChatBoxes}
                         <div
@@ -202,25 +203,6 @@
                             {/each}
                         </div>
                     {/if}
-                </div>
-            </div>
-
-            <!-- Widgets -->
-            <div class="w-full">
-                <h2 class="text-2xl p-2 text-left">Widgets</h2>
-                <div class="flex flex-col">
-                    {#each widgets as widget}
-                        <a
-                            href="/dashboard/{widget
-                                .toLowerCase()
-                                .replace(' ', '-')}"
-                            class="rounded-none {$isDarkMode
-                                ? 'title-glow-hover'
-                                : 'title-glow-light-hover'} p-2 text-left"
-                        >
-                            <span class="text-">{widget}</span>
-                        </a>
-                    {/each}
                 </div>
             </div>
         </div>

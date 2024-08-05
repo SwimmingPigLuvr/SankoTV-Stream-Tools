@@ -4,12 +4,13 @@
 	import { onMount } from "svelte";
 	import { writable } from "svelte/store";
 	import { browser } from "$app/environment";
-	import { isDarkMode } from "$lib/stores";
+	import { isDarkMode, showNameAlert } from "$lib/stores";
 	import { alertConfig, messageTemplate } from "$lib/stores/alertConfigStore";
 	import { fade, fly, slide, scale, draw, blur } from "svelte/transition";
 	import AnimationControls from "$lib/components/AnimationControls.svelte";
 	import { inConfig, outConfig } from "$lib/animations/stores";
 	import * as easings from "svelte/easing";
+	import CreateNew from "$lib/components/CreateNew.svelte";
 
 	type Placeholder = "{sender}" | "{amount}" | "{gift}";
 
@@ -523,6 +524,15 @@
 			}, alertDuration * 1000);
 		}
 	}
+
+	function handleAlertCreated(event: Event) {
+		// if alert has been created and added to userData in the CreateNew component
+		showNameAlert.set(false);
+	}
+
+	function handleCloseNameAlert() {
+		showNameAlert.set(false);
+	}
 </script>
 
 <svelte:head>
@@ -534,6 +544,15 @@
 		? 'bg-slate-900 text-white'
 		: 'bg-lime-100 text-slate-800'} w-full overflow-x-hidden font-mono p-4 pt-20"
 >
+	{#if $showNameAlert}
+		<div class="z-50">
+			<CreateNew
+				on:alertCreated={handleAlertCreated}
+				on:close={handleCloseNameAlert}
+			/>
+		</div>
+	{/if}
+
 	<div class="alert-grid m-auto sm:text-sm text-xs max-w-1080px]">
 		<h1
 			class="absolute top-10 font-cinema text-xl py-2 m-auto w-full text-left"

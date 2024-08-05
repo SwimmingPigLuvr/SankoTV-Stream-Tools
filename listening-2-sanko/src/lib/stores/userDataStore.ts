@@ -2,12 +2,19 @@
 import { writable, get } from 'svelte/store';
 import { supabase } from '$lib/supabaseClient';
 import { user } from './authStore';
+import { alertConfig, type AlertConfig } from '$lib/stores/alertConfigStore';
 
 interface UserData {
     id: string;
     username: string | null;
     wallet_address: string | null;
-    data: Record<string, any>;
+    data: {
+        donationAlerts: Array<{
+            id: string;
+            name: string;
+            config: AlertConfig;
+        }>;
+    };
     created_at: string;
     updated_at: string;
 }
@@ -71,24 +78,22 @@ function createUserDataStore() {
             }
 
             try {
+                const currentData = get(this) || { data: {} };
+                const updatedData = {
+                    ...currentData.data,
+                    [key]: value
+                };
+
                 const { data, error } = await supabase
                     .from('users')
-                    .update({ data: supabase.utils.toJSON({ [key]: value }) })
+                    .update({ data: updatedData })
                     .eq('id', currentUser.id)
                     .single();
 
                 if (error) throw error;
 
                 if (data) {
-                    update(currentData => {
-                        if (currentData) {
-                            return { 
-                                ...currentData, 
-                                data: { ...currentData.data, [key]: value }
-                            };
-                        }
-                        return currentData;
-                    });
+                    this.set({ ...currentData, data: updatedData } as UserData);
                 }
             } catch (error) {
                 console.error('Error updating data field:', error);
