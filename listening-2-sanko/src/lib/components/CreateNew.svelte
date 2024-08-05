@@ -8,9 +8,15 @@
     import { isDarkMode } from "$lib/stores";
     import { v4 as uuidv4 } from "uuid";
 
+    interface AlertCreatedEvent {
+        id: string;
+        name: string;
+        config: AlertConfig;
+    }
+
     const dispatch = createEventDispatcher<{
+        alertCreated: AlertCreatedEvent;
         close: void;
-        alertCreated: { name: string; config: AlertConfig };
     }>();
 
     let alertName = "";
@@ -22,8 +28,11 @@
             return;
         }
 
+        const newAlertId = uuidv4();
+
         // Create a new alert with the default config
-        const newAlert = {
+        const newAlert: AlertCreatedEvent = {
+            id: newAlertId,
             name: alertName,
             config: $alertConfig,
         };
@@ -35,7 +44,6 @@
         ]);
 
         dispatch("alertCreated", newAlert);
-        dispatch("close");
     }
 
     function handleClose() {

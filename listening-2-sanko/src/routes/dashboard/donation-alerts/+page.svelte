@@ -5,12 +5,30 @@
 	import { writable } from "svelte/store";
 	import { browser } from "$app/environment";
 	import { isDarkMode, showNameAlert } from "$lib/stores";
-	import { alertConfig, messageTemplate } from "$lib/stores/alertConfigStore";
+	import {
+		alertConfig,
+		type AlertConfig,
+		messageTemplate,
+	} from "$lib/stores/alertConfigStore";
 	import { fade, fly, slide, scale, draw, blur } from "svelte/transition";
 	import AnimationControls from "$lib/components/AnimationControls.svelte";
 	import { inConfig, outConfig } from "$lib/animations/stores";
 	import * as easings from "svelte/easing";
 	import CreateNew from "$lib/components/CreateNew.svelte";
+	import { goto } from "$app/navigation";
+	import { currentAlert, type Alert } from "$lib/stores/currentAlert";
+	import { page } from "$app/stores";
+	import { userData } from "$lib/stores/userDataStore";
+	import { debounce } from "lodash";
+
+	let alerts: Alert[] = [];
+	let nice = false;
+
+	interface AlertCreatedEvent {
+		id: string;
+		name: string;
+		config: AlertConfig;
+	}
 
 	type Placeholder = "{sender}" | "{amount}" | "{gift}";
 
@@ -59,6 +77,20 @@
 	let divScale = 1;
 
 	onMount(() => {
+		alerts = $userData?.data.donationAlerts || [];
+		const alertId = $page.url.searchParams.get("id");
+
+		if (alertId) {
+			const alert = alerts.find((a) => a.id === alertId);
+			if (alert) {
+				currentAlert.set(alert);
+			} else {
+				currentAlert.reset();
+			}
+		} else {
+			currentAlert.reset();
+		}
+
 		const resizeObserver = new ResizeObserver((entries) => {
 			for (let entry of entries) {
 				if (entry.target === previewContainer) {
@@ -525,13 +557,57 @@
 		}
 	}
 
-	function handleAlertCreated(event: Event) {
+	$: if ($currentAlert) {
+		debouncedUpdateAlert($currentAlert);
+	}
+
+	const debouncedUpdateAlert = debounce((alert: Alert) => {
+		const index = alerts.findIndex((a) => a.id === alert.id);
+		if (index !== -1) {
+			alerts[index] = alert;
+			alerts = [...alerts];
+			userData.updateDataField("donationAlerts", alerts);
+			console.log("alert updated in db");
+			nice = true;
+			setTimeout(() => {
+				let nice = false;
+				console.log(nice);
+			}, 500);
+		}
+	}, 500);
+
+	function handleAlertCreated(event: CustomEvent<AlertCreatedEvent>) {
 		// if alert has been created and added to userData in the CreateNew component
+		const newAlert = event.detail;
+		alerts = [...alerts, newAlert];
+		userData.updateDataField("donation-alerts", alerts);
 		showNameAlert.set(false);
+		selectAlert(newAlert);
 	}
 
 	function handleCloseNameAlert() {
 		showNameAlert.set(false);
+	}
+
+	function selectAlert(alert: Alert) {
+		currentAlert.set(alert);
+		goto(`/dashboard/donation-alerts?id=${alert.id}`);
+	}
+
+	function handleSaveAlert() {
+		if ($currentAlert) {
+			const index = alerts.findIndex((a) => a.id === $currentAlert.id);
+			if (index !== -1) {
+				alerts[index] = $currentAlert;
+				alerts = [...alerts];
+				userData.updateDataField("donation-alerts", alerts);
+			}
+		}
+	}
+
+	function backToList() {
+		currentAlert.reset();
+		goto("/dashboard/donation-alerts");
 	}
 </script>
 
@@ -544,6 +620,14 @@
 		? 'bg-slate-900 text-white'
 		: 'bg-lime-100 text-slate-800'} w-full overflow-x-hidden font-mono p-4 pt-20"
 >
+	{#if nice}
+		<button
+			class="z-50 fixed bottom-2 right-2 bg-slate-900 border-[1px] border-lime-400"
+		>
+			<p class="font-badger text-lime-400">NICE</p>
+		</button>
+	{/if}
+
 	{#if $showNameAlert}
 		<div class="z-50">
 			<CreateNew

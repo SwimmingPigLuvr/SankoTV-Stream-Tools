@@ -143,7 +143,7 @@
                             >
                             {#each donationAlerts as alert}
                                 <a
-                                    href="/donation-alerts/{alert.id}"
+                                    href="/dashboard/donation-alerts?id={alert.id}"
                                     class="w-full text-left {$isDarkMode
                                         ? 'title-glow-hover'
                                         : 'title-glow-light-hover'} p-2"
