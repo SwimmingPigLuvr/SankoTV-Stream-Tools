@@ -35,7 +35,6 @@
 	type Placeholder = "{sender}" | "{amount}" | "{gift}";
 
 	let alertName = "";
-	let debouncedAlertName: (name: string) => void;
 	let alertActive = true;
 	let volumePercent = 50;
 	let volume = volumePercent / 100;
@@ -80,14 +79,12 @@
 	let divScale = 1;
 
 	const debouncedUpdateAlertName = debounce((name: string) => {
-		if ($currentAlert) {
-			currentAlert.update((alert: Alert | null) => {
-				if (alert) {
-					return { ...alert, name: name };
-				}
-				return alert;
-			});
-		}
+		currentAlert.update((alert: Alert | null) => {
+			if (alert) {
+				return { ...alert, name: name };
+			}
+			return null;
+		});
 	}, 300);
 
 	onMount(() => {
@@ -574,16 +571,8 @@
 	$: if ($currentAlert) {
 		debouncedUpdateAlert($currentAlert);
 		alertName = $currentAlert.name;
-	}
-
-	function updateAlertName() {
-		if ($currentAlert) {
-			currentAlert.update((alert) => ({
-				...alert,
-				id: alert?.id,
-				name: alertName,
-			}));
-		}
+	} else {
+		alertName = "";
 	}
 
 	const debouncedUpdateAlert = debounce((alert: Alert) => {
