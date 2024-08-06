@@ -1,7 +1,7 @@
 <!-- src/routes/donationAlerts/+page.svelte -->
 <script lang="ts">
 	import type { AnimationProps } from "$lib/types";
-	import { onMount } from "svelte";
+	import { onMount, onDestroy } from "svelte";
 	import { writable } from "svelte/store";
 	import { browser } from "$app/environment";
 	import { isDarkMode, showNameAlert } from "$lib/stores";
@@ -35,6 +35,7 @@
 	type Placeholder = "{sender}" | "{amount}" | "{gift}";
 
 	let alertName = "";
+	let debouncedAlertName: (name: string) => void;
 	let alertActive = true;
 	let volumePercent = 50;
 	let volume = volumePercent / 100;
@@ -77,6 +78,17 @@
 	let previewePlaceholder: HTMLElement;
 	let maxWidth = 1080;
 	let divScale = 1;
+
+	const debouncedUpdateAlertName = debounce((name: string) => {
+		if ($currentAlert) {
+			currentAlert.update((alert: Alert | null) => {
+				if (alert) {
+					return { ...alert, name: name };
+				}
+				return alert;
+			});
+		}
+	}, 300);
 
 	onMount(() => {
 		alerts = $userData?.data.donationAlerts || [];
@@ -566,7 +578,11 @@
 
 	function updateAlertName() {
 		if ($currentAlert) {
-			currentAlert.update((alert) => ({ ...alert, name: alertName }));
+			currentAlert.update((alert) => ({
+				...alert,
+				id: alert?.id,
+				name: alertName,
+			}));
 		}
 	}
 
@@ -574,7 +590,7 @@
 		const index = alerts.findIndex((a) => a.id === alert.id);
 		if (index !== -1) {
 			alerts[index] = alert;
-			alerts = [...alerts];
+			alerts = [...alerts, alert];
 			userData.updateDataField("donationAlerts", alerts);
 			console.log("alert updated in db");
 			nice = true;
@@ -584,6 +600,12 @@
 			}, 500);
 		}
 	}, 500);
+
+	function handleInput(event: Event) {
+		const input = event.target as HTMLInputElement;
+		alertName = input.value;
+		debouncedUpdateAlertName(alertName);
+	}
 
 	function handleAlertCreated(event: CustomEvent<AlertCreatedEvent>) {
 		// if alert has been created and added to userData in the CreateNew component
@@ -618,6 +640,10 @@
 		currentAlert.reset();
 		goto("/dashboard/donation-alerts");
 	}
+
+	onDestroy(() => {
+		debouncedUpdateAlertName.cancel();
+	});
 </script>
 
 <svelte:head>
@@ -788,7 +814,7 @@
 					<!-- text input -->
 					<input
 						bind:value={alertName}
-						on:input={updateAlertName}
+						on:input={handleInput}
 						name="alertName"
 						id="alertName"
 						class=" flex space-x-4 p-4 {$isDarkMode
