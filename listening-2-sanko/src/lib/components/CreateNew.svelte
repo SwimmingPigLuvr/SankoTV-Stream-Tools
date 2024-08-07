@@ -3,6 +3,7 @@
     import {
         alertConfig,
         type AlertConfig,
+        type Alert,
     } from "$lib/stores/alertConfigStore";
     import { userData } from "$lib/stores/userDataStore";
     import { isDarkMode } from "$lib/stores";
@@ -21,6 +22,16 @@
 
     let alertName = "";
     let error = "";
+
+    const newAlertId = uuidv4();
+
+    function createNewAlert(name: string) {
+        const newAlert: Alert = {
+            id: newAlertId,
+            name: name,
+            config: $alertConfig,
+        }
+    }
 
     function handleSubmit() {
         if (!alertName.trim()) {

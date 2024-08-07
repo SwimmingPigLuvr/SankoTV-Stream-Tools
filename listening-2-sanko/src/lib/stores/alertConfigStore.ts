@@ -1,6 +1,20 @@
 // libs/stores/alertConfigStore.ts
 import { writable } from 'svelte/store'
 
+export interface Alert {
+    id: string;
+    name: string;
+    config: AlertConfig;
+}
+
+function createCurrentAlertStore() {
+    const { subscribe, set, update } = writable<Alert | null>(null);
+
+    return {
+        subscribe, set, update, reset: () => set(null)
+    };
+}
+
 export interface AlertConfig {
     alertDuration: number;
     alertVolume: number;
@@ -40,5 +54,5 @@ const defaultAlertConfig: AlertConfig = {
 };
 
 export const alertConfig = writable<AlertConfig>(defaultAlertConfig);
-
+export const currentAlert = createCurrentAlertStore();
 export const messageTemplate = writable<string>('{sender} donated {amount} {gift}!');

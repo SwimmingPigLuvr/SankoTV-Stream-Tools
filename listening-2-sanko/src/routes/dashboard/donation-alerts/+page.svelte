@@ -9,6 +9,8 @@
 		alertConfig,
 		type AlertConfig,
 		messageTemplate,
+		currentAlert,
+		type Alert,
 	} from "$lib/stores/alertConfigStore";
 	import { fade, fly, slide, scale, draw, blur } from "svelte/transition";
 	import AnimationControls from "$lib/components/AnimationControls.svelte";
@@ -16,7 +18,6 @@
 	import * as easings from "svelte/easing";
 	import CreateNew from "$lib/components/CreateNew.svelte";
 	import { goto } from "$app/navigation";
-	import { currentAlert, type Alert } from "$lib/stores/currentAlert";
 	import { page } from "$app/stores";
 	import { userData } from "$lib/stores/userDataStore";
 	import lodash from "lodash";
@@ -600,7 +601,7 @@
 		// if alert has been created and added to userData in the CreateNew component
 		const newAlert = event.detail;
 		alerts = [...alerts, newAlert];
-		userData.updateDataField("donation-alerts", alerts);
+		userData.updateDataField("donationAlerts", alerts);
 		showNameAlert.set(false);
 		selectAlert(newAlert);
 	}
