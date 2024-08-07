@@ -76,17 +76,6 @@
         .replace(/-/g, " ")
         .replace("/dashboard/", "");
 
-    console.log("current url", $page.url.pathname);
-    console.log("current url as section", path);
-
-    const getSectionClass = (section: string) => {
-        if ($isDarkMode) {
-            return path === section ? "title-glow" : "";
-        } else {
-            return path === section ? "title-glow-light" : "";
-        }
-    };
-
     function toggleDonationAlerts() {
         showDonationAlerts = !showDonationAlerts;
     }

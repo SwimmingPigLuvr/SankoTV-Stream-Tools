@@ -91,11 +91,15 @@
 	onMount(() => {
 		alerts = $userData?.data.donationAlerts || [];
 		const alertId = $page.url.searchParams.get("id");
+		if (alertId) {
+			console.log("alert ID: ", alertId);
+		}
 
 		if (alertId) {
 			const alert = alerts.find((a) => a.id === alertId);
 			if (alert) {
 				currentAlert.set(alert);
+				console.log('now editing: ', $currentAlert?.name);
 			} else {
 				currentAlert.reset();
 			}
