@@ -41,6 +41,13 @@ function createUserDataStore() {
 
                 if (error) throw error;
 
+                // deduplicate donation alerts
+                if (data && data.data && Array.isArray(data.data.donationAlerts)) {
+                    data.data.donationAlerts = Array.from(
+                        new Map(data.data.donationAlerts.map(alert => [alert.id, alert])).values()
+                    );
+                }
+
                 set(data as UserData);
             } catch (error) {
                 console.error('Error fetching user data:', error);
@@ -64,7 +71,13 @@ function createUserDataStore() {
                 if (error) throw error;
 
                 if (data) {
-                    update(currentData => ({ ...currentData, ...data } as UserData));
+                    update(currentData => {
+                        if (currentData) {
+                            return { ...currentData, ...data } as UserData
+                        } else {
+                            return data as UserData;
+                        }
+                    });
                 }
             } catch (error) {
                 console.error('Error updating user data:', error);
@@ -78,7 +91,9 @@ function createUserDataStore() {
             }
 
             try {
-                const currentData = get(this) || { data: {} };
+                const currentData = get(this);
+                if (!currentData) throw new Error("no current user data");
+
                 const updatedData = {
                     ...currentData.data,
                     [key]: value
@@ -93,7 +108,7 @@ function createUserDataStore() {
                 if (error) throw error;
 
                 if (data) {
-                    this.set({ ...currentData, data: updatedData } as UserData);
+                    this.set({ ...currentData, data: updatedData });
                 }
             } catch (error) {
                 console.error('Error updating data field:', error);

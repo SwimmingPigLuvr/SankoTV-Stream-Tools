@@ -24,7 +24,7 @@
 
 	const { debounce } = lodash;
 
-	let alerts: Alert[] = [];
+	$: alerts = $userData?.data?.donationAlerts || [];
 	let nice = false;
 
 	interface AlertCreatedEvent {
@@ -99,7 +99,7 @@
 			const alert = alerts.find((a) => a.id === alertId);
 			if (alert) {
 				currentAlert.set(alert);
-				console.log('now editing: ', $currentAlert?.name);
+				console.log("now editing: ", $currentAlert?.name);
 			} else {
 				currentAlert.reset();
 			}
@@ -604,8 +604,7 @@
 	function handleAlertCreated(event: CustomEvent<AlertCreatedEvent>) {
 		// if alert has been created and added to userData in the CreateNew component
 		const newAlert = event.detail;
-		alerts = [...alerts, newAlert];
-		userData.updateDataField("donationAlerts", alerts);
+		userData.updateDataField("donationAlerts", [...alerts, newAlert]);
 		showNameAlert.set(false);
 		selectAlert(newAlert);
 	}

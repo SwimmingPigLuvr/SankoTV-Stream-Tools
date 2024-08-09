@@ -28,7 +28,7 @@
     let showChatPlays = false;
     let showThemeLibrary = false;
 
-    $: donationAlerts = $userData?.data.donationAlerts || [];
+    $: donationAlerts = $userData?.data?.donationAlerts || [];
 
     const widgets = [
         "AI + Text to Speech",
@@ -98,8 +98,6 @@
         <div
             class="mt-16 flex flex-col space-y-2 items-start justify-center m-auto font-mono"
         >
-            <h1>{$userData?.data}</h1>
-
             <!-- Donation alerts -->
             <div class="w-full">
                 <div
@@ -130,7 +128,7 @@
                                     : 'title-glow-light-hover'} p-2"
                                 >create new</button
                             >
-                            {#each donationAlerts as alert}
+                            {#each donationAlerts as alert (alert.id)}
                                 <a
                                     href="/dashboard/donation-alerts?id={alert.id}"
                                     class="w-full text-left {$isDarkMode
