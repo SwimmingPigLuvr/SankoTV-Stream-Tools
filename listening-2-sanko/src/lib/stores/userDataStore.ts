@@ -4,16 +4,18 @@ import { supabase } from '$lib/supabaseClient';
 import { user } from './authStore';
 import { alertConfig, type AlertConfig } from '$lib/stores/alertConfigStore';
 
+interface Alert {
+    id: string;
+    name: string;
+    config: AlertConfig;
+}
+
 interface UserData {
     id: string;
     username: string | null;
     wallet_address: string | null;
     data: {
-        donationAlerts: Array<{
-            id: string;
-            name: string;
-            config: AlertConfig;
-        }>;
+        donationAlerts: Alert[];
     };
     created_at: string;
     updated_at: string;
@@ -31,23 +33,19 @@ function createUserDataStore() {
                 console.log("No user logged in");
                 return;
             }
-
             try {
                 const { data, error } = await supabase
                     .from('users')
                     .select('*')
                     .eq('id', currentUser.id)
                     .single();
-
                 if (error) throw error;
-
                 // deduplicate donation alerts
                 if (data && data.data && Array.isArray(data.data.donationAlerts)) {
                     data.data.donationAlerts = Array.from(
                         new Map(data.data.donationAlerts.map(alert => [alert.id, alert])).values()
                     );
                 }
-
                 set(data as UserData);
             } catch (error) {
                 console.error('Error fetching user data:', error);
@@ -60,16 +58,13 @@ function createUserDataStore() {
                 console.log("No user logged in");
                 return;
             }
-
             try {
                 const { data, error } = await supabase
                     .from('users')
                     .update(updates)
                     .eq('id', currentUser.id)
                     .single();
-
                 if (error) throw error;
-
                 if (data) {
                     update(currentData => {
                         if (currentData) {
@@ -89,30 +84,46 @@ function createUserDataStore() {
                 console.log("No user logged in");
                 return;
             }
-
             try {
                 const currentData = get(this);
                 if (!currentData) throw new Error("no current user data");
-
                 const updatedData = {
                     ...currentData.data,
                     [key]: value
                 };
-
                 const { data, error } = await supabase
                     .from('users')
                     .update({ data: updatedData })
                     .eq('id', currentUser.id)
                     .single();
-
                 if (error) throw error;
-
                 if (data) {
                     this.set({ ...currentData, data: updatedData });
                 }
             } catch (error) {
                 console.error('Error updating data field:', error);
             }
+        },
+        // New methods for managing donation alerts
+        async addDonationAlert(newAlert: Alert) {
+            const currentData = get(this);
+            if (!currentData) throw new Error("No current user data");
+            const updatedAlerts = [...currentData.data.donationAlerts, newAlert];
+            await this.updateDataField('donationAlerts', updatedAlerts);
+        },
+        async removeDonationAlert(id: string) {
+            const currentData = get(this);
+            if (!currentData) throw new Error("No current user data");
+            const updatedAlerts = currentData.data.donationAlerts.filter(alert => alert.id !== id);
+            await this.updateDataField('donationAlerts', updatedAlerts);
+        },
+        async updateDonationAlert(updatedAlert: Alert) {
+            const currentData = get(this);
+            if (!currentData) throw new Error("No current user data");
+            const updatedAlerts = currentData.data.donationAlerts.map(alert => 
+                alert.id === updatedAlert.id ? updatedAlert : alert
+            );
+            await this.updateDataField('donationAlerts', updatedAlerts);
         }
     };
 }
