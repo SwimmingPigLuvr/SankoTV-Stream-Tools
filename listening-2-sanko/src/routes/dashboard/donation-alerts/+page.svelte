@@ -601,10 +601,10 @@
 		debouncedUpdateAlertName(alertName);
 	}
 
-	function handleAlertCreated(event: CustomEvent<AlertCreatedEvent>) {
+	async function handleAlertCreated(event: CustomEvent<AlertCreatedEvent>) {
 		// if alert has been created and added to userData in the CreateNew component
 		const newAlert = event.detail;
-		userData.updateDataField("donationAlerts", [...alerts, newAlert]);
+		await userData.addDonationAlert(newAlert);
 		showNameAlert.set(false);
 		selectAlert(newAlert);
 	}

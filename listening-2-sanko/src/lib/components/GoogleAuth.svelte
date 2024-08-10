@@ -11,12 +11,32 @@
 
     async function handleNewUser(userId: string) {
         try {
-            console.log("Attempting to upsert user:", { userId });
+            console.log("checking if user exists: user id: ", { userId });
+
+            // first try to fetch the existing user
+            const { data: existingUser, error: fetchError } = await supabase
+                .from("users")
+                .select("*")
+                .eq("id", userId)
+                .single();
+
+            if (fetchError && fetchError.code !== "PGRST116") {
+                console.error("error fetching user:", fetchError);
+                throw fetchError;
+            }
+
+            if (existingUser) {
+                console.log("user already exists,", existingUser);
+                return;
+            }
+
+            //if no user create new one
+            console.log("creating new user: ", { userId });
             const { data, error: upsertError } = await supabase
                 .from("users")
                 .upsert({
                     id: userId,
-                    data: {},
+                    data: { donationAlerts: [] },
                 })
                 .single();
 

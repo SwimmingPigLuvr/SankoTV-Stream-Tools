@@ -14,7 +14,7 @@
     export let isMobile: boolean = false;
 
     onMount(() => {
-        if ($user) {
+        if ($userData) {
             userData.fetch();
         }
     });
