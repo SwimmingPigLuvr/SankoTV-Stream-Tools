@@ -35,7 +35,7 @@
 
 	type Placeholder = "{sender}" | "{amount}" | "{gift}";
 
-	let alertName = "";
+	$: alertName = $currentAlert?.name;
 	let alertActive = true;
 	let volumePercent = 50;
 	let volume = volumePercent / 100;

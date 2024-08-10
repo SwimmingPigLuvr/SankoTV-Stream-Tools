@@ -10,6 +10,7 @@
     import { user } from "$lib/stores/authStore";
     import CreateNew from "./CreateNew.svelte";
     import { goto } from "$app/navigation";
+    import { currentAlert } from "$lib/stores/alertConfigStore";
 
     export let isMobile: boolean = false;
 
@@ -53,11 +54,22 @@
         showDirectory.set(true);
     }
 
-    function handleGoToDonationAlerts() {
+    function handleGoToDonationAlerts(alertId: string | null) {
         if (isMobile) {
             showDirectory.set(false);
         } else if (!isMobile) {
             showDirectory.set(true);
+        }
+
+        if (alertId) {
+            const selectedAlert = $userData?.data?.donationAlerts.find(
+                (alert) => alert.id === alertId,
+            );
+            if (selectedAlert) {
+                currentAlert.set(selectedAlert);
+            }
+        } else {
+            currentAlert.set(null);
         }
     }
 
@@ -131,6 +143,8 @@
                             {#each donationAlerts as alert (alert.id)}
                                 <a
                                     href="/dashboard/donation-alerts?id={alert.id}"
+                                    on:click={() =>
+                                        handleGoToDonationAlerts(alert.id)}
                                     class="w-full text-left {$isDarkMode
                                         ? 'title-glow-hover'
                                         : 'title-glow-light-hover'} p-2"
@@ -174,7 +188,7 @@
                         >
                             <a
                                 href="/dashboard/chat-boxes"
-                                on:click={handleGoToDonationAlerts}
+                                on:click={() => handleGoToDonationAlerts(null)}
                                 class="w-full text-left {$isDarkMode
                                     ? 'title-glow-hover'
                                     : 'title-glow-light-hover'} p-2"
