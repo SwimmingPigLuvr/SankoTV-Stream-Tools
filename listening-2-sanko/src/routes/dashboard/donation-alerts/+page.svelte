@@ -2,7 +2,7 @@
 <script lang="ts">
 	import type { AnimationProps } from "$lib/types";
 	import { onMount, onDestroy } from "svelte";
-	import { writable } from "svelte/store";
+	import { writable, get } from "svelte/store";
 	import { browser } from "$app/environment";
 	import { isDarkMode, showNameAlert } from "$lib/stores";
 	import {
@@ -138,6 +138,10 @@
 	let currentBackgroundColor = "#000000";
 
 	$: currentBackgroundColor = $isDarkMode ? "#000000" : "#ffffff";
+
+	let showToast = false;
+	let toastKey = "";
+	let toastValue = "";
 
 	let showImgUploadControls = false;
 	let showAudioUploadControls = false;
@@ -595,6 +599,48 @@
 		}
 	}, 500);
 
+	const debouncedUpdateDatabase = debounce((alerts: Alert[]) => {
+		userData.updateDataField("donationAlerts", alerts);
+		console.log("alert updated in db");
+		nice = true;
+		setTimeout(() => {
+			nice = false;
+			console.log(nice);
+		}, 500);
+	}, 500);
+
+	function pushToastNoti(key: string, value: any) {
+		showToast = true;
+	}
+
+	function updateAlertConfig(key: string, value: any) {
+		const alert = get(currentAlert);
+		if (alert) {
+			currentAlert.update((currentAlert) => {
+				if (currentAlert) {
+					return {
+						...currentAlert,
+						config: {
+							...currentAlert.config,
+							[key]: value,
+						},
+					};
+				}
+				return alert;
+			});
+
+			const currentUserData = get(userData);
+
+			// update array
+			const updatedAlerts = (
+				currentUserData?.data.donationAlerts || []
+			).map((a) => (a.id === alert.id ? get(currentAlert) : a));
+
+			// update alerts in db
+			debouncedUpdateDatabase(updatedAlerts);
+		}
+	}
+
 	function handleInput(event: Event) {
 		const input = event.target as HTMLInputElement;
 		alertName = input.value;
@@ -648,6 +694,14 @@
 		? 'bg-slate-900 text-white'
 		: 'bg-lime-100 text-slate-800'} w-full overflow-x-hidden font-mono p-4 pt-20"
 >
+	{#if showToast}
+		<button
+			class="z-50 fixed bottom-2 right-2 bg-slate-900 border-[1px] border-lime-400"
+		>
+			<p class="font-badger text-lime-400">NICE</p>
+		</button>
+	{/if}
+
 	{#if nice}
 		<button
 			class="z-50 fixed bottom-2 right-2 bg-slate-900 border-[1px] border-lime-400"
@@ -695,7 +749,15 @@
 					class:layout-imgLeft={layoutSelection === "imgLeft"}
 					class:layout-imgRight={layoutSelection === "imgRight"}
 					class="preview-content leading-[1] flex items-center justify-center text-center"
-					style="background-color: {currentBackgroundColor}; border-radius: {$alertConfig.borderRadius}; font-family: {$alertConfig.fontFamily}; font-size: {$alertConfig.fontSize}; font-weight: {$alertConfig.fontWeight}; color: {$alertConfig.textColor}; text-transform: {$alertConfig.textTransform}; letter-spacing: {$alertConfig.letterSpacing}; text-shadow: {$alertConfig.textShadow};"
+					style="background-color: {currentBackgroundColor}; border-radius: {$currentAlert
+						?.config.borderRadius}; font-family: {$currentAlert
+						?.config.fontFamily}; font-size: {$currentAlert?.config
+						.fontSize}; font-weight: {$currentAlert?.config
+						.fontWeight}; color: {$currentAlert?.config
+						.textColor}; text-transform: {$currentAlert?.config
+						.textTransform}; letter-spacing: {$currentAlert?.config
+						.letterSpacing}; text-shadow: {$currentAlert?.config
+						.textShadow};"
 				>
 					{#if layoutSelection === "textOverImage"}
 						<img src={currentMediaSrc} alt="" />
@@ -703,8 +765,8 @@
 							{#each generateRandomMessage($messageTemplate).parts as part}
 								<span
 									style="color: {part.highlight
-										? $alertConfig.highlightColor
-										: $alertConfig.textColor};"
+										? $currentAlert?.config.highlightColor
+										: $currentAlert?.config.textColor};"
 								>
 									{part.text}
 								</span>
@@ -716,8 +778,8 @@
 							{#each generateRandomMessage($messageTemplate).parts as part}
 								<span
 									style="color: {part.highlight
-										? $alertConfig.highlightColor
-										: $alertConfig.textColor};"
+										? $currentAlert?.config.highlightColor
+										: $currentAlert?.config.textColor};"
 								>
 									{part.text}
 								</span>
@@ -1138,8 +1200,10 @@
 						: 'bg-lime-200'}"
 					name="font"
 					id="font"
-					bind:value={selectedFont}
-					on:change={handleFontChange}
+					value={$currentAlert?.config.fontFamily ??
+						$alertConfig.fontFamily}
+					on:change={(e) =>
+						updateAlertConfig("fontFamily", e.currentTarget.value)}
 				>
 					{#each fonts as font}
 						<option style="font-family: {font};" value={font}
@@ -1153,11 +1217,18 @@
 			<div class="flex flex-col space-y-2">
 				<div class="flex space-x-6">
 					<label class="block mb-2" for="font">Size</label>
-					<p>{fontSize}px</p>
+					<p>{$currentAlert?.config.fontSize ?? fontSize}px</p>
 				</div>
 				<!-- font size slider -->
 				<input
-					bind:value={fontSize}
+					value={parseInt(
+						$currentAlert?.config.fontSize ?? $alertConfig.fontSize,
+					)}
+					on:input={(e) =>
+						updateAlertConfig(
+							"fontSize",
+							`${e.currentTarget.value}px`,
+						)}
 					type="range"
 					id="fontsize"
 					name="fontsize"
@@ -1194,8 +1265,8 @@
 					class="custom-dropdown p-4 {$isDarkMode
 						? 'bg-slate-800'
 						: 'bg-lime-200'}"
-					name="font"
-					id="font"
+					name="fontweight"
+					id="fontweight"
 					bind:value={selectedWeight}
 					on:click={handleWeightChange}
 				>
@@ -1238,7 +1309,13 @@
 						name="color"
 						id="color"
 						type="color"
-						bind:value={$alertConfig.textColor}
+						value={$currentAlert?.config.textColor ??
+							$alertConfig.textColor}
+						on:input={(e) =>
+							updateAlertConfig(
+								"textColor",
+								e.currentTarget.value,
+							)}
 						class="mt-1 block"
 					/>
 				</div>
@@ -1250,7 +1327,13 @@
 						name="highlightcolor"
 						id="highlightcolor"
 						type="color"
-						bind:value={$alertConfig.highlightColor}
+						value={$currentAlert?.config.highlightColor ??
+							$alertConfig.highlightColor}
+						on:input={(e) =>
+							updateAlertConfig(
+								"highlightColor",
+								e.currentTarget.value,
+							)}
 						class="mt-1 block"
 					/>
 				</div>

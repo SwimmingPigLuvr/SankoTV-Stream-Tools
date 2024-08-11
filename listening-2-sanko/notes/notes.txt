@@ -357,4 +357,23 @@ successfully added to the db instantly nice nice
 showing in the directory --- taking a little too long so let's make that instant
 need to show the user that we have the correct alert loaded as soon as we get to the donation-alerts page
 
+O
+
 let's get the directory list updated instantly and the name in the alert config showing sf
+
+
+
+
+
+august 10
+6:07pm
+
+need to have different ui for /dashboard/donation-alerts
+when no alert is specified
+
+create components for the donation alert config ui
+
+make sure the changes save to the db!
+
+
+use the update function and create a toast noti to show what is changed
