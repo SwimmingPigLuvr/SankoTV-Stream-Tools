@@ -611,6 +611,8 @@
 
 	function pushToastNoti(key: string, value: any) {
 		showToast = true;
+		toastKey = key;
+		toastValue = value;
 	}
 
 	function updateAlertConfig(key: string, value: any) {
@@ -628,6 +630,8 @@
 				}
 				return alert;
 			});
+
+			pushToastNoti(key, value);
 
 			const currentUserData = get(userData);
 
@@ -696,9 +700,20 @@
 >
 	{#if showToast}
 		<button
-			class="z-50 fixed bottom-2 right-2 bg-slate-900 border-[1px] border-lime-400"
+			in:slide
+			class="z-50 fixed flex space-x-8 px-4 p-2 items-center top-2 left-1/2 -translate-x-1/2 bg-slate-600"
 		>
-			<p class="font-badger text-lime-400">NICE</p>
+			<p>✅</p>
+			<p class="font-mono text-left text-lime-400 flex flex-col">
+				<span class="text-lime-400 font-black"
+					>{$currentAlert?.name} updataed</span
+				>
+				<span class="text-xs text-slate-400"
+					>{toastKey} set to
+					<span class="text-lime-400">{toastValue}</span></span
+				>
+			</p>
+			<button on:click={() => (showToast = false)} class="p-2">x</button>
 		</button>
 	{/if}
 
