@@ -693,10 +693,12 @@
 		<button
 			in:slide
 			class="{$isDarkMode
-				? 'bg-slate-600'
+				? 'bg-blue-600'
 				: 'bg-white border-blue-700'} border-[1px] z-50 fixed w-[400px] rounded-none flex space-x-4 px-6 p-4 items-center justify-between top-2 left-1/2 -translate-x-1/2"
 		>
-			<p class="{$isDarkMode ? 'hue-rotate-90' : 'filter hue-rotate-180'} text-3xl">✅</p>
+			<p class="{$isDarkMode ? '' : ' hue-rotate-180'} filter text-3xl">
+				✅
+			</p>
 			<p class="font-mono text-left flex flex-col space-y-">
 				<span
 					class="{$isDarkMode
@@ -709,8 +711,10 @@
 						? 'text-slate-400'
 						: 'text-lime-600'}"
 					>{toastKey} set to
-					<span class={$isDarkMode ? "text-lime-400" : "text-sky-400 font-black"}
-						>{toastValue}</span
+					<span
+						class={$isDarkMode
+							? "text-lime-400"
+							: "text-sky-400 font-black"}>{toastValue}</span
 					></span
 				>
 			</p>
