@@ -25,7 +25,6 @@
 	const { debounce } = lodash;
 
 	$: alerts = $userData?.data?.donationAlerts || [];
-	let nice = false;
 
 	interface AlertCreatedEvent {
 		id: string;
@@ -591,22 +590,12 @@
 			alerts = [...alerts, alert];
 			userData.updateDataField("donationAlerts", alerts);
 			console.log("alert updated in db");
-			nice = true;
-			setTimeout(() => {
-				let nice = false;
-				console.log(nice);
-			}, 500);
 		}
 	}, 500);
 
 	const debouncedUpdateDatabase = debounce((alerts: Alert[]) => {
 		userData.updateDataField("donationAlerts", alerts);
 		console.log("alert updated in db");
-		nice = true;
-		setTimeout(() => {
-			nice = false;
-			console.log(nice);
-		}, 500);
 	}, 500);
 
 	function pushToastNoti(key: string, value: any) {
@@ -694,6 +683,8 @@
 </svelte:head>
 
 <main
+	in:fly={{ y: 10, duration: 1000, easing: easings.backOut }}
+	out:fly={{ y: 10, duration: 1000, easing: easings.backIn }}
 	class="{$isDarkMode
 		? 'bg-slate-900 text-white'
 		: 'bg-lime-100 text-slate-800'} w-full overflow-x-hidden font-mono p-4 pt-20"
@@ -701,27 +692,32 @@
 	{#if showToast}
 		<button
 			in:slide
-			class="z-50 fixed flex space-x-8 px-4 p-2 items-center top-2 left-1/2 -translate-x-1/2 bg-slate-600"
+			class="{$isDarkMode
+				? 'bg-slate-600'
+				: 'bg-white border-blue-700'} border-[1px] z-50 fixed w-[400px] rounded-none flex space-x-4 px-6 p-4 items-center justify-between top-2 left-1/2 -translate-x-1/2"
 		>
-			<p>✅</p>
-			<p class="font-mono text-left text-lime-400 flex flex-col">
-				<span class="text-lime-400 font-black"
+			<p class="{$isDarkMode ? 'hue-rotate-90' : 'filter hue-rotate-180'} text-3xl">✅</p>
+			<p class="font-mono text-left flex flex-col space-y-">
+				<span
+					class="{$isDarkMode
+						? 'text-lime-400'
+						: 'text-black'} font-serif italic -tracking-wide capitalize"
 					>{$currentAlert?.name} updataed</span
 				>
-				<span class="text-xs text-slate-400"
+				<span
+					class="text-xs {$isDarkMode
+						? 'text-slate-400'
+						: 'text-lime-600'}"
 					>{toastKey} set to
-					<span class="text-lime-400">{toastValue}</span></span
+					<span class={$isDarkMode ? "text-lime-400" : "text-sky-400 font-black"}
+						>{toastValue}</span
+					></span
 				>
 			</p>
-			<button on:click={() => (showToast = false)} class="p-2">x</button>
-		</button>
-	{/if}
-
-	{#if nice}
-		<button
-			class="z-50 fixed bottom-2 right-2 bg-slate-900 border-[1px] border-lime-400"
-		>
-			<p class="font-badger text-lime-400">NICE</p>
+			<button
+				on:click={() => (showToast = false)}
+				class="text-3xl right-4 ml-auto">x</button
+			>
 		</button>
 	{/if}
 

@@ -46,11 +46,11 @@
 				? "mx-auto w-1/2"
 				: $isMobile
 					? "w-full z-30"
-					: "fixed w-1/4"}
+					: "fixed"}
 		>
 			<Directory isMobile={$isMobile} />
 		</div>
-		<div class="ml-auto w-full md:w-3/4">
+		<div class="m-auto {$isMobile ? 'w-full' : ''} ">
 			<slot />
 		</div>
 	{/if}
