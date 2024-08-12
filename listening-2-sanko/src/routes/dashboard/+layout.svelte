@@ -43,14 +43,14 @@
 	{#if browser}
 		<div
 			class={centered
-				? "mx-auto w-1/2"
+				? " w-1/2"
 				: $isMobile
 					? "w-full z-30"
-					: "fixed"}
+					: "fixed w-1/5"}
 		>
 			<Directory isMobile={$isMobile} />
 		</div>
-		<div class="m-auto {$isMobile ? 'w-full' : ''} ">
+		<div class={$isMobile ? "w-full m-auto" : "ml-auto md:w-4/5"}>
 			<slot />
 		</div>
 	{/if}

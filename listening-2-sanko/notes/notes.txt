@@ -377,3 +377,6 @@ make sure the changes save to the db!
 
 
 use the update function and create a toast noti to show what is changed
+
+
+do the changes update the db irt

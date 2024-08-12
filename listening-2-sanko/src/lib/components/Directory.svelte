@@ -101,11 +101,11 @@
 {#if $showDirectory}
     <main
         in:slide
-        class="w-full h-screen {isMobile
+        class="{isMobile
             ? 'fixed w-full top-0 left-0'
-            : ''} p-4 min-h-screen font-mono {$isDarkMode
+            : ''} p-2 min-h-screen font-mono {$isDarkMode
             ? 'text-white bg-slate-800'
-            : 'text-slate-800 bg-blue-200'}"
+            : 'text-slate-800 bg-blue-200'} w-full h-screen"
     >
         <div
             class="mt-16 flex flex-col space-y-2 items-start justify-center m-auto font-mono"
