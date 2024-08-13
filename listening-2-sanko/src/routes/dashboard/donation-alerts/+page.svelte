@@ -22,9 +22,28 @@
 	import { userData } from "$lib/stores/userDataStore";
 	import lodash from "lodash";
 
+	interface Toast
+
 	const { debounce } = lodash;
 
+	let alerts: Alert[] = [];
 	$: alerts = $userData?.data?.donationAlerts || [];
+
+	$: {
+		const alertId = $page.url.searchParams.get("id");
+		if (alertId && alerts.length > 0) {
+			const alert = alerts.find((a) => a.id === alertId);
+			if (alert) {
+				currentAlert.set(alert);
+				console.log("now editing: ", alert.name);
+			} else {
+				currentAlert.reset();
+				console.log("alert not found");
+			}
+		} else if (!alertId) {
+			currentAlert.reset();
+		}
+	}
 
 	interface AlertCreatedEvent {
 		id: string;
@@ -88,24 +107,6 @@
 	}, 300);
 
 	onMount(() => {
-		alerts = $userData?.data.donationAlerts || [];
-		const alertId = $page.url.searchParams.get("id");
-		if (alertId) {
-			console.log("alert ID: ", alertId);
-		}
-
-		if (alertId) {
-			const alert = alerts.find((a) => a.id === alertId);
-			if (alert) {
-				currentAlert.set(alert);
-				console.log("now editing: ", $currentAlert?.name);
-			} else {
-				currentAlert.reset();
-			}
-		} else {
-			currentAlert.reset();
-		}
-
 		const resizeObserver = new ResizeObserver((entries) => {
 			for (let entry of entries) {
 				if (entry.target === previewContainer) {
@@ -598,10 +599,15 @@
 		console.log("alert updated in db");
 	}, 500);
 
+	let toasts: Toast[] = [];
+
 	function pushToastNoti(key: string, value: any) {
 		showToast = true;
 		toastKey = key;
 		toastValue = value;
+		setTimeout(() => {
+			showToast = false;
+		}, 5000);
 	}
 
 	function updateAlertConfig(key: string, value: any) {
@@ -690,30 +696,35 @@
 		: 'bg-lime-100 text-slate-800'} w-full overflow-x-hidden font-mono p-4 pt-20"
 >
 	{#if showToast}
+		{#each toasts as toast}{/each}
 		<button
 			in:slide
 			class="{$isDarkMode
-				? 'bg-blue-600'
+				? 'bg-lime-400 border-white'
 				: 'bg-white border-blue-700'} border-[1px] z-50 fixed w-[400px] rounded-none flex space-x-4 px-6 p-4 items-center justify-between top-2 left-1/2 -translate-x-1/2"
 		>
-			<p class="{$isDarkMode ? '' : ' hue-rotate-180'} filter text-3xl">
+			<p
+				class="{$isDarkMode
+					? 'hue-rotate-90'
+					: ' hue-rotate-180'} filter text-3xl"
+			>
 				✅
 			</p>
 			<p class="font-mono text-left flex flex-col space-y-">
 				<span
 					class="{$isDarkMode
-						? 'text-lime-400'
-						: 'text-black'} font-serif italic -tracking-wide capitalize"
+						? 'text-white font-mono font-black'
+						: 'text-black font-serif italic -tracking-wide capitalize'} text-xs"
 					>{$currentAlert?.name} updataed</span
 				>
 				<span
-					class="text-xs {$isDarkMode
-						? 'text-slate-400'
+					class="text {$isDarkMode
+						? 'text-lime-600'
 						: 'text-lime-600'}"
 					>{toastKey} set to
 					<span
 						class={$isDarkMode
-							? "text-lime-400"
+							? "text-white"
 							: "text-sky-400 font-black"}>{toastValue}</span
 					></span
 				>
@@ -1105,11 +1116,16 @@
 					<label class="block mb-2" for="alertduration"
 						>Alert Duration</label
 					>
-					<p>{alertDuration}s</p>
+					<p>{$currentAlert?.config.alertDuration}s</p>
 				</div>
 				<!-- letter spacing slider -->
 				<input
-					bind:value={alertDuration}
+					value={$currentAlert?.config.alertDuration}
+					on:change={(e) =>
+						updateAlertConfig(
+							"alertDuration",
+							e.currentTarget.value,
+						)}
 					type="range"
 					id="alertduration"
 					name="alertduration"
@@ -1185,11 +1201,19 @@
 			<div class="flex flex-col space-y-2">
 				<div class="flex space-x-6">
 					<label class="block mb-2" for="volume">Volume</label>
-					<p>{volumePercent}%</p>
+					<p>
+						{$currentAlert?.config.alertVolume
+							? $currentAlert?.config.alertVolume
+							: ""}%
+					</p>
 				</div>
 				<!-- volume slider -->
 				<input
-					bind:value={volumePercent}
+					value={$currentAlert?.config.alertVolume
+						? $currentAlert?.config.alertVolume
+						: ""}
+					on:change={(e) =>
+						updateAlertConfig("alertVolume", e.currentTarget.value)}
 					type="range"
 					id="volume"
 					name="volume"

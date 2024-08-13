@@ -380,3 +380,12 @@ use the update function and create a toast noti to show what is changed
 
 
 do the changes update the db irt
+
+
+right now the default font size is 32px
+
+when i set a new value it displays as 38pxpx
+
+so i need to use the users db value as the value displayed on the input right away
+
+i see the issue. when the page is refreshed the currentalert store is not existent. so on mount should fetch the users data if not fetches already
