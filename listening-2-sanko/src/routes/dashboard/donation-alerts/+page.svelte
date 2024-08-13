@@ -22,8 +22,6 @@
 	import { userData } from "$lib/stores/userDataStore";
 	import lodash from "lodash";
 
-	interface Toast
-
 	const { debounce } = lodash;
 
 	let alerts: Alert[] = [];
@@ -599,14 +597,38 @@
 		console.log("alert updated in db");
 	}, 500);
 
+	interface Toast {
+		key: string;
+		value: any;
+	}
+
 	let toasts: Toast[] = [];
 
+	// Function to delete a toast from the array using the toast's key
+	function deleteToast(key: string): void {
+		// Find the index of the toast with the specified key
+		const index = toasts.findIndex((toast) => toast.key === key);
+
+		// If the toast is found, remove it from the array
+		if (index !== -1) {
+			toasts.splice(index, 1);
+		}
+	}
+
 	function pushToastNoti(key: string, value: any) {
-		showToast = true;
-		toastKey = key;
-		toastValue = value;
+		// Push the new Toast object into the toasts array
+		toasts.push({ key, value });
+
+		// Set a timeout to remove the toast after 5000ms
 		setTimeout(() => {
-			showToast = false;
+			// Find the index of the toast to remove
+			const index = toasts.findIndex(
+				(toast) => toast.key === key && toast.value === value,
+			);
+			// Remove the toast if it exists in the array
+			if (index !== -1) {
+				toasts.splice(index, 1);
+			}
 		}, 5000);
 	}
 
@@ -695,46 +717,49 @@
 		? 'bg-slate-900 text-white'
 		: 'bg-lime-100 text-slate-800'} w-full overflow-x-hidden font-mono p-4 pt-20"
 >
-	{#if showToast}
-		{#each toasts as toast}{/each}
-		<button
-			in:slide
-			class="{$isDarkMode
-				? 'bg-lime-400 border-white'
-				: 'bg-white border-blue-700'} border-[1px] z-50 fixed w-[400px] rounded-none flex space-x-4 px-6 p-4 items-center justify-between top-2 left-1/2 -translate-x-1/2"
+	{#each toasts as toast}
+		<div
+			class="fixed z-50 top-2 left-1/2 -translate-x-1/2 flex flex-col space-y-2"
 		>
-			<p
-				class="{$isDarkMode
-					? 'hue-rotate-90'
-					: ' hue-rotate-180'} filter text-3xl"
-			>
-				✅
-			</p>
-			<p class="font-mono text-left flex flex-col space-y-">
-				<span
-					class="{$isDarkMode
-						? 'text-white font-mono font-black'
-						: 'text-black font-serif italic -tracking-wide capitalize'} text-xs"
-					>{$currentAlert?.name} updataed</span
-				>
-				<span
-					class="text {$isDarkMode
-						? 'text-lime-600'
-						: 'text-lime-600'}"
-					>{toastKey} set to
-					<span
-						class={$isDarkMode
-							? "text-white"
-							: "text-sky-400 font-black"}>{toastValue}</span
-					></span
-				>
-			</p>
 			<button
-				on:click={() => (showToast = false)}
-				class="text-3xl right-4 ml-auto">x</button
+				in:fade
+				class="{$isDarkMode
+					? 'bg-lime-400 border-white'
+					: 'bg-white border-blue-700'} border-[1px] w-[400px] rounded-none flex space-x-4 px-6 p-4 items-center justify-between"
 			>
-		</button>
-	{/if}
+				<p
+					class="{$isDarkMode
+						? 'hue-rotate-90'
+						: ' hue-rotate-180'} filter text-3xl"
+				>
+					✅
+				</p>
+				<p class="font-mono text-left flex flex-col space-y-">
+					<span
+						class="{$isDarkMode
+							? 'text-white font-mono font-black'
+							: 'text-black font-serif italic -tracking-wide capitalize'} text-xs"
+						>{$currentAlert?.name} updataed</span
+					>
+					<span
+						class="text {$isDarkMode
+							? 'text-lime-600'
+							: 'text-lime-600'}"
+						>{toast.key} set to
+						<span
+							class={$isDarkMode
+								? "text-white"
+								: "text-sky-400 font-black"}>{toast.value}</span
+						></span
+					>
+				</p>
+				<button
+					on:click={() => deleteToast(toast.key)}
+					class="text-3xl right-4 ml-auto">x</button
+				>
+			</button>
+		</div>
+	{/each}
 
 	{#if $showNameAlert}
 		<div class="z-50">
