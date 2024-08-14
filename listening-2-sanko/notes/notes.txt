@@ -408,3 +408,22 @@ if data {
 } else {
     🪲
 }
+
+todo
+go down the list and just make everything work well
+this means implementing the image / sound uploads too
+update the updateconfig to simply add a new alert or update the existing alert 
+there is no need to reqrite the entire array
+add delete buttons to manage alerts
+
+
+fist step is refactoriong the updatealertconfig to use the simpler update methods on the datastore
+    that was super easy not hard at all took 2s
+
+ui issues
+    right now the create new modal shows up before the donation-alerts page is reached so it jumps around a bit. let's go to donation-alerts then show the modal
+
+let's go through the list one at a time
+
+make the name editable
+    

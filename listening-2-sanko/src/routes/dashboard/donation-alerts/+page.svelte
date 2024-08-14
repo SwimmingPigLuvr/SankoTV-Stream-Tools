@@ -632,6 +632,27 @@
 		}, 5000);
 	}
 
+	function updateAlertName(key: "name", name: string) {
+		const alert = get(currentAlert);
+		if (!alert) {
+			console.error("no alert currently selected");
+			return;
+		}
+
+		// update current alert store with new name
+		const updatedAlert = {
+			...alert,
+			name: name,
+		};
+		currentAlert.set(updatedAlert);
+
+		// push toast
+		pushToastNoti(key, name);
+
+		// make sure that the updatedonation alert method can handle updating the name field
+		userData.updateDonationAlert(updatedAlert);
+	}
+
 	function updateAlertConfig(key: string, value: any) {
 		const alert = get(currentAlert);
 		if (!alert) {
@@ -639,42 +660,20 @@
 			return;
 		}
 
-		// update current store
-		currentAlert.update((currentAlert) => {
-			if (currentAlert) {
-				return {
-					...currentAlert,
-					config: {
-						...currentAlert.config,
-						[key]: value,
-					},
-				};
-			}
-			return currentAlert;
-		});
+		// update current alert store
+		const updatedAlert = {
+			...alert,
+			config: {
+				...alert.config,
+				[key]: value,
+			},
+		};
+		currentAlert.set(updatedAlert);
 
 		// trigger toast notification
 		pushToastNoti(key, value);
 
-
-		const currentUserData = get(userData);
-
-		if (currentUserData && currentUserData.data) {
-			// get updated alert
-			const updatedAlert = get(currentAlert);
-
-			if (updatedAlert) {
-				// create new array with the updated alert
-				const updatedAlerts = currentUserData.data.donationAlerts.map(a => a.id === updatedAlert.id ? updatedAlert : a);
-
-				// update userData store
-				userData.updateDataField('donationAlerts', updatedAlerts);
-			} else {
-				console.error('failed to get updated alert');
-			}
-		} else {
-			console.error('user data not available')
-		}
+		userData.updateDonationAlert(updatedAlert);
 	}
 
 	function handleInput(event: Event) {
@@ -791,7 +790,10 @@
 		>
 			<span>now editing: </span>
 			{#if $currentAlert?.name}
-				<span in:fade={{duration: 500, easing: easings.cubicInOut}} class="text-lime-400">{$currentAlert?.name}</span>
+				<span
+					in:fade={{ duration: 500, easing: easings.cubicInOut }}
+					class="text-lime-400">{$currentAlert?.name}</span
+				>
 			{:else}
 				<span class="animate-bounce text-xs"> </span>
 			{/if}
@@ -939,8 +941,9 @@
 					<label for="alertname">Alert Name</label>
 					<!-- text input -->
 					<input
-						bind:value={alertName}
-						on:input={handleInput}
+						value={$currentAlert?.name}
+						on:change={(e) =>
+							updateAlertConfig("name", e.currentTarget.value)}
 						name="alertName"
 						id="alertName"
 						class=" flex space-x-4 p-4 {$isDarkMode
