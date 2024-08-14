@@ -1,38 +1,17 @@
 <script lang="ts">
     import { createEventDispatcher } from "svelte";
-    import {
-        alertConfig,
-        type AlertConfig,
-        type Alert,
-    } from "$lib/stores/alertConfigStore";
+    import { alertConfig, type Alert } from "$lib/stores/alertConfigStore";
     import { userData } from "$lib/stores/userDataStore";
     import { isDarkMode } from "$lib/stores";
     import { v4 as uuidv4 } from "uuid";
 
-    interface AlertCreatedEvent {
-        id: string;
-        name: string;
-        config: AlertConfig;
-        isActive: boolean;
-    }
-
     const dispatch = createEventDispatcher<{
-        alertCreated: AlertCreatedEvent;
+        alertCreated: Alert;
         close: void;
     }>();
 
     let alertName = "";
     let error = "";
-
-    const newAlertId = uuidv4();
-
-    function createNewAlert(name: string) {
-        const newAlert: Alert = {
-            id: newAlertId,
-            name: name,
-            config: $alertConfig,
-        }
-    }
 
     function handleSubmit() {
         if (!alertName.trim()) {
@@ -43,10 +22,11 @@
         const newAlertId = uuidv4();
 
         // Create a new alert with the default config
-        const newAlert: AlertCreatedEvent = {
+        const newAlert: Alert = {
             id: newAlertId,
             name: alertName,
             config: $alertConfig,
+            isActive: true,
         };
 
         // Update user data

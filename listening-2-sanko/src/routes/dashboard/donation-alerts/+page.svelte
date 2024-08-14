@@ -47,6 +47,7 @@
 		id: string;
 		name: string;
 		config: AlertConfig;
+		isActive: boolean;
 	}
 
 	type Placeholder = "{sender}" | "{amount}" | "{gift}";
