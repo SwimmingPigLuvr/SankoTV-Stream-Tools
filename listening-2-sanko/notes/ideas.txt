@@ -1,4 +1,16 @@
-different pages for different features
+is there a way that i can get the users sanko user name once they connect their wallet?
+  ux
+  1st connect google -> connection
+  2nd connect same wallet you use for sankoTV -> connection
+  Welcome SwimmingPigLuvr!
+
+  logic
+  use client to check sanko.tv for username.
+    // todo!
+  give username to frontend and assign it to userdata.username
+
+
+
   animations
   lists
   top donations
