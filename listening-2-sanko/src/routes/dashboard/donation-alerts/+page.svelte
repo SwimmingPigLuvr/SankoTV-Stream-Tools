@@ -639,6 +639,7 @@
 			return;
 		}
 
+		// update current store
 		currentAlert.update((currentAlert) => {
 			if (currentAlert) {
 				return {
@@ -652,37 +653,27 @@
 			return currentAlert;
 		});
 
+		// trigger toast notification
 		pushToastNoti(key, value);
+
 
 		const currentUserData = get(userData);
 
 		if (currentUserData && currentUserData.data) {
-			// Find the index of the current alert in the array
-			const alertIndex = currentUserData.data.donationAlerts.findIndex(
-				(a) => a.id === alert.id,
-			);
+			// get updated alert
+			const updatedAlert = get(currentAlert);
 
-			if (alertIndex !== -1) {
-				// Get the updated alert
-				const updatedAlert = get(currentAlert);
+			if (updatedAlert) {
+				// create new array with the updated alert
+				const updatedAlerts = currentUserData.data.donationAlerts.map(a => a.id === updatedAlert.id ? updatedAlert : a);
 
-				if (updatedAlert) {
-					// Update the existing alert
-					const updatedAlerts = [
-						...currentUserData.data.donationAlerts,
-					];
-					updatedAlerts[alertIndex] = updatedAlert;
-
-					// Update the userData store
-					userData.updateDataField("donationAlerts", updatedAlerts);
-				} else {
-					console.error("Failed to get updated alert");
-				}
+				// update userData store
+				userData.updateDataField('donationAlerts', updatedAlerts);
 			} else {
-				console.error("Alert not found in userData");
+				console.error('failed to get updated alert');
 			}
 		} else {
-			console.error("User data is not available");
+			console.error('user data not available')
 		}
 	}
 
@@ -798,7 +789,12 @@
 		<h1
 			class="absolute top-10 font-mono text-xl py-2 m-auto w-full text-left"
 		>
-			now editing: <span class="text-lime-400">{$currentAlert?.name}</span>
+			<span>now editing: </span>
+			{#if $currentAlert?.name}
+				<span in:fade={{duration: 500, easing: easings.cubicInOut}} class="text-lime-400">{$currentAlert?.name}</span>
+			{:else}
+				<span class="animate-bounce text-xs"> </span>
+			{/if}
 		</h1>
 		<!-- donation preview -->
 		<div

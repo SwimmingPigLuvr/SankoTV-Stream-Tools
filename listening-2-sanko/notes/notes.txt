@@ -399,3 +399,12 @@ display correct percentage for volume
 make sure font size doesn't say 'pxpx'
 
 create a send to stream button to test out the alerts
+
+working on the database right now so that the user can edit and add data seamlessly! let's go
+
+right now i find it annoying that the alert title says undefined when the pagerefreshes so let's add a loading state?
+if data {
+    data
+} else {
+    🪲
+}

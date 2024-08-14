@@ -87,9 +87,18 @@ function createUserDataStore() {
             try {
                 const currentData = get(this);
                 if (!currentData) throw new Error("no current user data");
+
+                let updatedValue = value;
+
+                // ensure not duplicate
+                if (key === 'donationAlerts' && Array.isArray(value)) {
+                    const uniqueAlerts = Array.from(new Map(value.map(alert => [alert.id, alert])).values());
+                    updatedValue = uniqueAlerts;
+                }
+
                 const updatedData = {
                     ...currentData.data,
-                    [key]: value
+                    [key]: updatedValue
                 };
                 const { data, error } = await supabase
                     .from('users')
