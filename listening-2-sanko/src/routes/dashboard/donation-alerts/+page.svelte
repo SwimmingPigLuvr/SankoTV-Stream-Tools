@@ -943,7 +943,7 @@
 					<input
 						value={$currentAlert?.name}
 						on:change={(e) =>
-							updateAlertConfig("name", e.currentTarget.value)}
+							updateAlertName("name", e.currentTarget.value)}
 						name="alertName"
 						id="alertName"
 						class=" flex space-x-4 p-4 {$isDarkMode

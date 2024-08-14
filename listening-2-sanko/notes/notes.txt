@@ -426,4 +426,6 @@ ui issues
 let's go through the list one at a time
 
 make the name editable
+the problem with the current setup is that is only edits the config fieldd so it adds name: newName to the config field
+but i want to edit the name field that is above the config
     
