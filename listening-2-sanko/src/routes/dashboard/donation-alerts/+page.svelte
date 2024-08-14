@@ -634,31 +634,55 @@
 
 	function updateAlertConfig(key: string, value: any) {
 		const alert = get(currentAlert);
-		if (alert) {
-			currentAlert.update((currentAlert) => {
-				if (currentAlert) {
-					return {
-						...currentAlert,
-						config: {
-							...currentAlert.config,
-							[key]: value,
-						},
-					};
+		if (!alert) {
+			console.error("No alert is currently selected");
+			return;
+		}
+
+		currentAlert.update((currentAlert) => {
+			if (currentAlert) {
+				return {
+					...currentAlert,
+					config: {
+						...currentAlert.config,
+						[key]: value,
+					},
+				};
+			}
+			return currentAlert;
+		});
+
+		pushToastNoti(key, value);
+
+		const currentUserData = get(userData);
+
+		if (currentUserData && currentUserData.data) {
+			// Find the index of the current alert in the array
+			const alertIndex = currentUserData.data.donationAlerts.findIndex(
+				(a) => a.id === alert.id,
+			);
+
+			if (alertIndex !== -1) {
+				// Get the updated alert
+				const updatedAlert = get(currentAlert);
+
+				if (updatedAlert) {
+					// Update the existing alert
+					const updatedAlerts = [
+						...currentUserData.data.donationAlerts,
+					];
+					updatedAlerts[alertIndex] = updatedAlert;
+
+					// Update the userData store
+					userData.updateDataField("donationAlerts", updatedAlerts);
+				} else {
+					console.error("Failed to get updated alert");
 				}
-				return alert;
-			});
-
-			pushToastNoti(key, value);
-
-			const currentUserData = get(userData);
-
-			// update array
-			const updatedAlerts = (
-				currentUserData?.data.donationAlerts || []
-			).map((a) => (a.id === alert.id ? get(currentAlert) : a));
-
-			// update alerts in db
-			debouncedUpdateDatabase(updatedAlerts);
+			} else {
+				console.error("Alert not found in userData");
+			}
+		} else {
+			console.error("User data is not available");
 		}
 	}
 
