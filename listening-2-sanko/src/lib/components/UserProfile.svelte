@@ -6,7 +6,9 @@
 </script>
 
 {#if $userData}
-    <h1 class="font-botch text-xl">Welcome, {$userData.username ?? "anon"}!</h1>
+    <h1 class="font-mono mb-6 text-xl">
+        Welcome, {$userData.username ?? "anon"}!
+    </h1>
     <a
         class="px-4 p-2 {$isDarkMode
             ? 'border-white'

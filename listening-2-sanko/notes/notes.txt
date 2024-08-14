@@ -389,3 +389,13 @@ when i set a new value it displays as 38pxpx
 so i need to use the users db value as the value displayed on the input right away
 
 i see the issue. when the page is refreshed the currentalert store is not existent. so on mount should fetch the users data if not fetches already
+
+make name editable
+sync all inputs with user data
+clean up the toast notifications
+use the debounce especially for input types like range sliders
+
+display correct percentage for volume
+make sure font size doesn't say 'pxpx'
+
+create a send to stream button to test out the alerts

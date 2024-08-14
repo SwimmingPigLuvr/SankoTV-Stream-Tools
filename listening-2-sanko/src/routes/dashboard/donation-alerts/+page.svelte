@@ -796,9 +796,9 @@
 
 	<div class="alert-grid m-auto sm:text-sm text-xs max-w-1080px]">
 		<h1
-			class="absolute top-10 font-cinema text-xl py-2 m-auto w-full text-left"
+			class="absolute top-10 font-mono text-xl py-2 m-auto w-full text-left"
 		>
-			Donation Alerts
+			now editing: <span class="text-lime-400">{$currentAlert?.name}</span>
 		</h1>
 		<!-- donation preview -->
 		<div

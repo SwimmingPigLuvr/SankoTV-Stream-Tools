@@ -110,11 +110,11 @@
 
 		{#if showUx}
 			<div
-				class="fixed top-1/2 -translate-y-1/2 scale-100 flex flex-col space-y-2"
+				class="fixed top-1/2 -translate-y-1/2 scale-100 flex flex-col space-y-2 justify-start"
 			>
 				<!-- Wallet Connection and Authentication -->
 				<div
-					class="m-auto flex flex-col space-y-2 items-center"
+					class="flex flex-col space-y-2 items-center"
 				>
 					{#if $user}
 						<UserProfile />
