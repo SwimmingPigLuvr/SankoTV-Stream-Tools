@@ -13,6 +13,7 @@
         id: string;
         name: string;
         config: AlertConfig;
+        isActive: boolean;
     }
 
     const dispatch = createEventDispatcher<{

@@ -5,6 +5,7 @@ export interface Alert {
     id: string;
     name: string;
     config: AlertConfig;
+    isActive: boolean;
 }
 
 function createCurrentAlertStore() {

@@ -8,6 +8,7 @@ interface Alert {
     id: string;
     name: string;
     config: AlertConfig;
+    isActive: boolean;
 }
 
 interface UserData {

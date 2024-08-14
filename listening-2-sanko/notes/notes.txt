@@ -428,4 +428,8 @@ let's go through the list one at a time
 make the name editable
 the problem with the current setup is that is only edits the config fieldd so it adds name: newName to the config field
 but i want to edit the name field that is above the config
+super easy fix. i just needed to actually call the function because i nailed it the first time i just never even called it
+
+i need to add a new data field for whether or not the alert is even turned on
+it should be at teh top level with id, name, and config
     
