@@ -24,6 +24,8 @@
 
 	const { debounce } = lodash;
 
+	let showControls = false;
+
 	let alerts: Alert[] = [];
 	$: alerts = $userData?.data?.donationAlerts || [];
 
@@ -677,6 +679,20 @@
 		userData.updateDonationAlert(updatedAlert);
 	}
 
+	function handleDeleteAlert() {
+		console.log("calling handleDeletealert");
+		const alert = get(currentAlert);
+		if (!alert) {
+			console.log("no alert currently selected");
+			return;
+		}
+		currentAlert.reset();
+
+		// trigger toast for deleting alert
+
+		userData.removeDonationAlert(alert.id);
+	}
+
 	function handleInput(event: Event) {
 		const input = event.target as HTMLInputElement;
 		alertName = input.value;
@@ -786,670 +802,695 @@
 	{/if}
 
 	<div class="alert-grid m-auto sm:text-sm text-xs max-w-1080px]">
-		<h1
-			class="absolute top-10 font-mono text-xl py-2 m-auto w-full text-left"
-		>
-			<span>now editing: </span>
-			{#if $currentAlert?.name}
-				<span
-					in:fade={{ duration: 500, easing: easings.cubicInOut }}
-					class="text-lime-400">{$currentAlert?.name}</span
-				>
-			{:else}
-				<span class="animate-bounce text-xs"> </span>
-			{/if}
-		</h1>
-		<!-- donation preview -->
-		<div
-			bind:this={previewContainer}
-			style="background-color: {currentBackgroundColor}"
-			class="relative alert-grid-preview-container min-h-[420px]"
-		>
-			<!-- placeholder div to keep parent correct size -->
-			<div
-				bind:this={previewePlaceholder}
-				class="preview-placeholder"
-			></div>
-
-			{#if isPreviewPlaying}
-				<div
-					in:applyAnimation={$inConfig}
-					out:applyAnimation={$outConfig}
-					bind:this={previewContent}
-					class:layout-imageAboveText={layoutSelection ===
-						"imageAboveText"}
-					class:layout-textOverImage={layoutSelection ===
-						"textOverImage"}
-					class:layout-imgLeft={layoutSelection === "imgLeft"}
-					class:layout-imgRight={layoutSelection === "imgRight"}
-					class="preview-content leading-[1] flex items-center justify-center text-center"
-					style="background-color: {currentBackgroundColor}; border-radius: {$currentAlert
-						?.config.borderRadius}; font-family: {$currentAlert
-						?.config.fontFamily}; font-size: {$currentAlert?.config
-						.fontSize}; font-weight: {$currentAlert?.config
-						.fontWeight}; color: {$currentAlert?.config
-						.textColor}; text-transform: {$currentAlert?.config
-						.textTransform}; letter-spacing: {$currentAlert?.config
-						.letterSpacing}; text-shadow: {$currentAlert?.config
-						.textShadow};"
-				>
-					{#if layoutSelection === "textOverImage"}
-						<img src={currentMediaSrc} alt="" />
-						<div class="text" style="white-space: nowrap;">
-							{#each generateRandomMessage($messageTemplate).parts as part}
-								<span
-									style="color: {part.highlight
-										? $currentAlert?.config.highlightColor
-										: $currentAlert?.config.textColor};"
-								>
-									{part.text}
-								</span>
-							{/each}
-						</div>
-					{:else}
-						<img src={currentMediaSrc} alt="" />
-						<div style="white-space: nowrap;">
-							{#each generateRandomMessage($messageTemplate).parts as part}
-								<span
-									style="color: {part.highlight
-										? $currentAlert?.config.highlightColor
-										: $currentAlert?.config.textColor};"
-								>
-									{part.text}
-								</span>
-							{/each}
-						</div>
-					{/if}
-				</div>
-			{/if}
-			<div
-				class="absolute {$isDarkMode
-					? 'bg-slate-900'
-					: 'bg-lime-200'} z-20 bottom-0 w-full p-4 flex space-x-2 justify-end items-center"
+		<div>
+			<h1
+				class="absolute top-10 font-mono text-xl py-2 m-auto w-full text-left"
 			>
-				<!-- background color -->
-				<div class="flex mr-auto space-x-4 items-center">
-					<div class="flex space-x-2 items-center">
-						<label for="color">Background Color</label>
+				<span>now editing: </span>
+				{#if $currentAlert?.name}
+					<button
+						in:fade={{ duration: 500, easing: easings.cubicInOut }}
+						on:mouseenter={() => (showControls = true)}
+						on:mouseleave={() => (showControls = false)}
+						class="text-lime-400 relative"
+						>{$currentAlert?.name}
+						{#if showControls}
+							<button
+								on:click={handleDeleteAlert}
+								in:slide
+								class="text-sm text-black bg-white rounded-none px-4 p-2"
+								>delete alert</button
+							>
+						{/if}
+					</button>
+				{:else}
+					<span> </span>
+				{/if}
+			</h1>
+			<!-- donation preview -->
+			<div
+				bind:this={previewContainer}
+				style="background-color: {currentBackgroundColor}"
+				class="relative alert-grid-preview-container min-h-[420px]"
+			>
+				<!-- placeholder div to keep parent correct size -->
+				<div
+					bind:this={previewePlaceholder}
+					class="preview-placeholder"
+				></div>
+
+				{#if isPreviewPlaying}
+					<div
+						in:applyAnimation={$inConfig}
+						out:applyAnimation={$outConfig}
+						bind:this={previewContent}
+						class:layout-imageAboveText={layoutSelection ===
+							"imageAboveText"}
+						class:layout-textOverImage={layoutSelection ===
+							"textOverImage"}
+						class:layout-imgLeft={layoutSelection === "imgLeft"}
+						class:layout-imgRight={layoutSelection === "imgRight"}
+						class="preview-content leading-[1] flex items-center justify-center text-center"
+						style="background-color: {currentBackgroundColor}; border-radius: {$currentAlert
+							?.config.borderRadius}; font-family: {$currentAlert
+							?.config.fontFamily}; font-size: {$currentAlert
+							?.config.fontSize}; font-weight: {$currentAlert
+							?.config.fontWeight}; color: {$currentAlert?.config
+							.textColor}; text-transform: {$currentAlert?.config
+							.textTransform}; letter-spacing: {$currentAlert
+							?.config.letterSpacing}; text-shadow: {$currentAlert
+							?.config.textShadow};"
+					>
+						{#if layoutSelection === "textOverImage"}
+							<img src={currentMediaSrc} alt="" />
+							<div class="text" style="white-space: nowrap;">
+								{#each generateRandomMessage($messageTemplate).parts as part}
+									<span
+										style="color: {part.highlight
+											? $currentAlert?.config
+													.highlightColor
+											: $currentAlert?.config.textColor};"
+									>
+										{part.text}
+									</span>
+								{/each}
+							</div>
+						{:else}
+							<img src={currentMediaSrc} alt="" />
+							<div style="white-space: nowrap;">
+								{#each generateRandomMessage($messageTemplate).parts as part}
+									<span
+										style="color: {part.highlight
+											? $currentAlert?.config
+													.highlightColor
+											: $currentAlert?.config.textColor};"
+									>
+										{part.text}
+									</span>
+								{/each}
+							</div>
+						{/if}
+					</div>
+				{/if}
+				<div
+					class="absolute {$isDarkMode
+						? 'bg-slate-900'
+						: 'bg-lime-200'} z-20 bottom-0 w-full p-4 flex space-x-2 justify-end items-center"
+				>
+					<!-- background color -->
+					<div class="flex mr-auto space-x-4 items-center">
+						<div class="flex space-x-2 items-center">
+							<label for="color">Background Color</label>
+							<button
+								on:mouseenter={() =>
+									(showBackgroundColorInfo = true)}
+								on:mouseleave={() =>
+									(showBackgroundColorInfo = false)}
+								class="{$isDarkMode
+									? 'bg-slate-600 text-slate-400 hover:bg-slate-400 hover:text-slate-900'
+									: 'bg-lime-600 text-white hover:bg-lime-400 hover:text-black'} relative rounded-full w-4 h-4 text-xs"
+								>i
+								{#if showBackgroundColorInfo}
+									<div
+										in:fly={{ y: 10 }}
+										class="absolute border-[1px] -top-40 -left-20 text-left w-48 z-20 p-3 {$isDarkMode
+											? 'bg-slate-300 text-slate-600'
+											: 'bg-lime-400 text-black border-black'}"
+									>
+										This will not effect the background
+										color of the alert. This is just for
+										preview purposes. For best results set
+										background color to match your stream.
+									</div>
+								{/if}
+							</button>
+						</div>
+						<input
+							name="color"
+							id="color"
+							type="color"
+							bind:value={currentBackgroundColor}
+							class="block"
+						/>
+					</div>
+
+					<!-- mute button -->
+					<button
+						on:click={() => toggleMute()}
+						class="px-3 p-2 text-xl rounded-full {$isDarkMode
+							? 'hover:bg-slate-800'
+							: 'hover:bg-lime-300'} hover:bg-slate-800"
+					>
+						{#if muted}
+							🔇
+						{:else}
+							🔊
+						{/if}
+					</button>
+					<!-- preview button -->
+					<button
+						on:click={handleDonationPreview}
+						disabled={isPreviewPlaying}
+						class="text-xs ml-auto text-right p-4 {$isDarkMode
+							? 'bg-slate-800 hover:bg-slate-600'
+							: 'bg-lime-400 hover:bg-lime-600 hover:text-lime-100'} {isPreviewPlaying
+							? 'cursor-not-allowed'
+							: ''} ">preview</button
+					>
+				</div>
+			</div>
+
+			<!-- alert config -->
+			<div class="alert-grid-container relative">
+				<div
+					class="{$isDarkMode
+						? 'bg-black border-b-white'
+						: 'bg-white border-b-black'}  border-b-[1px] z-20 p-4 absolute top-0 w-full left-0 flex justify-between"
+				>
+					<!-- alert name -->
+					<div class="flex flex-col space-y-2 w-[70%]">
+						<label for="alertname">Alert Name</label>
+						<!-- text input -->
+						<input
+							value={$currentAlert?.name}
+							on:change={(e) =>
+								updateAlertName("name", e.currentTarget.value)}
+							name="alertName"
+							id="alertName"
+							class=" flex space-x-4 p-4 {$isDarkMode
+								? 'bg-slate-800'
+								: 'bg-lime-200'}"
+							type="text"
+						/>
+					</div>
+
+					<!-- alert active -->
+					<div class="flex flex-col space-y-2 w-[30%] items-center">
+						<label for="active" class="text-center"
+							>Alert {alertActive ? "Enabled" : "Disabled"}</label
+						>
 						<button
-							on:mouseenter={() =>
-								(showBackgroundColorInfo = true)}
+							name="active"
+							id="active"
+							on:click={() => toggleAlert()}
+							class="p-1 px-2 rounded-full flex items-center text-xl {$isDarkMode
+								? 'hover:bg-slate-800'
+								: 'hover:bg-lime-200'}"
+						>
+							{#if alertActive}
+								✅
+							{:else}
+								❌
+							{/if}
+						</button>
+					</div>
+				</div>
+
+				<!-- event trigger -->
+				<div class="flex flex-col space-y-2 mt-28">
+					<label for="eventtrigger">Event Trigger</label>
+					<select
+						class="custom-dropdown p-4 {$isDarkMode
+							? 'bg-slate-800'
+							: 'bg-lime-200'}"
+						name="eventtrigger"
+						id="eventtrigger"
+						bind:value={selectedTrigger}
+						on:change={handleTriggerChange}
+					>
+						<option value="donation">Donation</option>
+						<option value="specificgift">Specific Gift</option>
+						<option value="topdonation">Top Donation</option>
+						<option value="atleast"
+							>Donation amount is at least [amount]</option
+						>
+						<option value="exactamount"
+							>Donation is exactly [amount]</option
+						>
+					</select>
+				</div>
+
+				{#if selectedTrigger === "specificgift"}
+					<!-- specific gift -->
+					<!-- reverse this -->
+					<div class="flex flex-col space-y-2">
+						<label for="gift">Gift</label>
+						<select
+							class="custom-dropdown p-4 {$isDarkMode
+								? 'bg-slate-800'
+								: 'bg-lime-200'}"
+							name="gift"
+							id="gift"
+							bind:value={specificGift}
+							on:change={handleSpecificGiftChoice}
+						>
+							{#each gifts as gift}
+								<option value={gift}>{gift}</option>
+							{/each}
+						</select>
+					</div>
+				{/if}
+
+				{#if selectedTrigger === "atleast" || selectedTrigger === "exactamount"}
+					<!-- donation amount -->
+					<div class="flex flex-col space-y-2">
+						<label for="donationamount">Donation Amount</label>
+						<input
+							type="number"
+							class="custom-dropdown p-4 {$isDarkMode
+								? 'bg-slate-800'
+								: 'bg-lime-200'}"
+							name="donationamount"
+							id="donationamount"
+							bind:value={specificDonationAmount}
+							on:change={handleSpecificDonationAmount}
+						/>
+					</div>
+				{/if}
+
+				<!-- layout -->
+				<div class="flex flex-col space-y-2">
+					<label for="layout">Layout</label>
+					<select
+						class="custom-dropdown p-4 {$isDarkMode
+							? 'bg-slate-800'
+							: 'bg-lime-200'}"
+						name="layout"
+						id="layout"
+					>
+						<option value="imageAboveText">Image above text</option>
+						<option value="textOverImage">Text over image</option>
+						<option value="imgLeft">Image to left</option>
+						<option value="imgRight">Image to right</option>
+					</select>
+				</div>
+
+				<!-- image upload -->
+				<div class="flex flex-col space-y-2">
+					<label for="image">Image</label>
+
+					<!-- image upload -->
+					<button
+						class="relative flex items-center space-x-4 p-4 {$isDarkMode
+							? 'bg-slate-800'
+							: 'bg-lime-200'}"
+						name="image"
+						id="image"
+					>
+						<img
+							class="absolute max-w-[3.25rem] h-[3rem] left-0"
+							src={currentMediaSrc
+								? currentMediaSrc
+								: "/gifs/minecraft.gif"}
+							alt="🪲"
+						/>
+						<p class="pl-10 truncate max-w-sm sm:max-w-lg">
+							{currentMediaSrc
+								? currentMediaSrc
+								: "upload/link media"}
+						</p>
+						<button
+							on:mouseenter={() => (showImgUploadControls = true)}
 							on:mouseleave={() =>
-								(showBackgroundColorInfo = false)}
+								(showImgUploadControls = false)}
+							class="text-xs flex {$isDarkMode
+								? 'bg-slate-800'
+								: 'bg-lime-200'} space-x-0 absolute right-2"
+						>
+							{#if showImgUploadControls}
+								<!-- link image url -->
+								<button
+									class="{$isDarkMode
+										? 'hover:bg-slate-600'
+										: 'hover:bg-lime-400'} p-2 px-4"
+									>link</button
+								>
+								<!-- delete -->
+								{#if currentMediaSrc}
+									<button
+										on:click={handleRemoveCurrentMedia}
+										class="{$isDarkMode
+											? 'hover:bg-slate-600'
+											: 'hover:bg-lime-400'} p-2 px-4"
+										>remove</button
+									>
+								{/if}
+								<!-- upload -->
+								<button
+									class="{$isDarkMode
+										? 'hover:bg-slate-600'
+										: 'hover:bg-lime-400'} p-2 px-4"
+									>upload</button
+								>
+							{:else}
+								<p class="text-2xl p-2">+</p>
+							{/if}
+						</button>
+					</button>
+				</div>
+
+				<!-- Message template -->
+				<div class="flex flex-col space-y-2">
+					<div class="flex space-x-6 items-center">
+						<label for="template">Message Template</label>
+						<button
+							on:mouseenter={() => (showTemplateInfo = true)}
+							on:mouseleave={() => (showTemplateInfo = false)}
 							class="{$isDarkMode
 								? 'bg-slate-600 text-slate-400 hover:bg-slate-400 hover:text-slate-900'
 								: 'bg-lime-600 text-white hover:bg-lime-400 hover:text-black'} relative rounded-full w-4 h-4 text-xs"
 							>i
-							{#if showBackgroundColorInfo}
+							{#if showTemplateInfo}
 								<div
 									in:fly={{ y: 10 }}
-									class="absolute border-[1px] -top-40 -left-20 text-left w-48 z-20 p-3 {$isDarkMode
+									class="{$isDarkMode
 										? 'bg-slate-300 text-slate-600'
-										: 'bg-lime-400 text-black border-black'}"
+										: 'bg-lime-400 text-black border-black'} border-[1px] absolute -top-28 -left-20 text-left w-48 z-20 p-3"
 								>
-									This will not effect the background color of
-									the alert. This is just for preview
-									purposes. For best results set background
-									color to match your stream.
+									Format your message with three possible
+									variables:
+									<p>SENDER, AMOUNT, & GIFT.</p>
 								</div>
 							{/if}
 						</button>
 					</div>
-					<input
-						name="color"
-						id="color"
-						type="color"
-						bind:value={currentBackgroundColor}
-						class="block"
-					/>
-				</div>
 
-				<!-- mute button -->
-				<button
-					on:click={() => toggleMute()}
-					class="px-3 p-2 text-xl rounded-full {$isDarkMode
-						? 'hover:bg-slate-800'
-						: 'hover:bg-lime-300'} hover:bg-slate-800"
-				>
-					{#if muted}
-						🔇
-					{:else}
-						🔊
-					{/if}
-				</button>
-				<!-- preview button -->
-				<button
-					on:click={handleDonationPreview}
-					disabled={isPreviewPlaying}
-					class="text-xs ml-auto text-right p-4 {$isDarkMode
-						? 'bg-slate-800 hover:bg-slate-600'
-						: 'bg-lime-400 hover:bg-lime-600 hover:text-lime-100'} {isPreviewPlaying
-						? 'cursor-not-allowed'
-						: ''} ">preview</button
-				>
-			</div>
-		</div>
+					<!-- delete after we write this input correctly -->
 
-		<!-- alert config -->
-		<div class="alert-grid-container relative">
-			<div
-				class="{$isDarkMode
-					? 'bg-black border-b-white'
-					: 'bg-white border-b-black'}  border-b-[1px] z-20 p-4 absolute top-0 w-full left-0 flex justify-between"
-			>
-				<!-- alert name -->
-				<div class="flex flex-col space-y-2 w-[70%]">
-					<label for="alertname">Alert Name</label>
 					<!-- text input -->
 					<input
-						value={$currentAlert?.name}
-						on:change={(e) =>
-							updateAlertName("name", e.currentTarget.value)}
-						name="alertName"
-						id="alertName"
-						class=" flex space-x-4 p-4 {$isDarkMode
+						bind:value={$messageTemplate}
+						on:change={() => messageTemplate.set(message)}
+						name="template"
+						id="template"
+						class="flex space-x-4 p-4 {$isDarkMode
 							? 'bg-slate-800'
 							: 'bg-lime-200'}"
 						type="text"
 					/>
 				</div>
 
-				<!-- alert active -->
-				<div class="flex flex-col space-y-2 w-[30%] items-center">
-					<label for="active" class="text-center"
-						>Alert {alertActive ? "Enabled" : "Disabled"}</label
-					>
-					<button
-						name="active"
-						id="active"
-						on:click={() => toggleAlert()}
-						class="p-1 px-2 rounded-full flex items-center text-xl {$isDarkMode
-							? 'hover:bg-slate-800'
-							: 'hover:bg-lime-200'}"
-					>
-						{#if alertActive}
-							✅
-						{:else}
-							❌
-						{/if}
-					</button>
+				<!-- alert duration -->
+				<div class="flex flex-col space-y-2">
+					<div class="flex space-x-6">
+						<label class="block mb-2" for="alertduration"
+							>Alert Duration</label
+						>
+						<p>{$currentAlert?.config.alertDuration}s</p>
+					</div>
+					<!-- letter spacing slider -->
+					<input
+						value={$currentAlert?.config.alertDuration}
+						on:change={(e) =>
+							updateAlertConfig(
+								"alertDuration",
+								e.currentTarget.value,
+							)}
+						type="range"
+						id="alertduration"
+						name="alertduration"
+						min="2"
+						max="200"
+						step="1"
+					/>
 				</div>
 			</div>
 
-			<!-- event trigger -->
-			<div class="flex flex-col space-y-2 mt-28">
-				<label for="eventtrigger">Event Trigger</label>
-				<select
-					class="custom-dropdown p-4 {$isDarkMode
-						? 'bg-slate-800'
-						: 'bg-lime-200'}"
-					name="eventtrigger"
-					id="eventtrigger"
-					bind:value={selectedTrigger}
-					on:change={handleTriggerChange}
-				>
-					<option value="donation">Donation</option>
-					<option value="specificgift">Specific Gift</option>
-					<option value="topdonation">Top Donation</option>
-					<option value="atleast"
-						>Donation amount is at least [amount]</option
+			<!-- animation/sound settings -->
+			<div class="alert-grid-container">
+				<!-- sound-->
+				<!-- implement the same as the img upload -->
+
+				<div class="flex flex-col space-y-2">
+					<label for="sound">Sound</label>
+					<!-- sound upload -->
+					<button
+						class="relative flex items-center space-x-4 p-4 {$isDarkMode
+							? 'bg-slate-800'
+							: 'bg-lime-200'}"
+						name="sound"
+						id="sound"
 					>
-					<option value="exactamount"
-						>Donation is exactly [amount]</option
-					>
-				</select>
+						<p class="absolute text-2xl left-3">🎧</p>
+
+						<p class="pl-10">
+							{currentAudioSrc
+								? currentAudioSrc
+								: "upload/link audio"}
+						</p>
+						<button
+							on:mouseenter={() =>
+								(showAudioUploadControls = true)}
+							on:mouseleave={() =>
+								(showAudioUploadControls = false)}
+							class="text-xs z-20 {$isDarkMode
+								? 'bg-slate-800'
+								: 'bg-lime-200'} flex space-x-0 absolute right-2"
+						>
+							{#if showAudioUploadControls}
+								<!-- link image url -->
+								<button
+									class="{$isDarkMode
+										? 'hover:bg-slate-600'
+										: 'hover:bg-lime-400'} p-2 px-4"
+									>link</button
+								>
+								<!-- delete -->
+								{#if currentAudioSrc}
+									<button
+										on:click={handleRemoveCurrentAudio}
+										class="{$isDarkMode
+											? 'hover:bg-slate-600'
+											: 'hover:bg-lime-400'} p-2 px-4"
+										>remove</button
+									>
+								{/if}
+								<!-- upload -->
+								<button
+									class="{$isDarkMode
+										? 'hover:bg-slate-600'
+										: 'hover:bg-lime-400'} p-2 px-4"
+									>upload</button
+								>
+							{:else}
+								<p class="text-2xl p-2">+</p>
+							{/if}
+						</button>
+					</button>
+				</div>
+
+				<!-- alert volume -->
+				<div class="flex flex-col space-y-2">
+					<div class="flex space-x-6">
+						<label class="block mb-2" for="volume">Volume</label>
+						<p>
+							{$currentAlert?.config.alertVolume
+								? $currentAlert?.config.alertVolume
+								: ""}%
+						</p>
+					</div>
+					<!-- volume slider -->
+					<input
+						value={$currentAlert?.config.alertVolume
+							? $currentAlert?.config.alertVolume
+							: ""}
+						on:change={(e) =>
+							updateAlertConfig(
+								"alertVolume",
+								e.currentTarget.value,
+							)}
+						type="range"
+						id="volume"
+						name="volume"
+						min="0"
+						max="100"
+						step="1"
+					/>
+				</div>
 			</div>
 
-			{#if selectedTrigger === "specificgift"}
-				<!-- specific gift -->
-				<!-- reverse this -->
+			<div class="alert-grid-container">
+				<AnimationControls />
+			</div>
+
+			<!-- font settings -->
+			<div class="alert-grid-container">
+				<!-- font family -->
 				<div class="flex flex-col space-y-2">
-					<label for="gift">Gift</label>
+					<label for="font">Font</label>
 					<select
 						class="custom-dropdown p-4 {$isDarkMode
 							? 'bg-slate-800'
 							: 'bg-lime-200'}"
-						name="gift"
-						id="gift"
-						bind:value={specificGift}
-						on:change={handleSpecificGiftChoice}
+						name="font"
+						id="font"
+						value={$currentAlert?.config.fontFamily ??
+							$alertConfig.fontFamily}
+						on:change={(e) =>
+							updateAlertConfig(
+								"fontFamily",
+								e.currentTarget.value,
+							)}
 					>
-						{#each gifts as gift}
-							<option value={gift}>{gift}</option>
+						{#each fonts as font}
+							<option style="font-family: {font};" value={font}
+								>{font}</option
+							>
 						{/each}
 					</select>
 				</div>
-			{/if}
 
-			{#if selectedTrigger === "atleast" || selectedTrigger === "exactamount"}
-				<!-- donation amount -->
+				<!-- size -->
 				<div class="flex flex-col space-y-2">
-					<label for="donationamount">Donation Amount</label>
+					<div class="flex space-x-6">
+						<label class="block mb-2" for="font">Size</label>
+						<p>{$currentAlert?.config.fontSize ?? fontSize}px</p>
+					</div>
+					<!-- font size slider -->
 					<input
-						type="number"
+						value={parseInt(
+							$currentAlert?.config.fontSize ??
+								$alertConfig.fontSize,
+						)}
+						on:input={(e) =>
+							updateAlertConfig(
+								"fontSize",
+								`${e.currentTarget.value}px`,
+							)}
+						type="range"
+						id="fontsize"
+						name="fontsize"
+						min="12"
+						max="80"
+						step="1"
+					/>
+				</div>
+
+				<!-- weight -->
+				<div class="flex flex-col space-y-2">
+					<div class="space-x-2">
+						<label for="fontweight">Weight</label>
+						<button
+							on:mouseenter={() => (showWeightInfo = true)}
+							on:mouseleave={() => (showWeightInfo = false)}
+							class="relative {$isDarkMode
+								? 'bg-slate-600 hover:bg-slate-400 text-slate-400 hover:text-slate-900'
+								: 'bg-lime-600 text-white hover:bg-lime-400 hover:text-black'} rounded-full w-4 h-4 text-xs"
+							>i
+							{#if showWeightInfo}
+								<div
+									in:fly={{ y: 10 }}
+									class="absolute border-[1px] -top-20 -left-20 text-left w-48 z-20 p-3 {$isDarkMode
+										? 'bg-slate-300 text-slate-600'
+										: 'bg-lime-400 text-black border-black'}"
+								>
+									Some fonts do not have variable weights
+								</div>
+							{/if}
+						</button>
+					</div>
+					<select
 						class="custom-dropdown p-4 {$isDarkMode
 							? 'bg-slate-800'
 							: 'bg-lime-200'}"
-						name="donationamount"
-						id="donationamount"
-						bind:value={specificDonationAmount}
-						on:change={handleSpecificDonationAmount}
-					/>
-				</div>
-			{/if}
-
-			<!-- layout -->
-			<div class="flex flex-col space-y-2">
-				<label for="layout">Layout</label>
-				<select
-					class="custom-dropdown p-4 {$isDarkMode
-						? 'bg-slate-800'
-						: 'bg-lime-200'}"
-					name="layout"
-					id="layout"
-				>
-					<option value="imageAboveText">Image above text</option>
-					<option value="textOverImage">Text over image</option>
-					<option value="imgLeft">Image to left</option>
-					<option value="imgRight">Image to right</option>
-				</select>
-			</div>
-
-			<!-- image upload -->
-			<div class="flex flex-col space-y-2">
-				<label for="image">Image</label>
-
-				<!-- image upload -->
-				<button
-					class="relative flex items-center space-x-4 p-4 {$isDarkMode
-						? 'bg-slate-800'
-						: 'bg-lime-200'}"
-					name="image"
-					id="image"
-				>
-					<img
-						class="absolute max-w-[3.25rem] h-[3rem] left-0"
-						src={currentMediaSrc
-							? currentMediaSrc
-							: "/gifs/minecraft.gif"}
-						alt="🪲"
-					/>
-					<p class="pl-10 truncate max-w-sm sm:max-w-lg">
-						{currentMediaSrc
-							? currentMediaSrc
-							: "upload/link media"}
-					</p>
-					<button
-						on:mouseenter={() => (showImgUploadControls = true)}
-						on:mouseleave={() => (showImgUploadControls = false)}
-						class="text-xs flex {$isDarkMode
-							? 'bg-slate-800'
-							: 'bg-lime-200'} space-x-0 absolute right-2"
+						name="fontweight"
+						id="fontweight"
+						bind:value={selectedWeight}
+						on:click={handleWeightChange}
 					>
-						{#if showImgUploadControls}
-							<!-- link image url -->
-							<button
-								class="{$isDarkMode
-									? 'hover:bg-slate-600'
-									: 'hover:bg-lime-400'} p-2 px-4"
-								>link</button
+						{#each fontWeights as weight}
+							<option
+								style="font-weight: {weight};"
+								class=""
+								value={weight}>{weight}</option
 							>
-							<!-- delete -->
-							{#if currentMediaSrc}
-								<button
-									on:click={handleRemoveCurrentMedia}
-									class="{$isDarkMode
-										? 'hover:bg-slate-600'
-										: 'hover:bg-lime-400'} p-2 px-4"
-									>remove</button
-								>
-							{/if}
-							<!-- upload -->
-							<button
-								class="{$isDarkMode
-									? 'hover:bg-slate-600'
-									: 'hover:bg-lime-400'} p-2 px-4"
-								>upload</button
-							>
-						{:else}
-							<p class="text-2xl p-2">+</p>
-						{/if}
-					</button>
-				</button>
-			</div>
-
-			<!-- Message template -->
-			<div class="flex flex-col space-y-2">
-				<div class="flex space-x-6 items-center">
-					<label for="template">Message Template</label>
-					<button
-						on:mouseenter={() => (showTemplateInfo = true)}
-						on:mouseleave={() => (showTemplateInfo = false)}
-						class="{$isDarkMode
-							? 'bg-slate-600 text-slate-400 hover:bg-slate-400 hover:text-slate-900'
-							: 'bg-lime-600 text-white hover:bg-lime-400 hover:text-black'} relative rounded-full w-4 h-4 text-xs"
-						>i
-						{#if showTemplateInfo}
-							<div
-								in:fly={{ y: 10 }}
-								class="{$isDarkMode
-									? 'bg-slate-300 text-slate-600'
-									: 'bg-lime-400 text-black border-black'} border-[1px] absolute -top-28 -left-20 text-left w-48 z-20 p-3"
-							>
-								Format your message with three possible
-								variables:
-								<p>SENDER, AMOUNT, & GIFT.</p>
-							</div>
-						{/if}
-					</button>
+						{/each}
+					</select>
 				</div>
 
-				<!-- delete after we write this input correctly -->
-
-				<!-- text input -->
-				<input
-					bind:value={$messageTemplate}
-					on:change={() => messageTemplate.set(message)}
-					name="template"
-					id="template"
-					class="flex space-x-4 p-4 {$isDarkMode
-						? 'bg-slate-800'
-						: 'bg-lime-200'}"
-					type="text"
-				/>
-			</div>
-
-			<!-- alert duration -->
-			<div class="flex flex-col space-y-2">
-				<div class="flex space-x-6">
-					<label class="block mb-2" for="alertduration"
-						>Alert Duration</label
-					>
-					<p>{$currentAlert?.config.alertDuration}s</p>
-				</div>
-				<!-- letter spacing slider -->
-				<input
-					value={$currentAlert?.config.alertDuration}
-					on:change={(e) =>
-						updateAlertConfig(
-							"alertDuration",
-							e.currentTarget.value,
-						)}
-					type="range"
-					id="alertduration"
-					name="alertduration"
-					min="2"
-					max="200"
-					step="1"
-				/>
-			</div>
-		</div>
-
-		<!-- animation/sound settings -->
-		<div class="alert-grid-container">
-			<!-- sound-->
-			<!-- implement the same as the img upload -->
-
-			<div class="flex flex-col space-y-2">
-				<label for="sound">Sound</label>
-				<!-- sound upload -->
-				<button
-					class="relative flex items-center space-x-4 p-4 {$isDarkMode
-						? 'bg-slate-800'
-						: 'bg-lime-200'}"
-					name="sound"
-					id="sound"
-				>
-					<p class="absolute text-2xl left-3">🎧</p>
-
-					<p class="pl-10">
-						{currentAudioSrc
-							? currentAudioSrc
-							: "upload/link audio"}
-					</p>
-					<button
-						on:mouseenter={() => (showAudioUploadControls = true)}
-						on:mouseleave={() => (showAudioUploadControls = false)}
-						class="text-xs z-20 {$isDarkMode
-							? 'bg-slate-800'
-							: 'bg-lime-200'} flex space-x-0 absolute right-2"
-					>
-						{#if showAudioUploadControls}
-							<!-- link image url -->
-							<button
-								class="{$isDarkMode
-									? 'hover:bg-slate-600'
-									: 'hover:bg-lime-400'} p-2 px-4"
-								>link</button
-							>
-							<!-- delete -->
-							{#if currentAudioSrc}
-								<button
-									on:click={handleRemoveCurrentAudio}
-									class="{$isDarkMode
-										? 'hover:bg-slate-600'
-										: 'hover:bg-lime-400'} p-2 px-4"
-									>remove</button
-								>
-							{/if}
-							<!-- upload -->
-							<button
-								class="{$isDarkMode
-									? 'hover:bg-slate-600'
-									: 'hover:bg-lime-400'} p-2 px-4"
-								>upload</button
-							>
-						{:else}
-							<p class="text-2xl p-2">+</p>
-						{/if}
-					</button>
-				</button>
-			</div>
-
-			<!-- alert volume -->
-			<div class="flex flex-col space-y-2">
-				<div class="flex space-x-6">
-					<label class="block mb-2" for="volume">Volume</label>
-					<p>
-						{$currentAlert?.config.alertVolume
-							? $currentAlert?.config.alertVolume
-							: ""}%
-					</p>
-				</div>
-				<!-- volume slider -->
-				<input
-					value={$currentAlert?.config.alertVolume
-						? $currentAlert?.config.alertVolume
-						: ""}
-					on:change={(e) =>
-						updateAlertConfig("alertVolume", e.currentTarget.value)}
-					type="range"
-					id="volume"
-					name="volume"
-					min="0"
-					max="100"
-					step="1"
-				/>
-			</div>
-		</div>
-
-		<div class="alert-grid-container">
-			<AnimationControls />
-		</div>
-
-		<!-- font settings -->
-		<div class="alert-grid-container">
-			<!-- font family -->
-			<div class="flex flex-col space-y-2">
-				<label for="font">Font</label>
-				<select
-					class="custom-dropdown p-4 {$isDarkMode
-						? 'bg-slate-800'
-						: 'bg-lime-200'}"
-					name="font"
-					id="font"
-					value={$currentAlert?.config.fontFamily ??
-						$alertConfig.fontFamily}
-					on:change={(e) =>
-						updateAlertConfig("fontFamily", e.currentTarget.value)}
-				>
-					{#each fonts as font}
-						<option style="font-family: {font};" value={font}
-							>{font}</option
+				<!-- tracking -->
+				<div class="flex flex-col space-y-2">
+					<div class="flex space-x-6">
+						<label class="block mb-2" for="letterspacing"
+							>Letter Spacing</label
 						>
-					{/each}
-				</select>
-			</div>
-
-			<!-- size -->
-			<div class="flex flex-col space-y-2">
-				<div class="flex space-x-6">
-					<label class="block mb-2" for="font">Size</label>
-					<p>{$currentAlert?.config.fontSize ?? fontSize}px</p>
+						<p>{letterSpacing}em</p>
+					</div>
+					<!-- letter spacing slider -->
+					<input
+						bind:value={letterSpacing}
+						type="range"
+						id="letterspacing"
+						name="letterspacing"
+						min="-0.1"
+						max="0.1"
+						step="0.01"
+					/>
 				</div>
-				<!-- font size slider -->
-				<input
-					value={parseInt(
-						$currentAlert?.config.fontSize ?? $alertConfig.fontSize,
-					)}
-					on:input={(e) =>
-						updateAlertConfig(
-							"fontSize",
-							`${e.currentTarget.value}px`,
-						)}
-					type="range"
-					id="fontsize"
-					name="fontsize"
-					min="12"
-					max="80"
-					step="1"
-				/>
-			</div>
 
-			<!-- weight -->
-			<div class="flex flex-col space-y-2">
-				<div class="space-x-2">
-					<label for="fontweight">Weight</label>
-					<button
-						on:mouseenter={() => (showWeightInfo = true)}
-						on:mouseleave={() => (showWeightInfo = false)}
-						class="relative {$isDarkMode
-							? 'bg-slate-600 hover:bg-slate-400 text-slate-400 hover:text-slate-900'
-							: 'bg-lime-600 text-white hover:bg-lime-400 hover:text-black'} rounded-full w-4 h-4 text-xs"
-						>i
-						{#if showWeightInfo}
-							<div
-								in:fly={{ y: 10 }}
-								class="absolute border-[1px] -top-20 -left-20 text-left w-48 z-20 p-3 {$isDarkMode
-									? 'bg-slate-300 text-slate-600'
-									: 'bg-lime-400 text-black border-black'}"
-							>
-								Some fonts do not have variable weights
-							</div>
-						{/if}
-					</button>
+				<!-- text color -->
+				<div class="flex space-x-12 justify-start py-2">
+					<!-- color -->
+					<div class="flex space-x-2 items-center">
+						<label for="color">Text Color</label>
+						<input
+							name="color"
+							id="color"
+							type="color"
+							value={$currentAlert?.config.textColor ??
+								$alertConfig.textColor}
+							on:input={(e) =>
+								updateAlertConfig(
+									"textColor",
+									e.currentTarget.value,
+								)}
+							class="mt-1 block"
+						/>
+					</div>
+
+					<!-- highlight color -->
+					<div class="flex space-x-2 items-center">
+						<label for="color">Highlight Color</label>
+						<input
+							name="highlightcolor"
+							id="highlightcolor"
+							type="color"
+							value={$currentAlert?.config.highlightColor ??
+								$alertConfig.highlightColor}
+							on:input={(e) =>
+								updateAlertConfig(
+									"highlightColor",
+									e.currentTarget.value,
+								)}
+							class="mt-1 block"
+						/>
+					</div>
 				</div>
-				<select
-					class="custom-dropdown p-4 {$isDarkMode
-						? 'bg-slate-800'
-						: 'bg-lime-200'}"
-					name="fontweight"
-					id="fontweight"
-					bind:value={selectedWeight}
-					on:click={handleWeightChange}
-				>
-					{#each fontWeights as weight}
-						<option
-							style="font-weight: {weight};"
-							class=""
-							value={weight}>{weight}</option
+
+				<!-- Text Transform -->
+				<div class="flex flex-col space-y-2">
+					<label for="texttransform">Text Transform</label>
+					<select
+						class="custom-dropdown p-4 {$isDarkMode
+							? 'bg-slate-800'
+							: 'bg-lime-200'}"
+						name="texttransform"
+						id="texttransform"
+						bind:value={selectedTextTransform}
+						on:change={handleTextTransformChange}
+					>
+						<option class="" value="none">none</option>
+						<option class="lowercase" value="lowercase"
+							>lowercase</option
 						>
-					{/each}
-				</select>
-			</div>
-
-			<!-- tracking -->
-			<div class="flex flex-col space-y-2">
-				<div class="flex space-x-6">
-					<label class="block mb-2" for="letterspacing"
-						>Letter Spacing</label
-					>
-					<p>{letterSpacing}em</p>
+						<option class="uppsercase" value="uppercase"
+							>uppercase</option
+						>
+						<option class="capitalize" value="capitalize"
+							>capitalize</option
+						>
+					</select>
 				</div>
-				<!-- letter spacing slider -->
-				<input
-					bind:value={letterSpacing}
-					type="range"
-					id="letterspacing"
-					name="letterspacing"
-					min="-0.1"
-					max="0.1"
-					step="0.01"
-				/>
-			</div>
-
-			<!-- text color -->
-			<div class="flex space-x-12 justify-start py-2">
-				<!-- color -->
-				<div class="flex space-x-2 items-center">
-					<label for="color">Text Color</label>
-					<input
-						name="color"
-						id="color"
-						type="color"
-						value={$currentAlert?.config.textColor ??
-							$alertConfig.textColor}
-						on:input={(e) =>
-							updateAlertConfig(
-								"textColor",
-								e.currentTarget.value,
-							)}
-						class="mt-1 block"
-					/>
-				</div>
-
-				<!-- highlight color -->
-				<div class="flex space-x-2 items-center">
-					<label for="color">Highlight Color</label>
-					<input
-						name="highlightcolor"
-						id="highlightcolor"
-						type="color"
-						value={$currentAlert?.config.highlightColor ??
-							$alertConfig.highlightColor}
-						on:input={(e) =>
-							updateAlertConfig(
-								"highlightColor",
-								e.currentTarget.value,
-							)}
-						class="mt-1 block"
-					/>
-				</div>
-			</div>
-
-			<!-- Text Transform -->
-			<div class="flex flex-col space-y-2">
-				<label for="texttransform">Text Transform</label>
-				<select
-					class="custom-dropdown p-4 {$isDarkMode
-						? 'bg-slate-800'
-						: 'bg-lime-200'}"
-					name="texttransform"
-					id="texttransform"
-					bind:value={selectedTextTransform}
-					on:change={handleTextTransformChange}
-				>
-					<option class="" value="none">none</option>
-					<option class="lowercase" value="lowercase"
-						>lowercase</option
-					>
-					<option class="uppsercase" value="uppercase"
-						>uppercase</option
-					>
-					<option class="capitalize" value="capitalize"
-						>capitalize</option
-					>
-				</select>
 			</div>
 		</div>
 	</div>

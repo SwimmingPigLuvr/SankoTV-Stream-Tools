@@ -433,3 +433,7 @@ super easy fix. i just needed to actually call the function because i nailed it 
 i need to add a new data field for whether or not the alert is even turned on
 it should be at teh top level with id, name, and config
     
+
+when i made a new alert the alert name was undefined until i refreshed...
+
+the delete method deletes the store but it is immediate revived by the store value

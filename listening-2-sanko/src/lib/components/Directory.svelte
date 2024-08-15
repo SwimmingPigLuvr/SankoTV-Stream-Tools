@@ -147,7 +147,7 @@
                                         handleGoToDonationAlerts(alert.id)}
                                     class="w-full text-left {$isDarkMode
                                         ? 'title-glow-hover'
-                                        : 'title-glow-light-hover'} p-2"
+                                        : 'title-glow-light-hover'} p-2 relative"
                                     >{alert.name}</a
                                 >
                             {/each}
