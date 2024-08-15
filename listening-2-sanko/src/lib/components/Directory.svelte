@@ -120,7 +120,7 @@
                         class="
                             {$isDarkMode
                             ? 'title-glow-hover'
-                            : 'title-glow-light-hover'} rounded-none w-full p-2 text-left items-center justify-center"
+                            : 'title-glow-light-hover'} rounded-none w-full pl-2 text-left items-center justify-center"
                     >
                         <span class="text-xl font-black">Donation Alerts</span>
                     </button>
@@ -131,26 +131,26 @@
                                 easing: cubicInOut,
                                 duration: 250,
                             }}
-                            class="flex w-full flex-col items-center justify-center"
+                            class="flex pl-4 w-full flex-col items-center justify-center"
                         >
-                            <button
-                                on:click={handleCreateNewAlert}
-                                class="w-full text-left {$isDarkMode
-                                    ? 'title-glow-hover'
-                                    : 'title-glow-light-hover'} p-2"
-                                >create new</button
-                            >
                             {#each donationAlerts as alert (alert.id)}
                                 <a
                                     href="/dashboard/donation-alerts?id={alert.id}"
                                     on:click={() =>
                                         handleGoToDonationAlerts(alert.id)}
-                                    class="w-full text-left {$isDarkMode
+                                    class="w-full text-left text-xl font-thin tracking-widest {$isDarkMode
                                         ? 'title-glow-hover'
-                                        : 'title-glow-light-hover'} p-2 relative"
+                                        : 'title-glow-light-hover'} relative"
                                     >{alert.name}</a
                                 >
                             {/each}
+                            <button
+                                on:click={handleCreateNewAlert}
+                                class="w-full text-left {$isDarkMode
+                                    ? 'title-glow-hover text-lime-400 hover:text-white'
+                                    : 'title-glow-light-hover'}"
+                                >create new +</button
+                            >
                         </div>
                     {/if}
                 </div>
@@ -171,7 +171,7 @@
                     >
                         <span class="text-xl font-black"
                             >{#if comingSoon}
-                                <span class="font-serif">⚠️Coming Soon⚠️</span>
+                                <span class="font-serif">Coming Soon⚠️</span>
                             {:else}
                                 Chat Boxes
                             {/if}</span
