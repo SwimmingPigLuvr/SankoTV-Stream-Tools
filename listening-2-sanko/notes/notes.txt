@@ -437,3 +437,10 @@ it should be at teh top level with id, name, and config
 when i made a new alert the alert name was undefined until i refreshed...
 
 the delete method deletes the store but it is immediate revived by the store value
+
+why doesnt the isActive field get populated for the coffee alert data???????
+make sure that isActive displays the correct data from the db in the ui
+make sure that the toast displays the change
+
+
+

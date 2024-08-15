@@ -423,6 +423,7 @@
 
 	function toggleAlert() {
 		alertActive = !alertActive;
+
 	}
 
 	function getRandomSender() {
@@ -652,6 +653,27 @@
 
 		// make sure that the updatedonation alert method can handle updating the name field
 		userData.updateDonationAlert(updatedAlert);
+	}
+
+	function toggleIsActive(key: "alert enabled", isActive: boolean) {
+		const alert = get(currentAlert);
+		if (!alert) {
+			console.error("no alert currently selected");
+			return;
+		}
+
+		// toggle isActive
+		const updatedAlert = {
+			...alert,
+			isActive: isActive,
+		};
+		currentAlert.set(updatedAlert);
+
+		// push toast
+		pushToastNoti(key, name);
+
+		userData.updateDonationAlert(updatedAlert);
+
 	}
 
 	function updateAlertConfig(key: string, value: any) {

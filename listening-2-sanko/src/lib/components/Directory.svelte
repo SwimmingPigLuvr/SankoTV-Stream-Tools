@@ -120,7 +120,7 @@
                         class="
                             {$isDarkMode
                             ? 'title-glow-hover'
-                            : 'title-glow-light-hover'} rounded-none w-full pl-2 text-left items-center justify-center"
+                            : 'title-glow-light-hover'} rounded-none w-full p-2 text-left items-center justify-center"
                     >
                         <span class="text-xl font-black">Donation Alerts</span>
                     </button>
@@ -131,14 +131,14 @@
                                 easing: cubicInOut,
                                 duration: 250,
                             }}
-                            class="flex pl-4 w-full flex-col items-center justify-center"
+                            class="flex pl-4 w-full flex-col space-y-2 items-center justify-center"
                         >
                             {#each donationAlerts as alert (alert.id)}
                                 <a
                                     href="/dashboard/donation-alerts?id={alert.id}"
                                     on:click={() =>
                                         handleGoToDonationAlerts(alert.id)}
-                                    class="w-full text-left text-xl font-thin tracking-widest {$isDarkMode
+                                    class="w-full text-left text-xs font-thin tracking-widest {$isDarkMode
                                         ? 'title-glow-hover'
                                         : 'title-glow-light-hover'} relative"
                                     >{alert.name}</a
