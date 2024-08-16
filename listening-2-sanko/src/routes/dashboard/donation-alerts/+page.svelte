@@ -144,6 +144,11 @@
 
 	$: currentBackgroundColor = $isDarkMode ? "#000000" : "#ffffff";
 
+	let showUploadVisualMedia = false;
+	let showUploadAudio = false;
+	let showLinkVisualMedia = false;
+	let showLinkAudio = false;
+
 	let showToast = false;
 	let toastKey = "";
 	let toastValue = "";
@@ -1126,6 +1131,7 @@
 						{#if showImgUploadControls}
 							<!-- link image url -->
 							<button
+								on:click={() => (showLinkVisualMedia = true)}
 								class="{$isDarkMode
 									? 'hover:bg-slate-600'
 									: 'hover:bg-lime-400'} p-2 px-4"
@@ -1143,6 +1149,7 @@
 							{/if}
 							<!-- upload -->
 							<button
+								on:click={() => (showUploadVisualMedia = true)}
 								class="{$isDarkMode
 									? 'hover:bg-slate-600'
 									: 'hover:bg-lime-400'} p-2 px-4"
@@ -1152,6 +1159,11 @@
 							<p class="text-2xl p-2">+</p>
 						{/if}
 					</button>
+
+					<!-- link / upload modals -->
+					{#if showLinkVisualMedia}
+						<UploadOrLinkMedia />
+					{/if}
 				</button>
 			</div>
 
