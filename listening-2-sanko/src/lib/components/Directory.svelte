@@ -146,7 +146,7 @@
                             {/each}
                             <button
                                 on:click={handleCreateNewAlert}
-                                class="w-full text-left {$isDarkMode
+                                class="w-full text-xs text-left {$isDarkMode
                                     ? 'title-glow-hover text-lime-400 hover:text-white'
                                     : 'title-glow-light-hover'}"
                                 >create new +</button

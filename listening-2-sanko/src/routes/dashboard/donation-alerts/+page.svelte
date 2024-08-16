@@ -423,7 +423,6 @@
 
 	function toggleAlert() {
 		alertActive = !alertActive;
-
 	}
 
 	function getRandomSender() {
@@ -655,7 +654,7 @@
 		userData.updateDonationAlert(updatedAlert);
 	}
 
-	function toggleIsActive(key: "alert enabled", isActive: boolean) {
+	function toggleIsActive() {
 		const alert = get(currentAlert);
 		if (!alert) {
 			console.error("no alert currently selected");
@@ -665,15 +664,14 @@
 		// toggle isActive
 		const updatedAlert = {
 			...alert,
-			isActive: isActive,
+			isActive: !alert.isActive,
 		};
 		currentAlert.set(updatedAlert);
 
 		// push toast
-		pushToastNoti(key, name);
+		pushToastNoti("isActive", updatedAlert.isActive);
 
 		userData.updateDonationAlert(updatedAlert);
-
 	}
 
 	function updateAlertConfig(key: string, value: any) {
@@ -984,12 +982,12 @@
 					<button
 						name="active"
 						id="active"
-						on:click={() => toggleAlert()}
+						on:click={() => toggleIsActive()}
 						class="p-1 px-2 rounded-full flex items-center text-xl {$isDarkMode
 							? 'hover:bg-slate-800'
 							: 'hover:bg-lime-200'}"
 					>
-						{#if alertActive}
+						{#if $currentAlert?.isActive}
 							✅
 						{:else}
 							❌
@@ -1007,8 +1005,12 @@
 						: 'bg-lime-200'}"
 					name="eventtrigger"
 					id="eventtrigger"
-					bind:value={selectedTrigger}
-					on:change={handleTriggerChange}
+					value={$currentAlert?.config.eventTrigger}
+					on:change={(e) =>
+						updateAlertConfig(
+							"eventTrigger",
+							e.currentTarget.value,
+						)}
 				>
 					<option value="donation">Donation</option>
 					<option value="specificgift">Specific Gift</option>
@@ -1022,7 +1024,7 @@
 				</select>
 			</div>
 
-			{#if selectedTrigger === "specificgift"}
+			{#if $currentAlert?.config.eventTrigger === "specificgift"}
 				<!-- specific gift -->
 				<!-- reverse this -->
 				<div class="flex flex-col space-y-2">
@@ -1033,7 +1035,7 @@
 							: 'bg-lime-200'}"
 						name="gift"
 						id="gift"
-						bind:value={specificGift}
+						value={$currentAlert?.config.specificGift}
 						on:change={handleSpecificGiftChoice}
 					>
 						{#each gifts as gift}
@@ -1043,7 +1045,7 @@
 				</div>
 			{/if}
 
-			{#if selectedTrigger === "atleast" || selectedTrigger === "exactamount"}
+			{#if $currentAlert?.config.eventTrigger === "atleast" || $currentAlert?.config.eventTrigger === "exactamount"}
 				<!-- donation amount -->
 				<div class="flex flex-col space-y-2">
 					<label for="donationamount">Donation Amount</label>
@@ -1054,8 +1056,12 @@
 							: 'bg-lime-200'}"
 						name="donationamount"
 						id="donationamount"
-						bind:value={specificDonationAmount}
-						on:change={handleSpecificDonationAmount}
+						value={$currentAlert?.config.specificAmount}
+						on:change={(e) =>
+							updateAlertConfig(
+								"specificAmount",
+								e.currentTarget.value,
+							)}
 					/>
 				</div>
 			{/if}

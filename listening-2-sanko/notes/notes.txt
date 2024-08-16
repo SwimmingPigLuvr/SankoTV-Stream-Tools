@@ -442,5 +442,22 @@ why doesnt the isActive field get populated for the coffee alert data???????
 make sure that isActive displays the correct data from the db in the ui
 make sure that the toast displays the change
 
+boom all those are done that was easy.
+
+now i should probably go back and refactor the toasts for different data types because 
+updates should be a positive change,
+deletions should be a negative change,
+major updates should be distinct:
+name, isActive
+
+also make sure that the toast notis stack and debounce so that they don't flood the screen 
+also have a limit on the height with an overflow of y auto and x hidden so that the user can scroll through them all
+
+add the data field for the specific gift on the donation alerts
+also make sure that the triggers are saved to the db and updated correctly and toasted
+
+definitely need custom toasts for the updates on the triggers
+they are way too custom to match the template of the other ones
+
 
 

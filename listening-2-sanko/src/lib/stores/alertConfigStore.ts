@@ -24,6 +24,7 @@ export interface AlertConfig {
     textAnimation: string;
     borderRadius: string;
     eventTrigger: string,
+    specificGift: string,
     specificAmount: number;
     fontFamily: string;
     fontSize: string;
@@ -43,6 +44,7 @@ const defaultAlertConfig: AlertConfig = {
     textAnimation: "bounce",
     borderRadius: "0px",
     eventTrigger: "donation",
+    specificGift: "zyn",
     specificAmount: 5,
     fontFamily: "coolfont-trippy",
     fontSize: "32px",
