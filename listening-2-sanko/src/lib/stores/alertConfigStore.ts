@@ -35,6 +35,8 @@ export interface AlertConfig {
     textTransform: string;
     letterSpacing: string;
     textShadow: string;
+    mediaSrc: string | null;
+    audioSrc: string | null;
 }
 
 const defaultAlertConfig: AlertConfig = {
@@ -56,6 +58,8 @@ const defaultAlertConfig: AlertConfig = {
     textTransform: "uppercase",
     letterSpacing: "-0.05em",
     textShadow: "none",
+    mediaSrc: null,
+    audioSrc: null,
 };
 
 export const alertConfig = writable<AlertConfig>(defaultAlertConfig);

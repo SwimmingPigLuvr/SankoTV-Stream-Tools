@@ -90,7 +90,9 @@
 	let currentMediaSrc: string | null = defaultMedia;
 
 	let layout: string;
-	$: layout = $currentAlert?.config.composition;
+	$: if ($currentAlert) {
+		layout = $currentAlert.config.composition;
+	}
 
 	let layoutSelection = "imageAboveText";
 
@@ -281,6 +283,8 @@
 
 	function handleRemoveCurrentMedia() {
 		currentMediaSrc = null;
+		updateAlertConfig("mediaSrc", null);
+		updateAlertConfig("composition", "image-above-text");
 	}
 
 	function handleRemoveCurrentAudio() {

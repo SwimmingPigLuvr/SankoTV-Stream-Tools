@@ -444,7 +444,7 @@ make sure that the toast displays the change
 
 boom all those are done that was easy.
 
-now i should probably go back and refactor the toasts for different data types because 
+refactor the toasts for different data types
 updates should be a positive change,
 deletions should be a negative change,
 major updates should be distinct:
@@ -459,5 +459,14 @@ also make sure that the triggers are saved to the db and updated correctly and t
 definitely need custom toasts for the updates on the triggers
 they are way too custom to match the template of the other ones
 
+here again reminding myself to do custom toasts
 
+remove image should edit the layout
+we can just set it to image above text
 
+link / upload widgets
+create modal
+use a store for the link
+save that to user's data
+mediaSrc: link | storage
+create storage bucket for uploaded media
