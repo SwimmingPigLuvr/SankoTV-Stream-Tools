@@ -88,6 +88,10 @@
 	let defaultMedia =
 		"https://i.seadn.io/s/raw/files/e34c296e6e2089853f59748e87975c70.gif?auto=format&dpr=1&w=3840";
 	let currentMediaSrc: string | null = defaultMedia;
+
+	let layout: string;
+	$: layout = $currentAlert?.config.composition;
+
 	let layoutSelection = "imageAboveText";
 
 	let previewContainer: HTMLElement;
@@ -836,13 +840,7 @@
 					in:applyAnimation={$inConfig}
 					out:applyAnimation={$outConfig}
 					bind:this={previewContent}
-					class:layout-imageAboveText={layoutSelection ===
-						"imageAboveText"}
-					class:layout-textOverImage={layoutSelection ===
-						"textOverImage"}
-					class:layout-imgLeft={layoutSelection === "imgLeft"}
-					class:layout-imgRight={layoutSelection === "imgRight"}
-					class="preview-content leading-[1] flex items-center justify-center text-center"
+					class="{layout} preview-content leading-[1] flex items-center justify-center text-center"
 					style="background-color: {currentBackgroundColor}; border-radius: {$currentAlert
 						?.config.borderRadius}; font-family: {$currentAlert
 						?.config.fontFamily}; font-size: {$currentAlert?.config
@@ -853,7 +851,7 @@
 						.letterSpacing}; text-shadow: {$currentAlert?.config
 						.textShadow};"
 				>
-					{#if layoutSelection === "textOverImage"}
+					{#if layoutSelection === "tet-over-image"}
 						<img src={currentMediaSrc} alt="" />
 						<div class="text" style="white-space: nowrap;">
 							{#each generateRandomMessage($messageTemplate).parts as part}
@@ -1036,7 +1034,11 @@
 						name="gift"
 						id="gift"
 						value={$currentAlert?.config.specificGift}
-						on:change={handleSpecificGiftChoice}
+						on:change={(e) =>
+							updateAlertConfig(
+								"specificGift",
+								e.currentTarget.value,
+							)}
 					>
 						{#each gifts as gift}
 							<option value={gift}>{gift}</option>
@@ -1075,11 +1077,14 @@
 						: 'bg-lime-200'}"
 					name="layout"
 					id="layout"
+					value={$currentAlert?.config.composition}
+					on:change={(e) =>
+						updateAlertConfig("composition", e.currentTarget.value)}
 				>
-					<option value="imageAboveText">Image above text</option>
-					<option value="textOverImage">Text over image</option>
-					<option value="imgLeft">Image to left</option>
-					<option value="imgRight">Image to right</option>
+					<option value="image-above-text">Image above text</option>
+					<option value="text-over-image">Text over image</option>
+					<option value="image-left">Image left</option>
+					<option value="image-right">Image right</option>
 				</select>
 			</div>
 
@@ -1550,38 +1555,44 @@
 		}
 	}
 
-	.layout-imageAboveText {
+	.image-above-text {
 		gap: 0.5rem;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 	}
-	.layout-textOverImage {
+
+	/* Create a CSS class where the text is over the image */
+	/* They are both in the middle */
+	.text-over-image {
 		position: relative;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 	}
-	.layout-textOverImage img {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		z-index: 1;
-	}
-	.layout-textOverImage .text {
-		position: absolute;
-		z-index: 2;
-	}
-	.layout-imgLeft {
-		display: flex;
-		flex-direction: row;
-		gap: 2rem;
+
+	.text-over-image img {
+		position: fixed;
+		object-fit: fill;
+		z-index: -1;
+		margin: auto;
 	}
 
-	.layout-imgRight {
+	.image-left {
+		display: flex;
+		flex-direction: row;
+		gap: 1rem;
+	}
+	.image-left img {
+		max-height: 10%;
+	}
+
+	.image-right {
 		display: flex;
 		flex-direction: row-reverse;
-		gap: 2rem;
+		gap: 1rem;
+	}
+	.image-right img {
+		max-height: 10%;
 	}
 </style>

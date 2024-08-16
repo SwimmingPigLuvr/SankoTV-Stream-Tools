@@ -22,6 +22,7 @@ export interface AlertConfig {
     animationIn: string;
     animationOut: string;
     textAnimation: string;
+    composition: string;
     borderRadius: string;
     eventTrigger: string,
     specificGift: string,
@@ -42,6 +43,7 @@ const defaultAlertConfig: AlertConfig = {
     animationIn: "fly in up",
     animationOut: "fade out",
     textAnimation: "bounce",
+    composition: "image above text",
     borderRadius: "0px",
     eventTrigger: "donation",
     specificGift: "zyn",
