@@ -4,7 +4,11 @@
 	import { onMount, onDestroy } from "svelte";
 	import { writable, get } from "svelte/store";
 	import { browser } from "$app/environment";
-	import { isDarkMode, showNameAlert } from "$lib/stores";
+	import {
+		isDarkMode,
+		showNameAlert,
+		showLinkVisualMedia,
+	} from "$lib/stores";
 	import {
 		alertConfig,
 		type AlertConfig,
@@ -21,6 +25,7 @@
 	import { page } from "$app/stores";
 	import { userData } from "$lib/stores/userDataStore";
 	import lodash from "lodash";
+	import UploadOrLinkMedia from "$lib/components/UploadOrLinkMedia.svelte";
 
 	const { debounce } = lodash;
 
@@ -33,7 +38,6 @@
 			const alert = alerts.find((a) => a.id === alertId);
 			if (alert) {
 				currentAlert.set(alert);
-				console.log("now editing: ", alert.name);
 			} else {
 				currentAlert.reset();
 				console.log("alert not found");
@@ -75,6 +79,12 @@
 				audio.volume = volume;
 			}
 		});
+	}
+
+	function handleVisualMediaSelected(event: CustomEvent) {
+		console.log("event.detail: ", event.detail);
+		console.log("event.detail.media: ", event.detail.media);
+		updateAlertConfig("mediaSrc", event.detail.media);
 	}
 
 	function playAudio() {
@@ -146,7 +156,6 @@
 
 	let showUploadVisualMedia = false;
 	let showUploadAudio = false;
-	let showLinkVisualMedia = false;
 	let showLinkAudio = false;
 
 	let showToast = false;
@@ -602,7 +611,6 @@
 			alerts[index] = alert;
 			alerts = [...alerts, alert];
 			userData.updateDataField("donationAlerts", alerts);
-			console.log("alert updated in db");
 		}
 	}, 500);
 
@@ -1131,7 +1139,7 @@
 						{#if showImgUploadControls}
 							<!-- link image url -->
 							<button
-								on:click={() => (showLinkVisualMedia = true)}
+								on:click={() => showLinkVisualMedia.set(true)}
 								class="{$isDarkMode
 									? 'hover:bg-slate-600'
 									: 'hover:bg-lime-400'} p-2 px-4"
@@ -1161,8 +1169,14 @@
 					</button>
 
 					<!-- link / upload modals -->
-					{#if showLinkVisualMedia}
-						<UploadOrLinkMedia />
+					{#if $showLinkVisualMedia}
+						<div class="z-50">
+							<UploadOrLinkMedia
+								type="visual"
+								mode="link"
+								on:mediaSelected={handleVisualMediaSelected}
+							/>
+						</div>
 					{/if}
 				</button>
 			</div>

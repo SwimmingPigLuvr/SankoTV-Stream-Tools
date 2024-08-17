@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { showLinkVisualMedia } from "$lib/stores";
     import { createEventDispatcher } from "svelte";
 
     export let type: "audio" | "visual";
@@ -10,6 +11,10 @@
     const soundLibrary = ["club_beat", "notification", "pop"];
 
     const dispatch = createEventDispatcher();
+
+    function handleClose() {
+        showLinkVisualMedia.set(false);
+    }
 
     function handleFileChange(event: Event) {
         const target = event.target as HTMLInputElement;
@@ -45,10 +50,14 @@
     }
 </script>
 
-<div
+<button
+    on:click|self={handleClose}
     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
 >
-    <div class="bg-white p-8 rounded-lg shadow-xl w-96">
+    <button
+        on:click|stopPropagation
+        class="bg-white p-8 rounded-lg shadow-xl w-96"
+    >
         <h2 class="text-2xl font-bold mb-4">
             {type === "audio" ? "Audio" : "Visual"} Media {mode === "link"
                 ? "Link"
@@ -74,7 +83,7 @@
         {:else}
             <div class="mb-4">
                 <label
-                    class="block text-gray-700 text-sm font-bold mb-2"
+                    class="text-left block text-gray-700 text-sm font-bold mb-2"
                     for="media-link"
                 >
                     Enter a link:
@@ -84,7 +93,7 @@
                     id="media-link"
                     on:input={handleLinkChange}
                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    placeholder={`Enter ${type} link here`}
+                    placeholder="paste url here"
                 />
             </div>
         {/if}
@@ -113,13 +122,15 @@
             </div>
         {/if}
 
-        <div class="mt-6 flex justify-end">
-            <button
-                on:click={handleSubmit}
-                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            >
-                {mode === "upload" ? "Upload" : "Add Link"}
-            </button>
-        </div>
-    </div>
-</div>
+        {#if mode !== "link" && type !== "visual"}
+            <div class="mt-6 flex justify-end">
+                <button
+                    on:click={handleSubmit}
+                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                >
+                    {mode === "upload" ? "Upload" : "Add Link"}
+                </button>
+            </div>
+        {/if}
+    </button>
+</button>

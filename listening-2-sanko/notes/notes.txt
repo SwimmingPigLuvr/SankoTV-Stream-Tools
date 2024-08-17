@@ -470,3 +470,5 @@ use a store for the link
 save that to user's data
 mediaSrc: link | storage
 create storage bucket for uploaded media
+
+need to make the modal the highest z index
