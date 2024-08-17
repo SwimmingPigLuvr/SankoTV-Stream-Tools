@@ -1,5 +1,6 @@
 <script lang="ts">
     import { showLinkVisualMedia } from "$lib/stores";
+    import { currentAlert } from "$lib/stores/alertConfigStore";
     import { createEventDispatcher } from "svelte";
 
     export let type: "audio" | "visual";
@@ -58,12 +59,6 @@
         on:click|stopPropagation
         class="bg-white p-8 rounded-lg shadow-xl w-96"
     >
-        <h2 class="text-2xl font-bold mb-4">
-            {type === "audio" ? "Audio" : "Visual"} Media {mode === "link"
-                ? "Link"
-                : "Upload"}
-        </h2>
-
         {#if mode === "upload"}
             <div class="mb-4">
                 <label
@@ -93,7 +88,9 @@
                     id="media-link"
                     on:input={handleLinkChange}
                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    placeholder="paste url here"
+                    placeholder={$currentAlert?.config.mediaSrc
+                        ? $currentAlert?.config.mediaSrc
+                        : "paste url here"}
                 />
             </div>
         {/if}
@@ -107,14 +104,15 @@
             </div>
         {/if}
 
-        {#if media}
+        {#if media || $currentAlert?.config.mediaSrc}
             <div class="mt-4">
-                <h3 class="text-lg font-semibold mb-2">Preview:</h3>
                 {#if type === "audio"}
                     <audio controls src={media} class="w-full" />
                 {:else}
                     <img
-                        src={media}
+                        src={$currentAlert?.config.mediaSrc
+                            ? $currentAlert?.config.mediaSrc
+                            : media}
                         alt="Uploaded visual"
                         class="w-full h-auto"
                     />

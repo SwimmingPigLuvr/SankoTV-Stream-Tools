@@ -1157,7 +1157,7 @@
 								>link</button
 							>
 							<!-- delete -->
-							{#if currentMediaSrc}
+							{#if $currentAlert?.config.mediaSrc}
 								<button
 									on:click={handleRemoveCurrentMedia}
 									class="{$isDarkMode
