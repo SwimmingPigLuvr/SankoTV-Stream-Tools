@@ -1343,7 +1343,7 @@
 					name="fontweight"
 					id="fontweight"
 					value={$currentAlert?.config.fontWeight}
-					on:click={(e) =>
+					on:change={(e) =>
 						updateAlertConfig("fontWeight", e.currentTarget.value)}
 				>
 					{#each fontWeights as weight}
@@ -1371,8 +1371,8 @@
 					type="range"
 					id="letterspacing"
 					name="letterspacing"
-					min="-0.1"
-					max="0.1"
+					min="-0.2"
+					max="0.2"
 					step="0.01"
 				/>
 			</div>
