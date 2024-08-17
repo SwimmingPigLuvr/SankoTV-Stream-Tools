@@ -472,3 +472,6 @@ mediaSrc: link | storage
 create storage bucket for uploaded media
 
 need to make the modal the highest z index
+
+need to plan how i plan toachieve hte widget in the users stream
+should be a url that seems the easiest

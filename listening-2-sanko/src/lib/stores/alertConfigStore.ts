@@ -37,6 +37,7 @@ export interface AlertConfig {
     textShadow: string;
     mediaSrc: string | null;
     audioSrc: string | null;
+    messageTemplate: string;
 }
 
 const defaultAlertConfig: AlertConfig = {
@@ -60,8 +61,9 @@ const defaultAlertConfig: AlertConfig = {
     textShadow: "none",
     mediaSrc: null,
     audioSrc: null,
+    messageTemplate: '{sender} donated {amount} {gift}!',
 };
 
 export const alertConfig = writable<AlertConfig>(defaultAlertConfig);
 export const currentAlert = createCurrentAlertStore();
-export const messageTemplate = writable<string>('{sender} donated {amount} {gift}!');
+export const messageTemplate = writable<string>();

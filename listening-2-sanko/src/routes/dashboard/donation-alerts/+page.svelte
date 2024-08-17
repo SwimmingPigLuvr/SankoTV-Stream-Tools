@@ -1222,7 +1222,7 @@
 
 				<!-- text input -->
 				<input
-					bind:value={$messageTemplate}
+					value={$currentAlert?.config.messageTemplate}
 					on:change={() => messageTemplate.set(message)}
 					name="template"
 					id="template"
@@ -1597,7 +1597,7 @@
 	}
 
 	.image-above-text {
-		gap: 0.5rem;
+		gap: 1rem;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
