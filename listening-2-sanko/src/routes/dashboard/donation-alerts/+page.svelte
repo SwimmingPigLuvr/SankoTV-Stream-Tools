@@ -215,17 +215,7 @@
 		specificGift = null;
 	}
 
-	const fontWeights = [
-		"thin",
-		"extralight",
-		"light",
-		"normal",
-		"medium",
-		"semibold",
-		"bold",
-		"extrabold",
-		"black",
-	];
+	const fontWeights = [100, 200, 300, 400, 500, 600, 700, 800, 900];
 
 	const senders = ["Bill", "Michael", "Kevin", "Todd", "David"];
 
@@ -343,102 +333,6 @@
 		alertConfig.update((s) => ({ ...s, fontFamily: font }));
 	}
 
-	function handleWeightChange(event: Event) {
-		const target = event.target as HTMLSelectElement;
-		if (target) {
-			setWeight(target.value);
-		}
-	}
-
-	function setWeight(weight: string) {
-		selectedWeight = weight;
-		let numericalWeight: string;
-		switch (weight) {
-			case "thin":
-				numericalWeight = "100";
-				break;
-			case "extralight":
-				numericalWeight = "200";
-				break;
-			case "light":
-				numericalWeight = "300";
-				break;
-			case "normal":
-			case "regular":
-				numericalWeight = "400";
-				break;
-			case "medium":
-				numericalWeight = "500";
-				break;
-			case "semibold":
-				numericalWeight = "600";
-				break;
-			case "bold":
-				numericalWeight = "700";
-				break;
-			case "extrabold":
-				numericalWeight = "800";
-				break;
-			case "black":
-				numericalWeight = "900";
-				break;
-			default:
-				numericalWeight = "400";
-		}
-		alertConfig.update((s) => ({
-			...s,
-			fontWeight: numericalWeight,
-		}));
-	}
-
-	function handleTextTransformChange(event: Event) {
-		const target = event.target as HTMLSelectElement;
-		if (target) {
-			setTextTransform(target.value);
-		}
-	}
-
-	function setTextTransform(textTransform: string) {
-		selectedTextTransform = textTransform;
-		console.log("transform");
-		alertConfig.update((s) => ({
-			...s,
-			textTransform: textTransform,
-		}));
-	}
-
-	function setAlertVolume(volume: number) {
-		alertConfig.update((s) => ({ ...s, alertVolume: volume }));
-	}
-
-	$: setAlertVolume(volume);
-
-	function setFontSize(size: number) {
-		let sizeString: string = `${size}px`;
-		alertConfig.update((s) => ({ ...s, fontSize: sizeString }));
-	}
-
-	$: setFontSize(fontSize);
-
-	function setLetterSpacing(spacing: number) {
-		let spacingString: string = `${spacing}em`;
-		alertConfig.update((s) => ({
-			...s,
-			letterSpacing: spacingString,
-		}));
-	}
-
-	$: setLetterSpacing(letterSpacing);
-
-	function setAlertDuration(duration: number) {
-		alertConfig.update((s) => ({
-			...s,
-			alertDuration: duration,
-		}));
-	}
-
-	$: setAlertDuration(alertDuration);
-
 	function toggleMute() {
 		muted = !muted;
 	}
@@ -551,17 +445,27 @@
 		return `${gift}s`;
 	}
 
-	function generateRandomMessage(template: string): {
+	function generateRandomMessage(): {
 		parts: { text: string; highlight: boolean }[];
 	} {
+		if (!$currentAlert) {
+			console.warn("no current alert available");
+			return { parts: [] };
+		}
+
+		const alert = get(currentAlert);
+		const template = alert?.config.messageTemplate;
+		if (!template) {
+			console.warn("no template available");
+			return { parts: [] };
+		}
+
 		const sender = getRandomSender();
 		const amount = getRandomAmount();
-		let gift;
-		if (specificGift) {
-			gift = specificGift;
-		} else {
-			gift = getRandomGift();
-		}
+		const gift =
+			$currentAlert.config.eventTrigger === "specificgift"
+				? $currentAlert.config.specificGift
+				: getRandomGift();
 
 		const placeholders: Record<Placeholder, string> = {
 			"{sender}": sender,
@@ -578,7 +482,6 @@
 			}
 			return { text: part, highlight: false };
 		});
-
 		return { parts };
 	}
 
@@ -865,7 +768,7 @@
 						.fontWeight}; color: {$currentAlert?.config
 						.textColor}; text-transform: {$currentAlert?.config
 						.textTransform}; letter-spacing: {$currentAlert?.config
-						.letterSpacing}; text-shadow: {$currentAlert?.config
+						.letterSpacing}em; text-shadow: {$currentAlert?.config
 						.textShadow};"
 				>
 					{#if layoutSelection === "tet-over-image"}
@@ -876,15 +779,18 @@
 							alt=""
 						/>
 						<div class="text" style="white-space: nowrap;">
-							{#each generateRandomMessage($messageTemplate).parts as part}
-								<span
-									style="color: {part.highlight
-										? $currentAlert?.config.highlightColor
-										: $currentAlert?.config.textColor};"
-								>
-									{part.text}
-								</span>
-							{/each}
+							{#if $currentAlert}
+								{#each generateRandomMessage().parts as part}
+									<span
+										style="color: {part.highlight
+											? $currentAlert?.config
+													.highlightColor
+											: $currentAlert?.config.textColor};"
+									>
+										{part.text}
+									</span>
+								{/each}
+							{/if}
 						</div>
 					{:else}
 						<img
@@ -895,15 +801,18 @@
 							alt=""
 						/>
 						<div style="white-space: nowrap;">
-							{#each generateRandomMessage($messageTemplate).parts as part}
-								<span
-									style="color: {part.highlight
-										? $currentAlert?.config.highlightColor
-										: $currentAlert?.config.textColor};"
-								>
-									{part.text}
-								</span>
-							{/each}
+							{#if $currentAlert}
+								{#each generateRandomMessage().parts as part}
+									<span
+										style="color: {part.highlight
+											? $currentAlert?.config
+													.highlightColor
+											: $currentAlert?.config.textColor};"
+									>
+										{part.text}
+									</span>
+								{/each}
+							{/if}
 						</div>
 					{/if}
 				</div>
@@ -1223,7 +1132,11 @@
 				<!-- text input -->
 				<input
 					value={$currentAlert?.config.messageTemplate}
-					on:change={() => messageTemplate.set(message)}
+					on:change={(e) =>
+						updateAlertConfig(
+							"messageTemplate",
+							e.currentTarget.value,
+						)}
 					name="template"
 					id="template"
 					class="flex space-x-4 p-4 {$isDarkMode
@@ -1429,15 +1342,12 @@
 						: 'bg-lime-200'}"
 					name="fontweight"
 					id="fontweight"
-					bind:value={selectedWeight}
-					on:click={handleWeightChange}
+					value={$currentAlert?.config.fontWeight}
+					on:click={(e) =>
+						updateAlertConfig("fontWeight", e.currentTarget.value)}
 				>
 					{#each fontWeights as weight}
-						<option
-							style="font-weight: {weight};"
-							class=""
-							value={weight}>{weight}</option
-						>
+						<option value={weight}>{weight}</option>
 					{/each}
 				</select>
 			</div>
@@ -1448,11 +1358,16 @@
 					<label class="block mb-2" for="letterspacing"
 						>Letter Spacing</label
 					>
-					<p>{letterSpacing}em</p>
+					<p>{$currentAlert?.config.letterSpacing}em</p>
 				</div>
 				<!-- letter spacing slider -->
 				<input
-					bind:value={letterSpacing}
+					value={$currentAlert?.config.letterSpacing}
+					on:change={(e) =>
+						updateAlertConfig(
+							"letterSpacing",
+							e.currentTarget.value,
+						)}
 					type="range"
 					id="letterspacing"
 					name="letterspacing"
@@ -1471,8 +1386,7 @@
 						name="color"
 						id="color"
 						type="color"
-						value={$currentAlert?.config.textColor ??
-							$alertConfig.textColor}
+						value={$currentAlert?.config.textColor}
 						on:input={(e) =>
 							updateAlertConfig(
 								"textColor",
@@ -1489,8 +1403,7 @@
 						name="highlightcolor"
 						id="highlightcolor"
 						type="color"
-						value={$currentAlert?.config.highlightColor ??
-							$alertConfig.highlightColor}
+						value={$currentAlert?.config.highlightColor}
 						on:input={(e) =>
 							updateAlertConfig(
 								"highlightColor",
@@ -1510,8 +1423,12 @@
 						: 'bg-lime-200'}"
 					name="texttransform"
 					id="texttransform"
-					bind:value={selectedTextTransform}
-					on:change={handleTextTransformChange}
+					value={$currentAlert?.config.textTransform}
+					on:change={(e) =>
+						updateAlertConfig(
+							"textTransform",
+							e.currentTarget.value,
+						)}
 				>
 					<option class="" value="none">none</option>
 					<option class="lowercase" value="lowercase"

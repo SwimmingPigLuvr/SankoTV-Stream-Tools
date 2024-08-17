@@ -29,7 +29,7 @@ export interface AlertConfig {
     specificAmount: number;
     fontFamily: string;
     fontSize: string;
-    fontWeight: string;
+    fontWeight: number;
     textColor: string;
     highlightColor: string;
     textTransform: string;
@@ -53,7 +53,7 @@ const defaultAlertConfig: AlertConfig = {
     specificAmount: 5,
     fontFamily: "coolfont-trippy",
     fontSize: "32px",
-    fontWeight: "400",
+    fontWeight: 400,
     textColor: "",
     highlightColor: "#32CD32",
     textTransform: "uppercase",
