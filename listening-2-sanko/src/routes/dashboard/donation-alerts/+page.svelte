@@ -869,7 +869,12 @@
 						.textShadow};"
 				>
 					{#if layoutSelection === "tet-over-image"}
-						<img src={currentMediaSrc} alt="" />
+						<img
+							src={$currentAlert?.config.mediaSrc
+								? $currentAlert?.config.mediaSrc
+								: currentMediaSrc}
+							alt=""
+						/>
 						<div class="text" style="white-space: nowrap;">
 							{#each generateRandomMessage($messageTemplate).parts as part}
 								<span
@@ -882,7 +887,13 @@
 							{/each}
 						</div>
 					{:else}
-						<img src={currentMediaSrc} alt="" />
+						<img
+							class="max-h-[420px]"
+							src={$currentAlert?.config.mediaSrc
+								? $currentAlert?.config.mediaSrc
+								: currentMediaSrc}
+							alt=""
+						/>
 						<div style="white-space: nowrap;">
 							{#each generateRandomMessage($messageTemplate).parts as part}
 								<span
@@ -1119,14 +1130,14 @@
 				>
 					<img
 						class="absolute max-w-[3.25rem] h-[3rem] left-0"
-						src={currentMediaSrc
-							? currentMediaSrc
+						src={$currentAlert?.config.mediaSrc
+							? $currentAlert?.config.mediaSrc
 							: "/gifs/minecraft.gif"}
 						alt="🪲"
 					/>
 					<p class="pl-10 truncate max-w-sm sm:max-w-lg">
-						{currentMediaSrc
-							? currentMediaSrc
+						{$currentAlert?.config.mediaSrc
+							? $currentAlert?.config.mediaSrc
 							: "upload/link media"}
 					</p>
 					<button
@@ -1591,6 +1602,9 @@
 		flex-direction: column;
 		align-items: center;
 	}
+	.image-above-text img {
+		max-height: 200px;
+	}
 
 	/* Create a CSS class where the text is over the image */
 	/* They are both in the middle */
@@ -1602,6 +1616,7 @@
 	}
 
 	.text-over-image img {
+		max-height: 100px;
 		position: fixed;
 		object-fit: fill;
 		z-index: -1;
