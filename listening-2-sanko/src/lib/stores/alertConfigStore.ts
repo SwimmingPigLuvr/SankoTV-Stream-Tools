@@ -16,7 +16,26 @@ function createCurrentAlertStore() {
     };
 }
 
+export interface AnimationSettings {
+    type: string;
+    duration: number;
+    delay: number;
+    easing: string;
+    // advanced
+    amount?: number;
+    opacity?: number;
+    x?: number;
+    y?: number;
+    start?: number;
+    opacity?: number;
+    axis?: number;
+}
+
 export interface AlertConfig {
+    animation: {
+        in: AnimationSettings;
+        out: AnimationSettings;
+    }
     alertDuration: number;
     alertVolume: number;
     animationIn: string;
@@ -62,6 +81,23 @@ const defaultAlertConfig: AlertConfig = {
     mediaSrc: null,
     audioSrc: null,
     messageTemplate: '{sender} donated {amount} {gift}!',
+    animationSettings: {
+        in: {
+            type: "fly",
+            duration: 500,
+            delay: 0,
+            easing: "cubicOut",
+            y: 100,  // for "fly in up"
+            opacity: 0,  // start fully transparent
+        },
+        out: {
+            type: "fade",
+            duration: 300,
+            delay: 0,
+            easing: "linear",
+            opacity: 0,  // end fully transparent
+        }
+    }
 };
 
 export const alertConfig = writable<AlertConfig>(defaultAlertConfig);

@@ -131,14 +131,14 @@
                                 easing: cubicInOut,
                                 duration: 250,
                             }}
-                            class="flex pl-4 w-full flex-col space-y-2 items-center justify-center"
+                            class="flex p-2 w-full flex-col space-y-4 items-center justify-center"
                         >
                             {#each donationAlerts as alert (alert.id)}
                                 <a
                                     href="/dashboard/donation-alerts?id={alert.id}"
                                     on:click={() =>
                                         handleGoToDonationAlerts(alert.id)}
-                                    class="w-full text-left text-xs font-thin tracking-widest {$isDarkMode
+                                    class="w-full text-left font-thin tracking-widest {$isDarkMode
                                         ? 'title-glow-hover'
                                         : 'title-glow-light-hover'} relative"
                                     >{alert.name}</a
@@ -146,7 +146,7 @@
                             {/each}
                             <button
                                 on:click={handleCreateNewAlert}
-                                class="w-full text-xs text-left {$isDarkMode
+                                class="w-full text-left {$isDarkMode
                                     ? 'title-glow-hover text-lime-400 hover:text-white'
                                     : 'title-glow-light-hover'}"
                                 >create new +</button

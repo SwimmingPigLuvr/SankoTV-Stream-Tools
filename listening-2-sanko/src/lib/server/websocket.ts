@@ -1,3 +1,4 @@
+// $lib/server/websocket.ts
 import { WebSocketServer } from 'ws';
 import type { Server } from 'http';
 

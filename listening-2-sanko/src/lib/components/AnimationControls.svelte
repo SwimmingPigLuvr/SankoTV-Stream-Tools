@@ -11,22 +11,25 @@
     import { inConfig, outConfig } from "$lib/animations/stores";
     import type { EasingFunction } from "svelte/transition";
     import { isDarkMode } from "$lib/stores";
+    import type { AlertConfig } from "$lib/stores/alertConfigStore";
+
+    export let updateAlertConfig: (key: string, value: any) => void;
+    export let alertConfig: AlertConfig;
 
     let showAdvanced = false;
 
     function handlePremadeAnimationChange(
-        config: Writable<AnimationConfig>,
-        event: Event,
         direction: "in" | "out",
+        event: Event,
     ) {
         const target = event.target as HTMLSelectElement;
         const selectedAnimation = target.value as keyof typeof premadeConfigs;
         const updates = premadeConfigs[selectedAnimation];
 
-        updateConfig(config, updates);
-
-        console.log(`Selected animation ${direction}: ${selectedAnimation}`);
-        console.log(`${direction} config:`, JSON.stringify(get(config)));
+        updateAlertConfig(`animation.${direction}`, {
+            ...alertConfig.animation[direction],
+            ...updates,
+        });
     }
 
     function updateConfig(
@@ -64,26 +67,29 @@
     }
 
     function handleInputChange(
-        config: typeof inConfig | typeof outConfig,
+        direction: "in" | "out",
         param: string,
         event: Event,
     ) {
         const target = event.target as HTMLInputElement | HTMLSelectElement;
-        let value: string | number | EasingFunction = target.value;
+        let value: string | number = target.value;
 
         if (param === "easing") {
-            value = easings[value as keyof typeof easings] || easings.linear;
+            value = value; // Keep as string, convert to function when applying
         } else if (target.type === "number") {
             value = +value;
         }
 
-        updateConfig(config, { [param]: value });
+        updateAlertConfig(`animation.${direction}.${param}`, value);
     }
 
-    $: relevantParamsIn = [...commonParams, ...specificParams[$inConfig.type]];
+    $: relevantParamsIn = [
+        ...commonParams,
+        ...specificParams[alertConfig.animation.in.type],
+    ];
     $: relevantParamsOut = [
         ...commonParams,
-        ...specificParams[$outConfig.type],
+        ...specificParams[alertConfig.animation.out.type],
     ];
 
     const premadeAnimationsIn = [
@@ -149,9 +155,8 @@
                     class="custom-dropdown p-4 {$isDarkMode
                         ? 'bg-slate-800'
                         : 'bg-lime-200'}"
-                    bind:value={$inConfig.type}
-                    on:change={() =>
-                        updateConfig(inConfig, defaultConfigs[$inConfig.type])}
+                    bind:value={alertConfig.animation.in.type}
+                    on:change={(e) => handleInputChange("in", "type", e)}
                 >
                     {#each Object.keys(defaultConfigs) as type}
                         <option value={type}>{type}</option>
@@ -166,9 +171,8 @@
                             class="custom-dropdown p-4 {$isDarkMode
                                 ? 'bg-slate-800'
                                 : 'bg-lime-200'}"
-                            bind:value={currentInEasing}
-                            on:change={(e) =>
-                                handleInputChange(inConfig, param, e)}
+                            bind:value={alertConfig.animation.in.easing}
+                            on:change={(e) => handleInputChange("in", param, e)}
                         >
                             {#each easingFunctions as easing}
                                 <option value={easing}>{easing}</option>
@@ -180,9 +184,8 @@
                             class="custom-dropdown p-4 {$isDarkMode
                                 ? 'bg-slate-800'
                                 : 'bg-lime-200'}"
-                            bind:value={$inConfig[param]}
-                            on:change={(e) =>
-                                handleInputChange(inConfig, param, e)}
+                            bind:value={alertConfig.animation.in[param]}
+                            on:change={(e) => handleInputChange("in", param, e)}
                         >
                             <option value="x">x</option>
                             <option value="y">y</option>
@@ -194,9 +197,8 @@
                                 : 'bg-lime-200'}"
                             type="number"
                             id={`in-${param}`}
-                            bind:value={$inConfig[param]}
-                            on:input={(e) =>
-                                handleInputChange(inConfig, param, e)}
+                            bind:value={alertConfig.animation.in[param]}
+                            on:input={(e) => handleInputChange("in", param, e)}
                         />
                     {/if}
                 {/each}

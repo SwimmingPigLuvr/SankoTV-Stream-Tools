@@ -55,10 +55,3 @@
 		</div>
 	{/if}
 </main>
-
-<style>
-	.mx-auto {
-		margin-left: auto;
-		margin-right: auto;
-	}
-</style>
