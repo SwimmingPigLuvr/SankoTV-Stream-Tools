@@ -599,26 +599,28 @@
 	}
 
 	function updateAlertConfig(key: string, value: any) {
-		const alert = get(currentAlert);
-		if (!alert) {
-			console.error("No alert is currently selected");
-			return;
-		}
+		currentAlert.update((alert) => {
+			if (!alert) {
+				console.error("No alert is currently selected");
+				return alert;
+			}
 
-		// update current alert store
-		const updatedAlert = {
-			...alert,
-			config: {
-				...alert.config,
-				[key]: value,
-			},
-		};
-		currentAlert.set(updatedAlert);
+			const keys = key.split(".");
+			let current: any = alert.config;
+			for (let i = 0; i < keys.length - 1; i++) {
+				if (!current[keys[i]]) current[keys[i]] = {};
+				current = current[keys[i]];
+			}
+			current[keys[keys.length - 1]] = value;
 
-		// trigger toast notification
-		pushToastNoti(key, value);
+			// trigger toast notification
+			pushToastNoti(key, value);
 
-		userData.updateDonationAlert(updatedAlert);
+			// Update user data
+			userData.updateDonationAlert(alert);
+
+			return alert;
+		});
 	}
 
 	function handleInput(event: Event) {
@@ -757,8 +759,8 @@
 
 			{#if isPreviewPlaying}
 				<div
-					in:applyAnimation={$inConfig}
-					out:applyAnimation={$outConfig}
+					in:applyAnimation={$currentAlert?.config.animation.in}
+					out:applyAnimation={$currentAlert?.config.animation.out}
 					bind:this={previewContent}
 					class="{layout} preview-content leading-[1] flex items-center justify-center text-center"
 					style="background-color: {currentBackgroundColor}; border-radius: {$currentAlert
@@ -1261,7 +1263,12 @@
 		</div>
 
 		<div class="alert-grid-container">
-			<AnimationControls />
+			<AnimationControls
+				{updateAlertConfig}
+				alertConfig={$currentAlert?.config
+					? $currentAlert.config
+					: $alertConfig}
+			/>
 		</div>
 
 		<!-- font settings -->
