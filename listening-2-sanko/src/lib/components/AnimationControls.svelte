@@ -28,6 +28,10 @@
         "slide out down",
     ];
 
+    const premadeAnimationConfigs: Record<string, AnimationConfig> = {
+        "blur in": { ...defaultConfigs.blur, amount: 5 },
+    };
+
     function handlePremadeAnimationChange(
         direction: "in" | "out",
         event: Event,

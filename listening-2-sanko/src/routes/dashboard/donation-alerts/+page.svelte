@@ -217,7 +217,7 @@
 
 	const fontWeights = [100, 200, 300, 400, 500, 600, 700, 800, 900];
 
-	const senders = ["Bill", "Michael", "Kevin", "Todd", "David"];
+	const senders = ["swimmingPig", "fizzleStix", "charlotte", "Tony", "Dav3"];
 
 	const gifts = [
 		"Golden Glizzy",

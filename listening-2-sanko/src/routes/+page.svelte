@@ -19,6 +19,7 @@
 	import { user } from "$lib/stores/authStore";
 	import WalletAuth from "$lib/components/WalletAuth.svelte";
 	import UserProfile from "$lib/components/UserProfile.svelte";
+    import Trope from "$lib/components/Trope.svelte";
 
 	let error = "";
 	let showTitle = false;
@@ -107,6 +108,8 @@
 				</h1>
 			</div>
 		{/if}
+
+		<Trope />
 
 		{#if showUx}
 			<div
