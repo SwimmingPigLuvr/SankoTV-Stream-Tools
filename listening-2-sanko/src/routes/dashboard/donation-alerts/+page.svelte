@@ -495,9 +495,14 @@
 			if (!muted) {
 				playAudio();
 			}
-			setTimeout(() => {
-				isPreviewPlaying = false;
-			}, alertDuration * 1000);
+			setTimeout(
+				() => {
+					isPreviewPlaying = false;
+				},
+				$currentAlert?.config.alertDuration
+					? $currentAlert.config.alertDuration * 1000
+					: 4000,
+			);
 		}
 	}
 
@@ -608,7 +613,7 @@
 			}
 
 			const keys = key.split(".");
-			console.log('parsed keys', keys);
+			console.log("parsed keys", keys);
 			let current: any = alert.config;
 			for (let i = 0; i < keys.length - 1; i++) {
 				if (!current[keys[i]]) current[keys[i]] = {};
