@@ -1,7 +1,13 @@
 <script lang="ts">
-    import type { AlertConfig } from "$lib/stores/alertConfigStore";
+    import { currentAlert, type AlertConfig } from "$lib/stores/alertConfigStore";
     import { isDarkMode } from "$lib/stores";
     import { defaultConfigs, easingFunctions } from "../animations/constants";
+
+    import type {
+        AnimationType,
+        AnimationConfig,
+    } from "../animations/types.ts";
+    import { userData } from "$lib/stores/userDataStore";
 
     export let updateAlertConfig: (key: string, value: any) => void;
     export let alertConfig: AlertConfig;
@@ -30,6 +36,19 @@
 
     const premadeAnimationConfigs: Record<string, AnimationConfig> = {
         "blur in": { ...defaultConfigs.blur, amount: 5 },
+        "fade in": defaultConfigs.fade,
+        "fly in up": { ...defaultConfigs.fly, y: 20 },
+        "fly in down": { ...defaultConfigs.fly, y: -20 },
+        "scale in": { ...defaultConfigs.scale, start: 0.8 },
+        "slide in up": { ...defaultConfigs.slide, y: 20 },
+        "slide in down": { ...defaultConfigs.slide, y: -20 },
+        "blur out": { ...defaultConfigs.blur, amount: 5 },
+        "fade out": defaultConfigs.fade,
+        "fly out up": { ...defaultConfigs.fly, y: -20 },
+        "fly out down": { ...defaultConfigs.fly, y: 20 },
+        "scale out": { ...defaultConfigs.scale, start: 1.2 },
+        "slide out up": { ...defaultConfigs.slide, y: -20 },
+        "slide out down": { ...defaultConfigs.slide, y: 20 },
     };
 
     function handlePremadeAnimationChange(
@@ -37,7 +56,35 @@
         event: Event,
     ) {
         const target = event.target as HTMLSelectElement;
-        updateAlertConfig(`animation.${direction}.type`, target.value);
+        const selectedAnimation = target.value;
+        console.log("selected animation: ", selectedAnimation);
+
+        const config = premadeAnimationConfigs[selectedAnimation];
+        console.log("config: ", config);
+
+        if (config) {
+            currentAlert.update((alert) => {
+                if (!alert) {
+                    console.error("no alert...");
+                    return alert;
+                }
+
+                console.log(`updating ${direction} animation with: `, config);
+                alert.config.animation[direction] = {
+                    ...alert.config.animation[direction],
+                    ...config,
+                };
+
+                // trigger toast
+                // pushToastNoti(`animation.${direction}`, selectedAnimation);
+
+                //update userdata
+                console.log("updating userdata with new alert config");
+                userData.updateUserData(alert);
+
+                return alert;
+            });
+        }
     }
 </script>
 

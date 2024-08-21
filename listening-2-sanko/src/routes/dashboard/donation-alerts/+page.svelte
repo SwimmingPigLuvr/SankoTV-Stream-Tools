@@ -599,6 +599,8 @@
 	}
 
 	function updateAlertConfig(key: string, value: any) {
+		console.log(`updating alert config. Key: ${key}, vlue:`, value);
+
 		currentAlert.update((alert) => {
 			if (!alert) {
 				console.error("No alert is currently selected");
@@ -606,12 +608,16 @@
 			}
 
 			const keys = key.split(".");
+			console.log('parsed keys', keys);
 			let current: any = alert.config;
 			for (let i = 0; i < keys.length - 1; i++) {
 				if (!current[keys[i]]) current[keys[i]] = {};
 				current = current[keys[i]];
 			}
-			current[keys[keys.length - 1]] = value;
+
+			const finalKey = keys[keys.length - 1];
+			console.log(`setting ${finalKey} to: `, value);
+			current[finalKey] = value;
 
 			// trigger toast notification
 			pushToastNoti(key, value);
