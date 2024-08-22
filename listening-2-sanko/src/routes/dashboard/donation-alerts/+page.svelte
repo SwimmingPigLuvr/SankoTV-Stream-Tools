@@ -769,10 +769,16 @@
 			class="relative alert-grid-preview-container min-h-[420px]"
 		>
 			<!-- placeholder div to keep parent correct size -->
-			<div
-				bind:this={previewePlaceholder}
-				class="preview-placeholder"
-			></div>
+			<div bind:this={previewePlaceholder} class="preview-placeholder">
+				{#if isPreviewPlaying && $currentAlert}
+					<div class="absolute z-50 -top-4 w-full m-auto">
+						<Timer
+							duration={$currentAlert.config.alertDuration}
+							onComplete={endPreview}
+						/>
+					</div>
+				{/if}
+			</div>
 
 			{#if isPreviewPlaying}
 				<div
@@ -832,14 +838,6 @@
 									</span>
 								{/each}
 							{/if}
-						</div>
-					{/if}
-					{#if $currentAlert}
-						<div class="w-[95%]">
-							<Timer
-								duration={$currentAlert.config.alertDuration}
-								onComplete={endPreview}
-							/>
 						</div>
 					{/if}
 				</div>

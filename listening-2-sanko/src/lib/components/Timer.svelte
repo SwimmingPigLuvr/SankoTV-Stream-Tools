@@ -1,4 +1,5 @@
 <script lang="ts">
+    // style="width: {(1 - $progress) * 100}%"
     import { onMount, onDestroy } from "svelte";
     import { spring } from "svelte/motion";
 
@@ -32,12 +33,9 @@
     });
 </script>
 
-<div class="w-full bg-gray-200 rounded-none h-2.5 dark:bg-gray-700">
+<div class="bg-slate-950 h-4 dark:bg-gray-700">
     <div
-        class="bg-lime-400 h-2.5 rounded-none"
-        style="width: {(1 - $progress) * 100}%"
+        class="bg-sky-500 h-4 rounded-none"
+        style="width: {$progress * 100}%"
     ></div>
-</div>
-<div class="text-sm mt-1 text-center">
-    {Math.ceil(remainingTime)}
 </div>
