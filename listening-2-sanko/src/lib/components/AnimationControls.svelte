@@ -1,5 +1,8 @@
 <script lang="ts">
-    import { currentAlert, type AlertConfig } from "$lib/stores/alertConfigStore";
+    import {
+        currentAlert,
+        type AlertConfig,
+    } from "$lib/stores/alertConfigStore";
     import { isDarkMode } from "$lib/stores";
     import { defaultConfigs, easingFunctions } from "../animations/constants";
 

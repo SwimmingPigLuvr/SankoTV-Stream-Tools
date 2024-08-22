@@ -26,6 +26,7 @@
 	import { userData } from "$lib/stores/userDataStore";
 	import lodash from "lodash";
 	import UploadOrLinkMedia from "$lib/components/UploadOrLinkMedia.svelte";
+	import Timer from "$lib/components/Timer.svelte";
 
 	const { debounce } = lodash;
 
@@ -94,6 +95,14 @@
 	}
 
 	let isPreviewPlaying = false;
+
+	function startPreview() {
+		isPreviewPlaying = true;
+	}
+
+	function endPreview() {
+		isPreviewPlaying = false;
+	}
 
 	let defaultMedia =
 		"https://i.seadn.io/s/raw/files/e34c296e6e2089853f59748e87975c70.gif?auto=format&dpr=1&w=3840";
@@ -263,12 +272,17 @@
 		"Zyn",
 	];
 
+	$: inAnimation = $currentAlert?.config.animation?.in;
+	$: outAnimation = $currentAlert?.config.animation?.out;
+
 	function applyAnimation(node: HTMLElement, props: any) {
+		if (!props) return {};
+
 		const { type, easing: easingName, ...params } = props;
 		const easing =
 			typeof easingName === "string"
 				? easings[easingName as keyof typeof easings] || easings.linear
-				: easingName;
+				: easings.linear;
 		switch (type) {
 			case "blur":
 				return blur(node, { ...params, easing });
@@ -495,14 +509,6 @@
 			if (!muted) {
 				playAudio();
 			}
-			setTimeout(
-				() => {
-					isPreviewPlaying = false;
-				},
-				$currentAlert?.config.alertDuration
-					? $currentAlert.config.alertDuration * 1000
-					: 4000,
-			);
 		}
 	}
 
@@ -770,8 +776,8 @@
 
 			{#if isPreviewPlaying}
 				<div
-					in:applyAnimation={$currentAlert?.config.animation.in}
-					out:applyAnimation={$currentAlert?.config.animation.out}
+					in:applyAnimation={inAnimation}
+					out:applyAnimation={outAnimation}
 					bind:this={previewContent}
 					class="{layout} preview-content leading-[1] flex items-center justify-center text-center"
 					style="background-color: {currentBackgroundColor}; border-radius: {$currentAlert
@@ -826,6 +832,14 @@
 									</span>
 								{/each}
 							{/if}
+						</div>
+					{/if}
+					{#if $currentAlert}
+						<div class="w-[95%]">
+							<Timer
+								duration={$currentAlert.config.alertDuration}
+								onComplete={endPreview}
+							/>
 						</div>
 					{/if}
 				</div>
