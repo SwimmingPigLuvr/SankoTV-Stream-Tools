@@ -117,7 +117,7 @@
 
 	let previewContainer: HTMLElement;
 	let previewContent: HTMLElement;
-	let previewePlaceholder: HTMLElement;
+	let previewPlaceholder: HTMLElement;
 	let maxWidth = 1080;
 	let divScale = 1;
 
@@ -769,16 +769,10 @@
 			class="relative alert-grid-preview-container min-h-[420px]"
 		>
 			<!-- placeholder div to keep parent correct size -->
-			<div bind:this={previewePlaceholder} class="preview-placeholder">
-				{#if isPreviewPlaying && $currentAlert}
-					<div class="absolute z-50 -top-4 w-full m-auto">
-						<Timer
-							duration={$currentAlert.config.alertDuration}
-							onComplete={endPreview}
-						/>
-					</div>
-				{/if}
-			</div>
+			<div
+				bind:this={previewPlaceholder}
+				class="preview-placeholder relative"
+			></div>
 
 			{#if isPreviewPlaying}
 				<div
@@ -841,6 +835,14 @@
 						</div>
 					{/if}
 				</div>
+				{#if $currentAlert}
+					<div class="absolute bottom-20 left-0 right-0 z-50">
+						<Timer
+							duration={$currentAlert.config.alertDuration}
+							onComplete={endPreview}
+						/>
+					</div>
+				{/if}
 			{/if}
 			<div
 				class="absolute {$isDarkMode

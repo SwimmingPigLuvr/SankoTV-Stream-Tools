@@ -33,9 +33,11 @@
     });
 </script>
 
-<div class="bg-slate-950 h-4 dark:bg-gray-700">
+<div
+    class="w-full bg-slate-950 h-4 dark:bg-gray-700 rounded-none overflow-hidden"
+>
     <div
-        class="bg-sky-500 h-4 rounded-none"
+        class="bg-sky-500 h-full rounded-none transition-all duration-100 ease-linear"
         style="width: {$progress * 100}%"
     ></div>
 </div>
