@@ -18,48 +18,93 @@
     export let type: "audio" | "visual";
     export let mode: "link" | "upload" | "select";
 
-    let media: string | null = null;
+    let media: MediaItem | null = null;
     let error: string = "";
     let previewVideo: MediaItem | null = null;
 
     const dispatch = createEventDispatcher();
 
-    function handleClose() {
-        showLinkVisualMedia.set(false);
-        showSelectVisualMedia.set(false);
+    function getFileType(file: File): "image" | "video" | "audio" | "gif" {
+        if (file.type.startsWith("image/")) {
+            return file.type.includes("gif") ? "gif" : "image";
+        } else if (file.type.startsWith("video")) {
+            return "video";
+        } else if (file.type.startsWith("audio")) {
+            return "audio";
+        }
+        throw new Error("unsupported file type");
     }
 
     function handleFileChange(event: Event) {
         const target = event.target as HTMLInputElement;
         const file = target.files?.[0];
         if (file) {
-            if (type === "audio" && !file.type.startsWith("audio/")) {
-                error = "Please upload an audio file.";
-                return;
+            try {
+                const fileType = getFileType(file);
+                if (type === "audio" && fileType !== "audio") {
+                    error = "Please upload an audio file.";
+                    return;
+                }
+                if (
+                    type === "visual" &&
+                    !["image", "gif", "video"].includes(fileType)
+                ) {
+                    error = "Please upload an image or video file.";
+                    return;
+                }
+
+                const mediaItem: MediaItem = {
+                    src: URL.createObjectURL(file),
+                    type: fileType,
+                    category: "uploaded", // You might want to prompt the user for a more specific category
+                };
+
+                media = mediaItem;
+                error = "";
+                dispatch("mediaSelected", { media: mediaItem, file });
+                handleClose();
+            } catch (e) {
+                error = "Unsupported file type.";
             }
-            if (type === "visual" && !file.type.startsWith("image/")) {
-                error = "Please upload an image file.";
-                return;
-            }
-            media = URL.createObjectURL(file);
-            error = "";
-            dispatch("mediaSelected", { media, file });
-            handleClose();
         }
+    }
+
+    function handleClose() {
+        showLinkVisualMedia.set(false);
+        showSelectVisualMedia.set(false);
+    }
+
+    function getLinkType(url: string): "image" | "video" | "audio" | "gif" {
+        const extension = url.split(".").pop()?.toLowerCase();
+        if (extension) {
+            if (["jpg", "jpeg", "png", "webp"].includes(extension))
+                return "image";
+            if (extension === "gif") return "gif";
+            if (["mp4", "webm"].includes(extension)) return "video";
+            if (["mp3", "wav", "ogg"].includes(extension)) return "audio";
+        }
+        return "image"; // default
     }
 
     function handleLinkChange(event: Event) {
         const target = event.target as HTMLInputElement;
-        media = target.value;
+        const url = target.value;
+        const mediaItem: MediaItem = {
+            src: url,
+            type: getLinkType(url),
+            category: "link",
+        };
+
+        media = mediaItem;
         error = "";
-        dispatch("mediaSelected", { media });
+        dispatch("mediaSelected", { media: mediaItem });
         handleClose();
     }
 
     function handleSelect(item: MediaItem) {
-        media = item.src;
+        media = item;
         error = "";
-        dispatch("mediaSelected", { media: item.src });
+        dispatch("mediaSelected", { media: item });
         handleClose();
     }
 
@@ -152,8 +197,8 @@
                     class="{$isDarkMode
                         ? 'bg-black'
                         : ''} shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
-                    placeholder={$currentAlert?.config.mediaSrc
-                        ? $currentAlert?.config.mediaSrc
+                    placeholder={$currentAlert?.config?.media?.src
+                        ? $currentAlert.config.media.src
                         : "paste url here"}
                 />
             </div>
@@ -206,14 +251,14 @@
             </div>
         {/if}
 
-        {#if media || $currentAlert?.config.mediaSrc}
+        {#if media || $currentAlert?.config?.media}
             <div class="mt-4">
                 {#if type === "audio"}
                     <audio controls src={media} class="w-full" />
                 {:else if mode !== "select"}
                     <img
-                        src={$currentAlert?.config.mediaSrc
-                            ? $currentAlert?.config.mediaSrc
+                        src={$currentAlert?.config?.media?.src
+                            ? $currentAlert?.config.media.src
                             : media}
                         alt="Uploaded visual"
                         class="w-full h-auto"

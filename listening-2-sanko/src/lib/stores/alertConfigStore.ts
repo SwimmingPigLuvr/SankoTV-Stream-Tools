@@ -1,5 +1,6 @@
 // libs/stores/alertConfigStore.ts
-import { writable } from 'svelte/store'
+import { writable } from 'svelte/store';
+import { type MediaItem } from '../media-options';
 
 export interface Alert {
     id: string;
@@ -54,7 +55,7 @@ export interface AlertConfig {
     textTransform: string;
     letterSpacing: string;
     textShadow: string;
-    mediaSrc: string | null;
+    media: MediaItem | null;
     audioSrc: string | null;
     messageTemplate: string;
 }
@@ -78,7 +79,7 @@ const defaultAlertConfig: AlertConfig = {
     textTransform: "uppercase",
     letterSpacing: "-0.05em",
     textShadow: "none",
-    mediaSrc: null,
+    media: null,
     audioSrc: null,
     messageTemplate: '{sender} donated {amount} {gift}!',
     animationSettings: {

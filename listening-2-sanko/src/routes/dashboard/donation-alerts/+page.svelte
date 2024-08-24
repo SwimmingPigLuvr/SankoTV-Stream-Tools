@@ -1,6 +1,7 @@
 <!-- src/routes/donationAlerts/+page.svelte -->
 <script lang="ts">
 	import type { AnimationProps } from "$lib/types";
+	import { type MediaItem } from "$lib/media-options";
 	import { onMount, onDestroy } from "svelte";
 	import { writable, get } from "svelte/store";
 	import { browser } from "$app/environment";
@@ -86,7 +87,7 @@
 	function handleVisualMediaSelected(event: CustomEvent) {
 		console.log("event.detail: ", event.detail);
 		console.log("event.detail.media: ", event.detail.media);
-		updateAlertConfig("mediaSrc", event.detail.media);
+		updateAlertConfig("media", event.detail.media);
 	}
 
 	function playAudio() {
@@ -105,9 +106,12 @@
 		isPreviewPlaying = false;
 	}
 
-	let defaultMedia =
-		"https://i.seadn.io/s/raw/files/e34c296e6e2089853f59748e87975c70.gif?auto=format&dpr=1&w=3840";
-	let currentMediaSrc: string | null = defaultMedia;
+	let defaultMedia: MediaItem = {
+		src: "https://i.seadn.io/s/raw/files/e34c296e6e2089853f59748e87975c70.gif?auto=format&dpr=1&w=3840",
+		type: "image",
+		category: "remilia",
+	};
+	let currentMedia: MediaItem | null = defaultMedia;
 
 	let layout: string;
 	$: if ($currentAlert) {
@@ -301,8 +305,8 @@
 	}
 
 	function handleRemoveCurrentMedia() {
-		currentMediaSrc = null;
-		updateAlertConfig("mediaSrc", null);
+		currentMedia = null;
+		updateAlertConfig("media", null);
 		updateAlertConfig("composition", "image-above-text");
 	}
 
@@ -793,9 +797,9 @@
 				>
 					{#if layoutSelection === "tet-over-image"}
 						<img
-							src={$currentAlert?.config.mediaSrc
-								? $currentAlert?.config.mediaSrc
-								: currentMediaSrc}
+							src={$currentAlert?.config?.media?.src
+								? $currentAlert.config.media.src
+								: currentMedia?.src}
 							alt=""
 						/>
 						<div class="text" style="white-space: nowrap;">
@@ -815,9 +819,9 @@
 					{:else}
 						<img
 							class="max-h-[420px]"
-							src={$currentAlert?.config.mediaSrc
-								? $currentAlert?.config.mediaSrc
-								: currentMediaSrc}
+							src={$currentAlert?.config?.media?.src
+								? $currentAlert?.config.media.src
+								: currentMedia?.src}
 							alt=""
 						/>
 						<div style="white-space: nowrap;">
@@ -1065,16 +1069,27 @@
 					name="image"
 					id="image"
 				>
-					<img
-						class="absolute max-w-[3.25rem] h-[3rem] left-0"
-						src={$currentAlert?.config.mediaSrc
-							? $currentAlert?.config.mediaSrc
-							: "/gifs/minecraft.gif"}
-						alt="🪲"
-					/>
+					{#if $currentAlert?.config.media?.type === "image"}
+						<img
+							class="absolute max-w-[3.25rem] h-[3rem] left-0"
+							src={$currentAlert?.config?.media?.src
+								? $currentAlert.config?.media?.src
+								: "/gifs/minecraft.gif"}
+							alt="🪲"
+						/>
+					{:else if $currentAlert?.config.media?.type === "video"}
+						<video
+							autoplay
+							muted
+							class="absolute max-w-[3.25rem] h-full left-0"
+							src={$currentAlert?.config?.media?.src
+								? $currentAlert.config?.media?.src
+								: "/gifs/minecraft.gif"}
+						/>
+					{/if}
 					<p class="pl-10 truncate max-w-sm sm:max-w-lg">
-						{$currentAlert?.config.mediaSrc
-							? $currentAlert?.config.mediaSrc
+						{$currentAlert?.config?.media?.src
+							? $currentAlert.config.media.src
 							: "upload/link media"}
 					</p>
 					<button
@@ -1102,7 +1117,7 @@
 								>link</button
 							>
 							<!-- delete -->
-							{#if $currentAlert?.config.mediaSrc}
+							{#if $currentAlert?.config?.media?.src}
 								<button
 									on:click={handleRemoveCurrentMedia}
 									class="{$isDarkMode
