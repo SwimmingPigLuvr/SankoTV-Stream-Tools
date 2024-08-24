@@ -14,23 +14,23 @@ export const mediaOptions: MediaItem[] = [
   { src: "/media/remilia/yippee.mp4", type: "video", category: "remilia" },
 
   // Cult
-  { src: "/media/cult/ahhh.jpeg", type: "image", category: "cult" },
-  { src: "/media/cult/blue.jpeg", type: "image", category: "cult" },
-  { src: "/media/cult/cheeseworld.jpeg", type: "image", category: "cult" },
-  { src: "/media/cult/ciggy.jpeg", type: "image", category: "cult" },
-  { src: "/media/cult/icecream.jpg", type: "image", category: "cult" },
-  { src: "/media/cult/walk.png", type: "image", category: "cult" },
+  { src: "/media/remilia/cult/ahhh.jpeg", type: "image", category: "cult" },
+  { src: "/media/remilia/cult/blue.jpeg", type: "image", category: "cult" },
+  { src: "/media/remilia/cult/cheeseworld.jpeg", type: "image", category: "cult" },
+  { src: "/media/remilia/cult/ciggy.jpeg", type: "image", category: "cult" },
+  { src: "/media/remilia/cult/icecream.jpg", type: "image", category: "cult" },
+  { src: "/media/remilia/cult/walk.png", type: "image", category: "cult" },
 
   // Milady
-  { src: "/media/milady/bubble.jpeg", type: "image", category: "milady" },
-  { src: "/media/milady/cowboy.jpeg", type: "image", category: "milady" },
-  { src: "/media/milady/money.jpeg", type: "image", category: "milady" },
-  { src: "/media/milady/you.jpeg", type: "image", category: "milady" },
+  { src: "/media/remilia/milady/bubble.jpeg", type: "image", category: "milady" },
+  { src: "/media/remilia/milady/cowboy.jpeg", type: "image", category: "milady" },
+  { src: "/media/remilia/milady/money.jpeg", type: "image", category: "milady" },
+  { src: "/media/remilia/milady/you.jpeg", type: "image", category: "milady" },
 
   // Remilio
-  { src: "/media/remilio/please.jpeg", type: "image", category: "remilio" },
-  { src: "/media/remilio/remiremi.png", type: "image", category: "remilio" },
-  { src: "/media/remilio/remiremiremi.png", type: "image", category: "remilio" },
+  { src: "/media/remilia/remilio/please.jpeg", type: "image", category: "remilio" },
+  { src: "/media/remilia/remilio/remiremi.png", type: "image", category: "remilio" },
+  { src: "/media/remilia/remilio/remiremiremi.png", type: "image", category: "remilio" },
 
   // Sanko
   { src: "/media/sanko/cowboyBun.jpeg", type: "image", category: "sanko" },

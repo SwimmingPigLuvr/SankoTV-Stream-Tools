@@ -1,9 +1,9 @@
 <script lang="ts">
     import { mediaOptions, type MediaItem } from "$lib/media-options";
-    import { showLinkVisualMedia, showSelectVisualMedia } from "$lib/stores";
+    import { isDarkMode, showLinkVisualMedia, showSelectVisualMedia } from "$lib/stores";
     import { currentAlert } from "$lib/stores/alertConfigStore";
     import { createEventDispatcher } from "svelte";
-    import { blur, slide } from "svelte/transition";
+    import { blur, fade, slide } from "svelte/transition";
 
     export let type: "audio" | "visual";
     export let mode: "link" | "upload" | "select";
@@ -61,14 +61,14 @@
 </script>
 
 <button
-    in:blur
+    in:fade={{duration: 300}}
     on:click|self={handleClose}
-    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center overflow-y-auto"
+    class="fixed inset-0 {$isDarkMode ? 'bg-black' : 'bg-white'} bg-opacity-50 backdrop-blur-xl flex items-center justify-center overflow-y-auto"
 >
     <button
-        in:slide
+        in:slide={{delay: 300}}
         on:click|stopPropagation
-        class="bg-white p-8 rounded-lg shadow-xl {mode === 'link'
+        class="{$isDarkMode ? 'border-lime-400 bg-black ' : 'border-blue-700 bg-white'} rounded-none border-[2px] p-8 shadow-xl {mode === 'link'
             ? 'w-96'
             : 'w-[555px]'} max-h-[555px] flex flex-col"
     >
@@ -89,9 +89,9 @@
                 />
             </div>
         {:else if mode === "link"}
-            <div class="mb-4">
+            <div class="mb-4 w-full ">
                 <label
-                    class="text-left block text-gray-700 text-sm font-bold mb-2"
+                    class="text-left block text-sm font-bold mb-2"
                     for="media-link"
                 >
                     Paste URL:
@@ -100,7 +100,7 @@
                     type="text"
                     id="media-link"
                     on:input={handleLinkChange}
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    class="{$isDarkMode ? 'bg-black' : ''} shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
                     placeholder={$currentAlert?.config.mediaSrc
                         ? $currentAlert?.config.mediaSrc
                         : "paste url here"}
@@ -110,7 +110,7 @@
             <!-- Create a container for the grid -->
             <div class="mb-4">
                 <label
-                    class="text-left block text-gray-700 text-sm font-bold mb-2"
+                    class="text-left block text-sm font-bold mb-2"
                     for="media-option"
                 >
                     Choose Media:
@@ -174,11 +174,11 @@
 
     /* Style for individual grid items */
     .image-item {
-        width: 100%;
-        height: auto;
-        object-fit: cover;
+        width: auto;
+        height: 100%;
+        object-fit: contain;
         cursor: pointer;
-        transition: transform 0.2s ease-in-out;
+        transition: transform 0.2s cubic-bezier(0.075, 0.82, 0.165, 1);
     }
 
     /* Add a hover effect to the images */
