@@ -1,6 +1,10 @@
 <script lang="ts">
     import { mediaOptions, type MediaItem } from "$lib/media-options";
-    import { isDarkMode, showLinkVisualMedia, showSelectVisualMedia } from "$lib/stores";
+    import {
+        isDarkMode,
+        showLinkVisualMedia,
+        showSelectVisualMedia,
+    } from "$lib/stores";
     import { currentAlert } from "$lib/stores/alertConfigStore";
     import { createEventDispatcher } from "svelte";
     import { blur, fade, slide } from "svelte/transition";
@@ -61,16 +65,21 @@
 </script>
 
 <button
-    in:fade={{duration: 300}}
+    in:fade={{ duration: 300 }}
     on:click|self={handleClose}
-    class="fixed inset-0 {$isDarkMode ? 'bg-black' : 'bg-white'} bg-opacity-50 backdrop-blur-xl flex items-center justify-center overflow-y-auto"
+    class="fixed inset-0 {$isDarkMode
+        ? 'bg-black'
+        : 'bg-white'} bg-opacity-50 backdrop-blur-xl flex items-center justify-center overflow-y-auto"
 >
     <button
-        in:slide={{delay: 300}}
+        in:slide={{ delay: 300 }}
         on:click|stopPropagation
-        class="{$isDarkMode ? 'border-lime-400 bg-black ' : 'border-blue-700 bg-white'} rounded-none border-[2px] p-8 shadow-xl {mode === 'link'
+        class="{$isDarkMode
+            ? 'border-lime-400 bg-black '
+            : 'border-blue-700 bg-white'} rounded-none border-[2px] p-8 shadow-xl {mode ===
+        'link'
             ? 'w-96'
-            : 'w-[555px]'} max-h-[555px] flex flex-col"
+            : 'w-[555px]'} max-h-[800px] flex flex-col"
     >
         {#if mode === "upload"}
             <div class="mb-4">
@@ -89,7 +98,7 @@
                 />
             </div>
         {:else if mode === "link"}
-            <div class="mb-4 w-full ">
+            <div class="mb-4 w-full">
                 <label
                     class="text-left block text-sm font-bold mb-2"
                     for="media-link"
@@ -100,7 +109,9 @@
                     type="text"
                     id="media-link"
                     on:input={handleLinkChange}
-                    class="{$isDarkMode ? 'bg-black' : ''} shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
+                    class="{$isDarkMode
+                        ? 'bg-black'
+                        : ''} shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
                     placeholder={$currentAlert?.config.mediaSrc
                         ? $currentAlert?.config.mediaSrc
                         : "paste url here"}
@@ -139,7 +150,7 @@
             <div class="mt-4">
                 {#if type === "audio"}
                     <audio controls src={media} class="w-full" />
-                {:else}
+                {:else if mode !== "select"}
                     <img
                         src={$currentAlert?.config.mediaSrc
                             ? $currentAlert?.config.mediaSrc
