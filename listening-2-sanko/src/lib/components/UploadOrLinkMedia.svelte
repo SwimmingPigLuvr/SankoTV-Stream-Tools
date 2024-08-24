@@ -1,10 +1,12 @@
 <script lang="ts">
-    import { showLinkVisualMedia } from "$lib/stores";
+    import { mediaOptions, type MediaItem } from "$lib/media-options";
+    import { showLinkVisualMedia, showSelectVisualMedia } from "$lib/stores";
     import { currentAlert } from "$lib/stores/alertConfigStore";
     import { createEventDispatcher } from "svelte";
+    import { blur, slide } from "svelte/transition";
 
     export let type: "audio" | "visual";
-    export let mode: "link" | "upload";
+    export let mode: "link" | "upload" | "select";
 
     let media: string | null = null;
     let error: string = "";
@@ -15,6 +17,7 @@
 
     function handleClose() {
         showLinkVisualMedia.set(false);
+        showSelectVisualMedia.set(false);
     }
 
     function handleFileChange(event: Event) {
@@ -42,6 +45,12 @@
         dispatch("mediaSelected", { media });
     }
 
+    function handleSelect(item: MediaItem) {
+        media = item.src;
+        error = "";
+        dispatch("mediaSelected", { media });
+    }
+
     function handleSubmit() {
         if (media) {
             dispatch("submit", { media });
@@ -52,12 +61,16 @@
 </script>
 
 <button
+    in:blur
     on:click|self={handleClose}
-    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center overflow-y-auto"
 >
     <button
+        in:slide
         on:click|stopPropagation
-        class="bg-white p-8 rounded-lg shadow-xl w-96"
+        class="bg-white p-8 rounded-lg shadow-xl {mode === 'link'
+            ? 'w-96'
+            : 'w-[555px]'} max-h-[555px] flex flex-col"
     >
         {#if mode === "upload"}
             <div class="mb-4">
@@ -75,13 +88,13 @@
                     class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                 />
             </div>
-        {:else}
+        {:else if mode === "link"}
             <div class="mb-4">
                 <label
                     class="text-left block text-gray-700 text-sm font-bold mb-2"
                     for="media-link"
                 >
-                    Enter a link:
+                    Paste URL:
                 </label>
                 <input
                     type="text"
@@ -92,6 +105,24 @@
                         ? $currentAlert?.config.mediaSrc
                         : "paste url here"}
                 />
+            </div>
+        {:else}
+            <!-- Create a container for the grid -->
+            <div class="mb-4">
+                <label
+                    class="text-left block text-gray-700 text-sm font-bold mb-2"
+                    for="media-option"
+                >
+                    Choose Media:
+                </label>
+            </div>
+
+            <!-- Grid container for images -->
+            <div class="image-grid overflow-x-hidden overflow-y-auto">
+                <!-- Example images (replace with dynamic content as needed) -->
+                {#each mediaOptions as media}
+                    <img src={media.src} alt="" class="image-item" />
+                {/each}
             </div>
         {/if}
 
@@ -132,3 +163,26 @@
         {/if}
     </button>
 </button>
+
+<style>
+    /* Style for the grid container */
+    .image-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 10px;
+    }
+
+    /* Style for individual grid items */
+    .image-item {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+        cursor: pointer;
+        transition: transform 0.2s ease-in-out;
+    }
+
+    /* Add a hover effect to the images */
+    .image-item:hover {
+        transform: scale(1.05);
+    }
+</style>

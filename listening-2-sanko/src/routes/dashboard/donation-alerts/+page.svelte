@@ -8,6 +8,7 @@
 		isDarkMode,
 		showNameAlert,
 		showLinkVisualMedia,
+		showSelectVisualMedia,
 	} from "$lib/stores";
 	import {
 		alertConfig,
@@ -59,11 +60,11 @@
 
 	$: alertName = $currentAlert?.name;
 	let alertActive = true;
-	let volumePercent = 50;
-	let volume = volumePercent / 100;
+	$: volumePercent = $currentAlert?.config.alertVolume;
+	$: volume = volumePercent ? volumePercent / 100 : 0.5;
 
 	$: {
-		volume = volumePercent / 100;
+		volume = volumePercent ? volumePercent / 100 : 0.5;
 		if (audio) {
 			audio.volume = volume;
 		}
@@ -148,11 +149,11 @@
 		const containerWidth = previewContainer.offsetWidth;
 		divScale = containerWidth / maxWidth;
 
-		if (previewePlaceholder) {
-			previewePlaceholder.style.transform = `scale(${divScale})`;
-			previewePlaceholder.style.transformOrigin = "center";
-			previewePlaceholder.style.width = `${100 / divScale}%`;
-			previewePlaceholder.style.height = "540px";
+		if (previewPlaceholder) {
+			previewPlaceholder.style.transform = `scale(${divScale})`;
+			previewPlaceholder.style.transformOrigin = "center";
+			previewPlaceholder.style.width = `${100 / divScale}%`;
+			previewPlaceholder.style.height = "540px";
 		}
 		if (previewContent) {
 			previewContent.style.transform = `scale(${divScale})`;
@@ -1084,6 +1085,14 @@
 							: 'bg-lime-200'} space-x-0 absolute right-2"
 					>
 						{#if showImgUploadControls}
+							<!-- select image -->
+							<button
+								on:click={() => showSelectVisualMedia.set(true)}
+								class="{$isDarkMode
+									? 'hover:bg-slate-600'
+									: 'hover:bg-lime-400'} p-2 px-4"
+								>select</button
+							>
 							<!-- link image url -->
 							<button
 								on:click={() => showLinkVisualMedia.set(true)}
@@ -1116,6 +1125,18 @@
 					</button>
 
 					<!-- link / upload modals -->
+
+					<!-- select -->
+					{#if $showSelectVisualMedia}
+						<div class="z-50">
+							<UploadOrLinkMedia
+								type="visual"
+								mode="select"
+								on:mediaSelected={handleVisualMediaSelected}
+							/>
+						</div>
+					{/if}
+
 					{#if $showLinkVisualMedia}
 						<div class="z-50">
 							<UploadOrLinkMedia
