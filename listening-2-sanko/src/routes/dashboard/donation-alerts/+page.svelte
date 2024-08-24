@@ -817,13 +817,24 @@
 							{/if}
 						</div>
 					{:else}
-						<img
-							class="max-h-[420px]"
-							src={$currentAlert?.config?.media?.src
-								? $currentAlert?.config.media.src
-								: currentMedia?.src}
-							alt=""
-						/>
+						{#if $currentAlert?.config.media?.type === "video"}
+							<video
+								autoplay
+								loop
+								class="max-h-[50vh]"
+								src={$currentAlert?.config?.media?.src
+									? $currentAlert?.config.media.src
+									: currentMedia?.src}
+							/>
+						{:else}
+							<img
+								class="h-[750px] w-auto"
+								src={$currentAlert?.config?.media?.src
+									? $currentAlert?.config.media.src
+									: currentMedia?.src}
+								alt=""
+							/>
+						{/if}
 						<div style="white-space: nowrap;">
 							{#if $currentAlert}
 								{#each generateRandomMessage().parts as part}
@@ -1069,7 +1080,7 @@
 					name="image"
 					id="image"
 				>
-					{#if $currentAlert?.config.media?.type === "image"}
+					{#if $currentAlert?.config.media?.type === "image" || $currentAlert?.config.media?.type === "gif"}
 						<img
 							class="absolute max-w-[3.25rem] h-[3rem] left-0"
 							src={$currentAlert?.config?.media?.src

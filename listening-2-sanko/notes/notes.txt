@@ -494,3 +494,7 @@ requirements to use video
 the code must know the difference between images and videos in my selected media
 in the db we have mediaSrc saved but we should use MediaItem as the type 
 which has media: { src: string, type: 'image' | 'gif' | 'video', category: string }
+
+things to make sure of.
+mute button can mute video.
+volume control for sound and video

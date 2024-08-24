@@ -233,7 +233,7 @@
                     >
                         <video src={video.src} class="image-item" />
                         <div
-                            class="absolute text-5xl inset-0 flex items-center justify-center hover:bg-opacity-10 bg-black bg-opacity-50"
+                            class="absolute text-white text-5xl inset-0 flex items-center justify-center hover:bg-opacity-10 {$isDarkMode ? 'bg-black' : 'bg-white'} bg-opacity-50"
                         >
                             ▶️
                         </div>

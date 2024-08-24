@@ -60,7 +60,10 @@ export const gifs: MediaItem[] = [
 
 export const videos: MediaItem[] = [
   { src: "/media/remilia/yippee.mp4", type: "video", category: "remilia" },
+  { src: "/media/misc/gemmy.mp4", type: "video", category: "misc" },
+  { src: "/media/misc/jakechat_edit.mp4", type: "video", category: "misc" },
   { src: "/media/misc/jump.mp4", type: "video", category: "misc" },
+  { src: "/media/misc/mario64_seal.mp4", type: "video", category: "misc" },
 
 ];
 
