@@ -481,3 +481,11 @@ be able to change tabs once modal is open
 seamlessly switch between link/upload/select
 select can even auto hold all of the previous links and uploads
 sounds on hover? especially elements that grow
+
+todo
+handle videos as donation alerts
+fix animations in
+create image upload logic
+create storage for images
+create storage limit for users
+create sound selections

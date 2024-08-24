@@ -2,16 +2,13 @@
 
 export interface MediaItem {
   src: string;
-  type: 'image' | 'audio' | 'video';
+  type: 'image' | 'gif' | 'audio' | 'video';
   category: string;
 }
 
-export const mediaOptions: MediaItem[] = [
+export const images: MediaItem[] = [
   // Remilia
   { src: "/media/remilia/forever.jpeg", type: "image", category: "remilia" },
-  { src: "/media/remilia/miladycraft.gif", type: "image", category: "remilia" },
-  { src: "/media/remilia/remigradientbg.gif", type: "image", category: "remilia" },
-  { src: "/media/remilia/yippee.mp4", type: "video", category: "remilia" },
 
   // Cult
   { src: "/media/remilia/cult/ahhh.jpeg", type: "image", category: "cult" },
@@ -43,18 +40,33 @@ export const mediaOptions: MediaItem[] = [
   { src: "/media/sanko/turni.jpeg", type: "image", category: "sanko" },
 
   // Chud
-  { src: "/media/chud/chudjak-walking.gif", type: "image", category: "chud" },
   { src: "/media/chud/head-down-crying.png", type: "image", category: "chud" },
   { src: "/media/chud/tears-of-joy.jpeg", type: "image", category: "chud" },
 
   // Misc
-  { src: "/media/misc/jump.mp4", type: "video", category: "misc" },
   { src: "/media/misc/normal.jpeg", type: "image", category: "misc" },
-  { src: "/media/misc/oscar.gif", type: "image", category: "misc" },
-  { src: "/media/misc/smile.gif", type: "image", category: "misc" },
 
   // Sound Library
+];
+
+export const gifs: MediaItem[] = [
+  { src: "/media/remilia/miladycraft.gif", type: "gif", category: "remilia" },
+  { src: "/media/remilia/remigradientbg.gif", type: "gif", category: "remilia" },
+  { src: "/media/chud/chudjak-walking.gif", type: "gif", category: "chud" },
+  { src: "/media/misc/oscar.gif", type: "gif", category: "misc" },
+  { src: "/media/misc/smile.gif", type: "gif", category: "misc" },
+
+];
+
+export const videos: MediaItem[] = [
+  { src: "/media/remilia/yippee.mp4", type: "video", category: "remilia" },
+  { src: "/media/misc/jump.mp4", type: "video", category: "misc" },
+
+];
+
+export const sounds: MediaItem[] = [
   { src: "/media/audio/club_beat.mp3", type: "audio", category: "sound" },
   { src: "/media/audio/notification.mp3", type: "audio", category: "sound" },
   { src: "/media/audio/pop.mp3", type: "audio", category: "sound" },
+
 ];

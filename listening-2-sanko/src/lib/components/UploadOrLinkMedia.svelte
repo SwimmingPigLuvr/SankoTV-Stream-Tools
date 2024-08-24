@@ -1,5 +1,11 @@
 <script lang="ts">
-    import { mediaOptions, type MediaItem } from "$lib/media-options";
+    import {
+        images,
+        gifs,
+        videos,
+        sounds,
+        type MediaItem,
+    } from "$lib/media-options";
     import {
         isDarkMode,
         showLinkVisualMedia,
@@ -14,8 +20,7 @@
 
     let media: string | null = null;
     let error: string = "";
-
-    const soundLibrary = ["club_beat", "notification", "pop"];
+    let previewVideo: MediaItem | null = null;
 
     const dispatch = createEventDispatcher();
 
@@ -39,6 +44,7 @@
             media = URL.createObjectURL(file);
             error = "";
             dispatch("mediaSelected", { media, file });
+            handleClose();
         }
     }
 
@@ -47,17 +53,28 @@
         media = target.value;
         error = "";
         dispatch("mediaSelected", { media });
+        handleClose();
     }
 
     function handleSelect(item: MediaItem) {
         media = item.src;
         error = "";
-        dispatch("mediaSelected", { media });
+        dispatch("mediaSelected", { media: item.src });
+        handleClose();
+    }
+
+    function handleVideoSelect(video: MediaItem) {
+        previewVideo = video;
+    }
+
+    function closePreview() {
+        previewVideo = null;
     }
 
     function handleSubmit() {
         if (media) {
             dispatch("submit", { media });
+            handleClose();
         } else {
             error = "Please select or link media before submitting.";
         }
@@ -71,6 +88,7 @@
         ? 'bg-black'
         : 'bg-white'} bg-opacity-50 backdrop-blur-xl flex items-center justify-center overflow-y-auto"
 >
+    <!-- modal -->
     <button
         in:slide={{ delay: 300 }}
         on:click|stopPropagation
@@ -81,7 +99,29 @@
             ? 'w-96'
             : 'w-[555px]'} max-h-[800px] flex flex-col"
     >
-        {#if mode === "upload"}
+        {#if previewVideo}
+            <div class="w-full h-full flex flex-col">
+                <video
+                    src={previewVideo.src}
+                    controls
+                    autoplay
+                    class="w-full h-auto"
+                />
+                <div class="flex space-x-4 text-xl justify-end">
+                    <button
+                        on:click={closePreview}
+                        class="mt-4 bg-red-500 hover:bg-blue-700 text-white font-bold py-2 px-4"
+                        >go back</button
+                    >
+                    <button
+                        on:click={() =>
+                            previewVideo && handleSelect(previewVideo)}
+                        class="mt-4 bg-lime-500 hover:bg-blue-700 text-white font-bold py-2 px-4"
+                        >use video</button
+                    >
+                </div>
+            </div>
+        {:else if mode === "upload"}
             <div class="mb-4">
                 <label
                     class="block text-gray-700 text-sm font-bold mb-2"
@@ -131,8 +171,28 @@
             <!-- Grid container for images -->
             <div class="image-grid overflow-x-hidden overflow-y-auto">
                 <!-- Example images (replace with dynamic content as needed) -->
-                {#each mediaOptions as media}
-                    <img src={media.src} alt="" class="image-item" />
+                {#each gifs as gif}
+                    <button on:click={() => handleSelect(gif)}>
+                        <img src={gif.src} alt="" class="image-item" />
+                    </button>
+                {/each}
+                {#each images as image}
+                    <button on:click={() => handleSelect(image)}>
+                        <img src={image.src} alt="" class="image-item" />
+                    </button>
+                {/each}
+                {#each videos as video}
+                    <button
+                        on:click={() => handleVideoSelect(video)}
+                        class="relative image-item"
+                    >
+                        <video src={video.src} class="image-item" />
+                        <div
+                            class="absolute text-5xl inset-0 flex items-center justify-center hover:bg-opacity-10 bg-black bg-opacity-50"
+                        >
+                            ▶️
+                        </div>
+                    </button>
                 {/each}
             </div>
         {/if}
