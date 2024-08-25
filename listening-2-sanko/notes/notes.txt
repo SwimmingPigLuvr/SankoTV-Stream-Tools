@@ -498,3 +498,6 @@ which has media: { src: string, type: 'image' | 'gif' | 'video', category: strin
 things to make sure of.
 mute button can mute video.
 volume control for sound and video
+
+video alert duration?
+1x or loop?

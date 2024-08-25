@@ -32,6 +32,11 @@
 
 	const { debounce } = lodash;
 
+	let audio: HTMLAudioElement | undefined;
+	let videoElement: HTMLVideoElement | undefined;
+	let currentAudioSrc: string | null = "/sounds/notification.mp3";
+	let muted = false;
+
 	let alerts: Alert[] = [];
 	$: alerts = $userData?.data?.donationAlerts || [];
 
@@ -69,10 +74,11 @@
 		if (audio) {
 			audio.volume = volume;
 		}
+		if (videoElement) {
+			videoElement.volume = volume;
+		}
 	}
 
-	let audio: HTMLAudioElement | undefined;
-	let currentAudioSrc: string | null = "/sounds/notification.mp3";
 
 	// This will run only in the browser
 	if (browser) {
@@ -182,7 +188,6 @@
 	let showBackgroundColorInfo = false;
 	let showWeightInfo = false;
 	let message: string;
-	let muted = false;
 
 	let fontSize = 32;
 	let letterSpacing = 0;
@@ -354,6 +359,12 @@
 
 	function toggleMute() {
 		muted = !muted;
+		if (audio) {
+			audio.muted = muted;
+		}
+		if (videoElement) {
+			videoElement.muted = muted;
+		}
 	}
 
 	function toggleAlert() {
@@ -819,9 +830,10 @@
 					{:else}
 						{#if $currentAlert?.config.media?.type === "video"}
 							<video
+								bind:this={videoElement}
 								autoplay
 								loop
-								class="max-h-[50vh]"
+								class="max-h-[50%]"
 								src={$currentAlert?.config?.media?.src
 									? $currentAlert?.config.media.src
 									: currentMedia?.src}
@@ -904,6 +916,7 @@
 
 				<!-- mute button -->
 				<button
+				
 					on:click={() => toggleMute()}
 					class="px-3 p-2 text-xl rounded-full {$isDarkMode
 						? 'hover:bg-slate-800'
