@@ -532,12 +532,30 @@
 		console.log("animation props");
 		console.log("IN: ", $inConfig);
 		console.log("OUT: ", $outConfig);
+		if (videoElement && $currentAlert) {
+			handleVideoDisplay(videoElement, $currentAlert);
+		}
 		// play /sounds/notification.mp3
 		if (!isPreviewPlaying) {
 			isPreviewPlaying = true;
 			if (!muted) {
 				playAudio();
 			}
+		}
+	}
+
+	function handleVideoDisplay(video: HTMLVideoElement, alert: Alert) {
+		switch (alert.config.videoDuration) {
+			case "once":
+				video.loop = false;
+				break;
+			case "match":
+				video.loop = false;
+				updateAlertConfig("alertDuration", Math.ceil(video.duration));
+				break;
+			case "loop":
+				video.loop = true;
+				break;
 		}
 	}
 
@@ -845,11 +863,23 @@
 							<video
 								bind:this={videoElement}
 								autoplay
-								loop={$currentAlert?.config?.media?.loop}
+								loop={$currentAlert.config.videoDuration ===
+									"loop"}
 								class="max-h-[50%]"
-								src={$currentAlert?.config?.media?.src
-									? $currentAlert?.config.media.src
-									: currentMedia?.src}
+								src={$currentAlert?.config?.media?.src ||
+									currentMedia?.src}
+								on:loadedmetadata={() => {
+									if (
+										videoElement &&
+										$currentAlert?.config?.videoDuration ===
+											"match"
+									) {
+										updateAlertConfig(
+											"alertDuration",
+											Math.ceil(videoElement?.duration),
+										);
+									}
+								}}
 							>
 								<track kind="captions" src="" label="English" />
 							</video>
@@ -1313,7 +1343,7 @@
 			</div>
 
 			<!-- alert duration -->
-			<div class="flex flex-col space-y-2 bg-rose-800">
+			<div class="flex flex-col space-y-2">
 				<div class="flex space-x-6">
 					<label class="block mb-2" for="alertduration"
 						>Alert Duration</label
@@ -1357,9 +1387,7 @@
 								)}
 						>
 							<option value="loop">Loop</option>
-							<option value="once"
-								>Play Once then dissappear</option
-							>
+							<option value="once">Play Once</option>
 							<option value="match"
 								>Match Alert Duration to Video Duration</option
 							>

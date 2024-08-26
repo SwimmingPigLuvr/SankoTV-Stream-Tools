@@ -521,3 +521,7 @@ the data types are set up properly now let's see how i can apply that data with 
 should i pass the whole updated media item?
 
 when match alertduration is chosen we need to also set the alert duration to match the video. i gotta ask claude how we can detect the video duration from the file
+
+make sure the animation controls are working.
+
+let's make it as simple as possible to aplly the default svelte kit animations and easings
