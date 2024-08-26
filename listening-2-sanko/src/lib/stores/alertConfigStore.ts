@@ -56,6 +56,7 @@ export interface AlertConfig {
     letterSpacing: string;
     textShadow: string;
     media: MediaItem | null;
+    videoDuration: 'once' | 'match' | 'loop';
     audioSrc: string | null;
     messageTemplate: string;
 }

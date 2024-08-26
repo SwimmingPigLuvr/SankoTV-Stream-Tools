@@ -516,3 +516,8 @@ loop video
     Y: will loop until alertduration is done
     N: will play video once then it will hide the video and let the donation message go until the end of alert duration
 
+the data types are set up properly now let's see how i can apply that data with the update function
+
+should i pass the whole updated media item?
+
+when match alertduration is chosen we need to also set the alert duration to match the video. i gotta ask claude how we can detect the video duration from the file

@@ -376,6 +376,14 @@
 		alertActive = !alertActive;
 	}
 
+	function toggleLoop() {
+		// implement logic to change the loop field in the users db
+	}
+
+	function toggleMatchVideoDuration() {
+		// implement logic to change the match field in the users db
+	}
+
 	function getRandomSender() {
 		return senders[Math.floor(Math.random() * senders.length)];
 	}
@@ -837,12 +845,14 @@
 							<video
 								bind:this={videoElement}
 								autoplay
-								loop
+								loop={$currentAlert?.config?.media?.loop}
 								class="max-h-[50%]"
 								src={$currentAlert?.config?.media?.src
 									? $currentAlert?.config.media.src
 									: currentMedia?.src}
-							/>
+							>
+								<track kind="captions" src="" label="English" />
+							</video>
 						{:else}
 							<img
 								class="h-[750px] w-auto"
@@ -1310,7 +1320,7 @@
 					>
 					<p>{$currentAlert?.config.alertDuration}s</p>
 				</div>
-				<!-- letter spacing slider -->
+				<!-- alert duration input -->
 				<input
 					value={$currentAlert?.config.alertDuration}
 					on:change={(e) =>
@@ -1331,52 +1341,30 @@
 				{#if showVideoDurationControls}
 					<div class="flex flex-col space-y-2">
 						<label for="videoDurationControl" class="block mb-2"
-							>Video Duration Control</label
+							>Video Duration</label
 						>
 						<select
 							id="videoDurationControl"
-							class="custom-dropdown p-4 {$isDarkMode
+							class="p-4 {$isDarkMode
 								? 'bg-slate-950'
 								: 'bg-lime-200'}"
+							value={$currentAlert?.config.videoDuration ||
+								"once"}
 							on:change={(e) =>
 								updateAlertConfig(
-									"videoDurationControl",
+									"videoDuration",
 									e.currentTarget.value,
 								)}
 						>
-							<option value="loop">Loop Video</option>
-							<option value="matchAlert"
-								>Match Alert Duration</option
+							<option value="loop">Loop</option>
+							<option value="once"
+								>Play Once then dissappear</option
 							>
-							<option value="noLoop">Play Once</option>
+							<option value="match"
+								>Match Alert Duration to Video Duration</option
+							>
 						</select>
 					</div>
-					{#if $currentAlert?.config.videoDurationControl === "matchAlert"}
-						<div class="flex space-x-6">
-							<label class="block mb-2" for="alertduration"
-								>Video Duration</label
-							>
-							<p>{$currentAlert?.config.alertDuration}s</p>
-						</div>
-					{/if}
-					{#if $currentAlert?.config.videoDurationControl === "noLoop"}
-						<div class="flex items-center space-x-2">
-							<input
-								type="checkbox"
-								id="hideVideoAfterPlay"
-								checked={$currentAlert?.config
-									.hideVideoAfterPlay}
-								on:change={(e) =>
-									updateAlertConfig(
-										"hideVideoAfterPlay",
-										e.currentTarget.checked,
-									)}
-							/>
-							<label for="hideVideoAfterPlay"
-								>Hide video after playback</label
-							>
-						</div>
-					{/if}
 				{/if}
 			</div>
 		</div>

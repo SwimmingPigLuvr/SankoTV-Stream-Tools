@@ -4,7 +4,6 @@ export interface MediaItem {
   src: string;
   type: 'image' | 'gif' | 'audio' | 'video';
   category: string;
-  videoDuration?: 'loop' | 'match' | 'once';
 }
 
 export const images: MediaItem[] = [
