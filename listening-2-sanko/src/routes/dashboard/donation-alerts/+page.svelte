@@ -79,7 +79,6 @@
 		}
 	}
 
-
 	// This will run only in the browser
 	if (browser) {
 		onMount(() => {
@@ -173,6 +172,12 @@
 	let currentBackgroundColor = "#000000";
 
 	$: currentBackgroundColor = $isDarkMode ? "#000000" : "#ffffff";
+
+	let showVideoDurationControls = false;
+
+	$: if ($currentAlert?.config?.media?.type === "video") {
+		showVideoDurationControls = true;
+	}
 
 	let showUploadVisualMedia = false;
 	let showUploadAudio = false;
@@ -864,7 +869,7 @@
 					{/if}
 				</div>
 				{#if $currentAlert}
-					<div class="absolute bottom-20 left-0 right-0 z-50">
+					<div class="absolute bottom-20 left-0 right-0 z-0">
 						<Timer
 							duration={$currentAlert.config.alertDuration}
 							onComplete={endPreview}
@@ -893,7 +898,7 @@
 							{#if showBackgroundColorInfo}
 								<div
 									in:fly={{ y: 10 }}
-									class="absolute border-[1px] -top-40 -left-20 text-left w-48 z-20 p-3 {$isDarkMode
+									class="absolute border-[1px] -top-40 -left-20 text-left w-48 z-50 p-3 {$isDarkMode
 										? 'bg-slate-300 text-slate-600'
 										: 'bg-lime-400 text-black border-black'}"
 								>
@@ -916,11 +921,10 @@
 
 				<!-- mute button -->
 				<button
-				
 					on:click={() => toggleMute()}
 					class="px-3 p-2 text-xl rounded-full {$isDarkMode
-						? 'hover:bg-slate-800'
-						: 'hover:bg-lime-300'} hover:bg-slate-800"
+						? 'hover:bg-slate-950'
+						: 'hover:bg-lime-300'}"
 				>
 					{#if muted}
 						🔇
@@ -933,7 +937,7 @@
 					on:click={handleDonationPreview}
 					disabled={isPreviewPlaying}
 					class="text-xs ml-auto text-right p-4 {$isDarkMode
-						? 'bg-slate-800 hover:bg-slate-600'
+						? 'bg-slate-950 hover:bg-slate-800'
 						: 'bg-lime-400 hover:bg-lime-600 hover:text-lime-100'} {isPreviewPlaying
 						? 'cursor-not-allowed'
 						: ''} ">preview</button
@@ -946,10 +950,10 @@
 			<div
 				class="{$isDarkMode
 					? 'bg-black border-b-white'
-					: 'bg-white border-b-black'}  border-b-[1px] z-20 p-4 absolute top-0 w-full left-0 flex justify-between"
+					: 'bg-white border-b-black'}  border-b-[1px] z-20 p-4 absolute top-0 w-full left-0 flex space-x-8 justify-end"
 			>
 				<!-- alert name -->
-				<div class="flex flex-col space-y-2 w-[70%]">
+				<div class="flex flex-col space-y-2 w-[30%]">
 					<label for="alertname">Alert Name</label>
 					<!-- text input -->
 					<input
@@ -959,10 +963,45 @@
 						name="alertName"
 						id="alertName"
 						class=" flex space-x-4 p-4 {$isDarkMode
-							? 'bg-slate-800'
+							? 'bg-slate-900'
 							: 'bg-lime-200'}"
 						type="text"
 					/>
+				</div>
+
+				<!-- Unique Alert URL -->
+				<div class="flex flex-col space-y-2 w-[60%]">
+					<label for="alertUrl">Widget URL</label>
+					<div class="flex items-center space-x-2">
+						<div class="relative w-full">
+							<button
+								on:click={() => {
+									if ($currentAlert) {
+										navigator.clipboard.writeText(
+											`https://yoursite.com/donation-alerts/${$currentAlert.id}`,
+										);
+										// You might want to show a toast notification here
+									}
+								}}
+								class="{$isDarkMode
+									? 'bg-slate-900 hover:border-white hover:bg-slate-950'
+									: 'bg-lime-300 hover:bg-lime-400 hover:border-black'} w-full h-full absolute left-0 top-0 border-transparent border-[1px] bg-opacity-50 backdrop-blur-[3px]"
+								>Copy Widget URL</button
+							>
+							<input
+								readonly
+								value={$currentAlert
+									? `https://yoursite.com/donation-alerts/${$currentAlert.id}`
+									: ""}
+								name="alertUrl"
+								id="alertUrl"
+								class="w-full flex-grow p-4 {$isDarkMode
+									? 'bg-slate-950'
+									: 'bg-lime-200'}"
+								type="text"
+							/>
+						</div>
+					</div>
 				</div>
 
 				<!-- alert active -->
@@ -975,7 +1014,7 @@
 						id="active"
 						on:click={() => toggleIsActive()}
 						class="p-1 px-2 rounded-full flex items-center text-xl {$isDarkMode
-							? 'hover:bg-slate-800'
+							? 'hover:bg-slate-950'
 							: 'hover:bg-lime-200'}"
 					>
 						{#if $currentAlert?.isActive}
@@ -992,7 +1031,7 @@
 				<label for="eventtrigger">Event Trigger</label>
 				<select
 					class="custom-dropdown p-4 {$isDarkMode
-						? 'bg-slate-800'
+						? 'bg-slate-950'
 						: 'bg-lime-200'}"
 					name="eventtrigger"
 					id="eventtrigger"
@@ -1022,7 +1061,7 @@
 					<label for="gift">Gift</label>
 					<select
 						class="custom-dropdown p-4 {$isDarkMode
-							? 'bg-slate-800'
+							? 'bg-slate-950'
 							: 'bg-lime-200'}"
 						name="gift"
 						id="gift"
@@ -1047,7 +1086,7 @@
 					<input
 						type="number"
 						class="custom-dropdown p-4 {$isDarkMode
-							? 'bg-slate-800'
+							? 'bg-slate-950'
 							: 'bg-lime-200'}"
 						name="donationamount"
 						id="donationamount"
@@ -1066,7 +1105,7 @@
 				<label for="layout">Layout</label>
 				<select
 					class="custom-dropdown p-4 {$isDarkMode
-						? 'bg-slate-800'
+						? 'bg-slate-950'
 						: 'bg-lime-200'}"
 					name="layout"
 					id="layout"
@@ -1083,19 +1122,21 @@
 
 			<!-- image upload -->
 			<div class="flex flex-col space-y-2">
-				<label for="image">Image</label>
+				<label for="image" class="capitalize"
+					>{$currentAlert?.config?.media?.type || "Media"}</label
+				>
 
 				<!-- image upload -->
 				<button
 					class="relative flex items-center space-x-4 p-4 {$isDarkMode
-						? 'bg-slate-800'
+						? 'bg-slate-950'
 						: 'bg-lime-200'}"
 					name="image"
 					id="image"
 				>
 					{#if $currentAlert?.config.media?.type === "image" || $currentAlert?.config.media?.type === "gif"}
 						<img
-							class="absolute max-w-[3.25rem] h-[3rem] left-0"
+							class="absolute max-w-[3.25rem] h-full left-0"
 							src={$currentAlert?.config?.media?.src
 								? $currentAlert.config?.media?.src
 								: "/gifs/minecraft.gif"}
@@ -1111,53 +1152,71 @@
 								: "/gifs/minecraft.gif"}
 						/>
 					{/if}
+					{#if !$currentAlert?.config?.media}
+						<img
+							src="/media/remilia/milady/cowboy.jpeg"
+							alt=""
+							class="filter sepia absolute w-[3.25rem] h-full left-0"
+						/>
+					{/if}
 					<p class="pl-10 truncate max-w-sm sm:max-w-lg">
 						{$currentAlert?.config?.media?.src
 							? $currentAlert.config.media.src
-							: "upload/link media"}
+							: "no media selected"}
 					</p>
 					<button
 						on:mouseenter={() => (showImgUploadControls = true)}
 						on:mouseleave={() => (showImgUploadControls = false)}
 						class="text-xs flex {$isDarkMode
-							? 'bg-slate-800'
+							? 'bg-slate-950'
 							: 'bg-lime-200'} space-x-0 absolute right-2"
 					>
 						{#if showImgUploadControls}
-							<!-- select image -->
-							<button
-								on:click={() => showSelectVisualMedia.set(true)}
-								class="{$isDarkMode
-									? 'hover:bg-slate-600'
-									: 'hover:bg-lime-400'} p-2 px-4"
-								>select</button
+							<div
+								in:fly={{
+									x: -10,
+									duration: 500,
+									easing: easings.cubicOut,
+								}}
 							>
-							<!-- link image url -->
-							<button
-								on:click={() => showLinkVisualMedia.set(true)}
-								class="{$isDarkMode
-									? 'hover:bg-slate-600'
-									: 'hover:bg-lime-400'} p-2 px-4"
-								>link</button
-							>
-							<!-- delete -->
-							{#if $currentAlert?.config?.media?.src}
+								<!-- select image -->
 								<button
-									on:click={handleRemoveCurrentMedia}
+									on:click={() =>
+										showSelectVisualMedia.set(true)}
 									class="{$isDarkMode
 										? 'hover:bg-slate-600'
 										: 'hover:bg-lime-400'} p-2 px-4"
-									>remove</button
+									>select</button
 								>
-							{/if}
-							<!-- upload -->
-							<button
-								on:click={() => (showUploadVisualMedia = true)}
-								class="{$isDarkMode
-									? 'hover:bg-slate-600'
-									: 'hover:bg-lime-400'} p-2 px-4"
-								>upload</button
-							>
+								<!-- link image url -->
+								<button
+									on:click={() =>
+										showLinkVisualMedia.set(true)}
+									class="{$isDarkMode
+										? 'hover:bg-slate-600'
+										: 'hover:bg-lime-400'} p-2 px-4"
+									>link</button
+								>
+								<!-- delete -->
+								{#if $currentAlert?.config?.media?.src}
+									<button
+										on:click={handleRemoveCurrentMedia}
+										class="{$isDarkMode
+											? 'hover:bg-slate-600'
+											: 'hover:bg-lime-400'} p-2 px-4"
+										>remove</button
+									>
+								{/if}
+								<!-- upload -->
+								<button
+									on:click={() =>
+										(showUploadVisualMedia = true)}
+									class="{$isDarkMode
+										? 'hover:bg-slate-600'
+										: 'hover:bg-lime-400'} p-2 px-4"
+									>upload</button
+								>
+							</div>
 						{:else}
 							<p class="text-2xl p-2">+</p>
 						{/if}
@@ -1203,12 +1262,22 @@
 							<div
 								in:fly={{ y: 10 }}
 								class="{$isDarkMode
-									? 'bg-slate-300 text-slate-600'
-									: 'bg-lime-400 text-black border-black'} border-[1px] absolute -top-28 -left-20 text-left w-48 z-20 p-3"
+									? 'bg-slate-950 text-slate-100'
+									: 'bg-lime-400 text-black border-black'} border-[1px] text-xs absolute -top-24 -left-20 text-left w-60 z-20 p-4"
 							>
 								Format your message with three possible
 								variables:
-								<p>SENDER, AMOUNT, & GIFT.</p>
+								<p class="">
+									<span class="text-lime-400"
+										>&#123;SENDER&#125;</span
+									>,
+									<span class="text-lime-400"
+										>&#123;AMOUNT&#125;</span
+									>,
+									<span class="text-lime-400"
+										>&#123;GIFT&#125;</span
+									>.
+								</p>
 							</div>
 						{/if}
 					</button>
@@ -1227,14 +1296,14 @@
 					name="template"
 					id="template"
 					class="flex space-x-4 p-4 {$isDarkMode
-						? 'bg-slate-800'
+						? 'bg-slate-950'
 						: 'bg-lime-200'}"
 					type="text"
 				/>
 			</div>
 
 			<!-- alert duration -->
-			<div class="flex flex-col space-y-2">
+			<div class="flex flex-col space-y-2 bg-rose-800">
 				<div class="flex space-x-6">
 					<label class="block mb-2" for="alertduration"
 						>Alert Duration</label
@@ -1249,13 +1318,66 @@
 							"alertDuration",
 							e.currentTarget.value,
 						)}
-					type="range"
+					type="number"
 					id="alertduration"
 					name="alertduration"
 					min="2"
 					max="200"
 					step="1"
+					class="p-4 text-white {$isDarkMode
+						? 'bg-slate-950'
+						: 'bg-lime-200'}"
 				/>
+				{#if showVideoDurationControls}
+					<div class="flex flex-col space-y-2">
+						<label for="videoDurationControl" class="block mb-2"
+							>Video Duration Control</label
+						>
+						<select
+							id="videoDurationControl"
+							class="custom-dropdown p-4 {$isDarkMode
+								? 'bg-slate-950'
+								: 'bg-lime-200'}"
+							on:change={(e) =>
+								updateAlertConfig(
+									"videoDurationControl",
+									e.currentTarget.value,
+								)}
+						>
+							<option value="loop">Loop Video</option>
+							<option value="matchAlert"
+								>Match Alert Duration</option
+							>
+							<option value="noLoop">Play Once</option>
+						</select>
+					</div>
+					{#if $currentAlert?.config.videoDurationControl === "matchAlert"}
+						<div class="flex space-x-6">
+							<label class="block mb-2" for="alertduration"
+								>Video Duration</label
+							>
+							<p>{$currentAlert?.config.alertDuration}s</p>
+						</div>
+					{/if}
+					{#if $currentAlert?.config.videoDurationControl === "noLoop"}
+						<div class="flex items-center space-x-2">
+							<input
+								type="checkbox"
+								id="hideVideoAfterPlay"
+								checked={$currentAlert?.config
+									.hideVideoAfterPlay}
+								on:change={(e) =>
+									updateAlertConfig(
+										"hideVideoAfterPlay",
+										e.currentTarget.checked,
+									)}
+							/>
+							<label for="hideVideoAfterPlay"
+								>Hide video after playback</label
+							>
+						</div>
+					{/if}
+				{/if}
 			</div>
 		</div>
 
@@ -1269,7 +1391,7 @@
 				<!-- sound upload -->
 				<button
 					class="relative flex items-center space-x-4 p-4 {$isDarkMode
-						? 'bg-slate-800'
+						? 'bg-slate-950'
 						: 'bg-lime-200'}"
 					name="sound"
 					id="sound"
@@ -1285,7 +1407,7 @@
 						on:mouseenter={() => (showAudioUploadControls = true)}
 						on:mouseleave={() => (showAudioUploadControls = false)}
 						class="text-xs z-20 {$isDarkMode
-							? 'bg-slate-800'
+							? 'bg-slate-950'
 							: 'bg-lime-200'} flex space-x-0 absolute right-2"
 					>
 						{#if showAudioUploadControls}
@@ -1363,7 +1485,7 @@
 				<label for="font">Font</label>
 				<select
 					class="custom-dropdown p-4 {$isDarkMode
-						? 'bg-slate-800'
+						? 'bg-slate-950'
 						: 'bg-lime-200'}"
 					name="font"
 					id="font"
@@ -1430,7 +1552,7 @@
 				</div>
 				<select
 					class="custom-dropdown p-4 {$isDarkMode
-						? 'bg-slate-800'
+						? 'bg-slate-950'
 						: 'bg-lime-200'}"
 					name="fontweight"
 					id="fontweight"
@@ -1511,7 +1633,7 @@
 				<label for="texttransform">Text Transform</label>
 				<select
 					class="custom-dropdown p-4 {$isDarkMode
-						? 'bg-slate-800'
+						? 'bg-slate-950'
 						: 'bg-lime-200'}"
 					name="texttransform"
 					id="texttransform"

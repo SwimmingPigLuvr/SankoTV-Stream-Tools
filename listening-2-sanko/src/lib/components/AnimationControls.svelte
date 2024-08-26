@@ -111,7 +111,7 @@
                 <select
                     id="animationIn"
                     class="custom-dropdown p-4 {$isDarkMode
-                        ? 'bg-slate-800'
+                        ? 'bg-slate-950'
                         : 'bg-lime-200'}"
                     value={alertConfig.animation.in.type}
                     on:change={(e) =>
@@ -130,7 +130,7 @@
                     type="number"
                     id="in-duration"
                     class="custom-dropdown p-4 {$isDarkMode
-                        ? 'bg-slate-800'
+                        ? 'bg-slate-950'
                         : 'bg-lime-200'}"
                     value={alertConfig.animation.in.duration}
                     on:change={(e) =>
@@ -145,7 +145,7 @@
                     type="number"
                     id="in-delay"
                     class="custom-dropdown p-4 {$isDarkMode
-                        ? 'bg-slate-800'
+                        ? 'bg-slate-950'
                         : 'bg-lime-200'}"
                     value={alertConfig.animation.in.delay}
                     on:change={(e) =>
@@ -159,7 +159,7 @@
                 <select
                     id="in-easing"
                     class="custom-dropdown p-4 {$isDarkMode
-                        ? 'bg-slate-800'
+                        ? 'bg-slate-950'
                         : 'bg-lime-200'}"
                     value={alertConfig.animation.in.easing}
                     on:change={(e) =>
@@ -178,7 +178,7 @@
                 <select
                     id="animationIn"
                     class="custom-dropdown p-4 {$isDarkMode
-                        ? 'bg-slate-800'
+                        ? 'bg-slate-950'
                         : 'bg-lime-200'}"
                     on:change={(e) => handlePremadeAnimationChange("in", e)}
                 >
@@ -196,7 +196,7 @@
                 <select
                     id="animationOut"
                     class="custom-dropdown p-4 {$isDarkMode
-                        ? 'bg-slate-800'
+                        ? 'bg-slate-950'
                         : 'bg-lime-200'}"
                     value={alertConfig.animation.out.type}
                     on:change={(e) =>
@@ -215,7 +215,7 @@
                     type="number"
                     id="out-duration"
                     class="custom-dropdown p-4 {$isDarkMode
-                        ? 'bg-slate-800'
+                        ? 'bg-slate-950'
                         : 'bg-lime-200'}"
                     value={alertConfig.animation.out.duration}
                     on:change={(e) =>
@@ -230,7 +230,7 @@
                     type="number"
                     id="out-delay"
                     class="custom-dropdown p-4 {$isDarkMode
-                        ? 'bg-slate-800'
+                        ? 'bg-slate-950'
                         : 'bg-lime-200'}"
                     value={alertConfig.animation.out.delay}
                     on:change={(e) =>
@@ -244,7 +244,7 @@
                 <select
                     id="out-easing"
                     class="custom-dropdown p-4 {$isDarkMode
-                        ? 'bg-slate-800'
+                        ? 'bg-slate-950'
                         : 'bg-lime-200'}"
                     value={alertConfig.animation.out.easing}
                     on:change={(e) =>
@@ -263,7 +263,7 @@
                 <select
                     id="animationOut"
                     class="custom-dropdown p-4 {$isDarkMode
-                        ? 'bg-slate-800'
+                        ? 'bg-slate-950'
                         : 'bg-lime-200'}"
                     on:change={(e) => handlePremadeAnimationChange("out", e)}
                 >

@@ -501,3 +501,18 @@ volume control for sound and video
 
 video alert duration?
 1x or loop?
+
+
+now that we are getting something formed i should be testing it live on stream to see if it reacts to events correctly
+
+in order to loop the video we need to update the data type to handle a looped boolean
+
+should we keep the alertduration and the video duration separate?
+i don't really think so. maybe you want to have a quick video triggered that is annoying to have on repeat but you want the message to persist so that you can show people that you got a donation. because donations might be infrequent.
+so yes let's enable that feature but it should be a niche case
+
+set alert duration to video duration?
+loop video
+    Y: will loop until alertduration is done
+    N: will play video once then it will hide the video and let the donation message go until the end of alert duration
+

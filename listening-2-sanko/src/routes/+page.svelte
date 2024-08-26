@@ -19,7 +19,7 @@
 	import { user } from "$lib/stores/authStore";
 	import WalletAuth from "$lib/components/WalletAuth.svelte";
 	import UserProfile from "$lib/components/UserProfile.svelte";
-    import Trope from "$lib/components/Trope.svelte";
+	import Trope from "$lib/components/Trope.svelte";
 
 	let error = "";
 	let showTitle = false;
@@ -63,16 +63,10 @@
 					<span class="text-blue-500">A</span>
 					<span class="text-lime-500">N</span>
 					<span class="text-yellow-400">K</span>
-					<span
-						class={$isDarkMode
-							? "text-white"
-							: "text-slate-800"}
+					<span class={$isDarkMode ? "text-white" : "text-slate-800"}
 						>O</span
 					>
-					<span
-						class="text-lime-400 tracking-[0.1rem]"
-						>.TV</span
-					>
+					<span class="text-lime-400 tracking-[0.1rem]">.TV</span>
 				</h2>
 
 				<h1
@@ -109,16 +103,12 @@
 			</div>
 		{/if}
 
-		<Trope />
-
 		{#if showUx}
 			<div
 				class="fixed top-1/2 -translate-y-1/2 scale-100 flex flex-col space-y-2 justify-start"
 			>
 				<!-- Wallet Connection and Authentication -->
-				<div
-					class="flex flex-col space-y-2 items-center"
-				>
+				<div class="flex flex-col space-y-2 items-center">
 					{#if $user}
 						<UserProfile />
 					{:else}
