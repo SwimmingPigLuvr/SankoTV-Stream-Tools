@@ -118,12 +118,7 @@
 	};
 	let currentMedia: MediaItem | null = defaultMedia;
 
-	let layout: string;
-	$: if ($currentAlert) {
-		layout = $currentAlert.config.composition;
-	}
-
-	let layoutSelection = "imageAboveText";
+	$: layout = $currentAlert?.config?.composition || "image-over-text";
 
 	let previewContainer: HTMLElement;
 	let previewContent: HTMLElement;
@@ -156,16 +151,19 @@
 
 	function updatePreviewScale() {
 		const containerWidth = previewContainer.offsetWidth;
-		divScale = containerWidth / maxWidth;
+		const containerHeight = previewContainer.offsetHeight;
+		const maxWidth = 1080;
+		const maxHeight = 540;
+
+		const scaleX = containerWidth / maxWidth;
+		const scaleY = containerHeight / maxHeight;
+		divScale = Math.min(scaleX, scaleY);
 
 		if (previewPlaceholder) {
-			previewPlaceholder.style.transform = `scale(${divScale})`;
-			previewPlaceholder.style.transformOrigin = "center";
-			previewPlaceholder.style.width = `${100 / divScale}%`;
-			previewPlaceholder.style.height = "540px";
+			previewPlaceholder.style.transform = `translate(-50$, -50%) scale(${divScale})`;
 		}
 		if (previewContent) {
-			previewContent.style.transform = `scale(${divScale})`;
+			previewContent.style.transform = `translate(-50$, -50%) scale(${divScale})`;
 		}
 	}
 
@@ -178,6 +176,8 @@
 	$: if ($currentAlert?.config?.media?.type === "video") {
 		showVideoDurationControls = true;
 	}
+
+	let copiedWidgetURL = false;
 
 	let showUploadVisualMedia = false;
 	let showUploadAudio = false;
@@ -559,6 +559,13 @@
 		}
 	}
 
+	function handleUpdateVideoDuration(value: string) {
+		updateAlertConfig("videoDuration", value);
+		if (value === "match" && videoElement) {
+			updateAlertConfig("alertConfig", Math.ceil(videoElement.duration));
+		}
+	}
+
 	$: if ($currentAlert) {
 		debouncedUpdateAlert($currentAlert);
 		alertName = $currentAlert.name;
@@ -739,7 +746,7 @@
 	in:fly={{ y: 10, duration: 1000, easing: easings.backOut }}
 	out:fly={{ y: 10, duration: 1000, easing: easings.backIn }}
 	class="{$isDarkMode
-		? 'bg-slate-900 text-white'
+		? 'bg-slate-800 text-white'
 		: 'bg-lime-100 text-slate-800'} w-full overflow-x-hidden font-mono p-4 pt-20"
 >
 	{#each toasts as toast}
@@ -809,24 +816,26 @@
 				<span class=""> </span>
 			{/if}
 		</h1>
-		<!-- donation preview -->
+
+		<!-- DONATION PREVIEW CONTAINER -->
 		<div
 			bind:this={previewContainer}
 			style="background-color: {currentBackgroundColor}"
-			class="relative alert-grid-preview-container min-h-[420px]"
+			class="alert-grid-preview-container"
 		>
-			<!-- placeholder div to keep parent correct size -->
+			<!-- DONATION PLACEHOLDER DIV -->
 			<div
 				bind:this={previewPlaceholder}
-				class="preview-placeholder relative"
+				class="preview-placeholder"
 			></div>
 
+			<!-- DONATION PREVIEW CONTENT -->
 			{#if isPreviewPlaying}
 				<div
 					in:applyAnimation={inAnimation}
 					out:applyAnimation={outAnimation}
 					bind:this={previewContent}
-					class="{layout} preview-content leading-[1] flex items-center justify-center text-center"
+					class="preview-content {layout}"
 					style="background-color: {currentBackgroundColor}; border-radius: {$currentAlert
 						?.config.borderRadius}; font-family: {$currentAlert
 						?.config.fontFamily}; font-size: {$currentAlert?.config
@@ -837,77 +846,56 @@
 						.letterSpacing}em; text-shadow: {$currentAlert?.config
 						.textShadow};"
 				>
-					{#if layoutSelection === "tet-over-image"}
+					<!-- VIDEO -->
+					{#if $currentAlert?.config.media?.type === "video"}
+						<video
+							bind:this={videoElement}
+							autoplay
+							loop={$currentAlert?.config.videoDuration ===
+								"loop"}
+							src={$currentAlert?.config?.media?.src ||
+								currentMedia?.src}
+							on:loadedmetadata={() => {
+								if (
+									videoElement &&
+									$currentAlert?.config?.videoDuration ===
+										"match"
+								) {
+									updateAlertConfig(
+										"alertDuration",
+										Math.ceil(videoElement?.duration),
+									);
+								}
+							}}
+						>
+							<track kind="captions" src="" label="English" />
+						</video>
+					{:else}
+						<!-- IMAGE / GIF -->
 						<img
-							src={$currentAlert?.config?.media?.src
-								? $currentAlert.config.media.src
-								: currentMedia?.src}
+							src={$currentAlert?.config?.media?.src ||
+								currentMedia?.src}
 							alt=""
 						/>
-						<div class="text" style="white-space: nowrap;">
-							{#if $currentAlert}
-								{#each generateRandomMessage().parts as part}
-									<span
-										style="color: {part.highlight
-											? $currentAlert?.config
-													.highlightColor
-											: $currentAlert?.config.textColor};"
-									>
-										{part.text}
-									</span>
-								{/each}
-							{/if}
-						</div>
-					{:else}
-						{#if $currentAlert?.config.media?.type === "video"}
-							<video
-								bind:this={videoElement}
-								autoplay
-								loop={$currentAlert.config.videoDuration ===
-									"loop"}
-								class="max-h-[50%]"
-								src={$currentAlert?.config?.media?.src ||
-									currentMedia?.src}
-								on:loadedmetadata={() => {
-									if (
-										videoElement &&
-										$currentAlert?.config?.videoDuration ===
-											"match"
-									) {
-										updateAlertConfig(
-											"alertDuration",
-											Math.ceil(videoElement?.duration),
-										);
-									}
-								}}
-							>
-								<track kind="captions" src="" label="English" />
-							</video>
-						{:else}
-							<img
-								class="h-[750px] w-auto"
-								src={$currentAlert?.config?.media?.src
-									? $currentAlert?.config.media.src
-									: currentMedia?.src}
-								alt=""
-							/>
-						{/if}
-						<div style="white-space: nowrap;">
-							{#if $currentAlert}
-								{#each generateRandomMessage().parts as part}
-									<span
-										style="color: {part.highlight
-											? $currentAlert?.config
-													.highlightColor
-											: $currentAlert?.config.textColor};"
-									>
-										{part.text}
-									</span>
-								{/each}
-							{/if}
-						</div>
 					{/if}
+
+					<!-- MESSAGE TEXT -->
+					<div class="text">
+						{#if $currentAlert}
+							{#each generateRandomMessage().parts as part}
+								<span
+									style="color: {part.highlight
+										? $currentAlert?.config.highlightColor
+										: $currentAlert?.config.textColor};"
+								>
+									{part.text}
+								</span>
+							{/each}
+						{/if}
+					</div>
 				</div>
+
+				<!-- TIMER -->
 				{#if $currentAlert}
 					<div class="absolute bottom-20 left-0 right-0 z-0">
 						<Timer
@@ -917,6 +905,8 @@
 					</div>
 				{/if}
 			{/if}
+
+			<!-- SETTINGS -->
 			<div
 				class="absolute {$isDarkMode
 					? 'bg-slate-900'
@@ -1020,13 +1010,19 @@
 										navigator.clipboard.writeText(
 											`https://yoursite.com/donation-alerts/${$currentAlert.id}`,
 										);
+										copiedWidgetURL = true;
+										setTimeout(() => {
+											copiedWidgetURL = false;
+										}, 3000);
 										// You might want to show a toast notification here
 									}
 								}}
+								disabled={copiedWidgetURL}
 								class="{$isDarkMode
 									? 'bg-slate-900 hover:border-white hover:bg-slate-950'
 									: 'bg-lime-300 hover:bg-lime-400 hover:border-black'} w-full h-full absolute left-0 top-0 border-transparent border-[1px] bg-opacity-50 backdrop-blur-[3px]"
-								>Copy Widget URL</button
+								>{#if copiedWidgetURL}✅ Copied{:else}📋 Copy
+									Widget URL{/if}</button
 							>
 							<input
 								readonly
@@ -1368,8 +1364,8 @@
 						? 'bg-slate-950'
 						: 'bg-lime-200'}"
 				/>
-				{#if showVideoDurationControls}
-					<div class="flex flex-col space-y-2">
+				{#if videoElement}
+					<div class="pt-3 flex flex-col space-y-2">
 						<label for="videoDurationControl" class="block mb-2"
 							>Video Duration</label
 						>
@@ -1381,8 +1377,7 @@
 							value={$currentAlert?.config.videoDuration ||
 								"once"}
 							on:change={(e) =>
-								updateAlertConfig(
-									"videoDuration",
+								handleUpdateVideoDuration(
 									e.currentTarget.value,
 								)}
 						>
@@ -1706,29 +1701,34 @@
 
 	.alert-grid-preview-container {
 		display: flex;
-		flex-flow: column nowrap;
 		align-items: center;
 		justify-content: center;
-		gap: 20px;
 		width: 100%;
-		border: 1px solid;
-		border-radius: 0px;
+		height: 100%;
+		min-height: 540px;
 		overflow: hidden;
+		position: relative;
 	}
 
 	.preview-placeholder {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
 		width: 100%;
 		height: 540px;
-		transform-origin: center;
 	}
 
 	.preview-content {
 		position: absolute;
-		top: 0;
-		left: 0;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
 		width: 100%;
 		height: 100%;
-		transform-origin: center;
+		max-width: 1080px;
+		max-height: 80%;
+		overflow: hidden;
 	}
 
 	@media (max-width: 1024px) {
@@ -1743,48 +1743,53 @@
 		}
 	}
 
-	.image-above-text {
-		gap: 1rem;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-	}
-	.image-above-text img {
-		max-height: 200px;
-	}
-
-	/* Create a CSS class where the text is over the image */
-	/* They are both in the middle */
-	.text-over-image {
-		position: relative;
+	.image-above-text,
+	.text-over-image,
+	.image-left,
+	.image-right {
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		width: 100%;
+		height: 100%;
+		padding: 1rem;
 	}
 
-	.text-over-image img {
-		max-height: 100px;
-		position: fixed;
-		object-fit: fill;
-		z-index: -1;
-		margin: auto;
-	}
-
-	.image-left {
-		display: flex;
-		flex-direction: row;
-		gap: 1rem;
-	}
-	.image-left img {
-		max-height: 10%;
+	.image-above-text {
+		flex-direction: column;
 	}
 
 	.image-right {
-		display: flex;
 		flex-direction: row-reverse;
-		gap: 1rem;
 	}
-	.image-right img {
-		max-height: 10%;
+
+	.image-above-text img,
+	.image-above-text video,
+	.image-left img,
+	.image-left video,
+	.image-right img,
+	.image-right video {
+		max-height: 80%;
+		max-width: 80%;
+		object-fit: contain;
+	}
+
+	.text-over-image img,
+	.text-over-image video {
+		position: absolute;
+		max-width: 100%;
+		max-height: 100%;
+		object-fit: contain;
+		z-index: 1;
+	}
+
+	.text-over-image .text {
+		position: relative;
+		z-index: 2;
+	}
+
+	.text {
+		white-space: nowrap;
+		padding: 0.5rem;
 	}
 </style>

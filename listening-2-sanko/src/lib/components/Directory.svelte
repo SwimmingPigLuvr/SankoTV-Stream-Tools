@@ -104,7 +104,7 @@
         class="{isMobile
             ? 'fixed w-full top-0 left-0'
             : ''} p-2 min-h-screen font-mono {$isDarkMode
-            ? 'text-white bg-slate-800'
+            ? 'text-white bg-slate-950'
             : 'text-slate-800 bg-blue-200'} w-full h-screen"
     >
         <div

@@ -525,3 +525,10 @@ when match alertduration is chosen we need to also set the alert duration to mat
 make sure the animation controls are working.
 
 let's make it as simple as possible to aplly the default svelte kit animations and easings
+
+send preview to widget url
+this is good because the user can test donations in their stream
+
+todo
+animate critical vars in donation alert
+:
