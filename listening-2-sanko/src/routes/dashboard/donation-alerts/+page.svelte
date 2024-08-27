@@ -821,7 +821,9 @@
 		<div
 			bind:this={previewContainer}
 			style="background-color: {currentBackgroundColor}"
-			class="alert-grid-preview-container"
+			class="alert-grid-preview-container border-[1px] {$isDarkMode
+				? 'border-white'
+				: 'border-black'}"
 		>
 			<!-- DONATION PLACEHOLDER DIV -->
 			<div
@@ -1020,7 +1022,7 @@
 								disabled={copiedWidgetURL}
 								class="{$isDarkMode
 									? 'bg-slate-900 hover:border-white hover:bg-slate-950'
-									: 'bg-lime-300 hover:bg-lime-400 hover:border-black'} w-full h-full absolute left-0 top-0 border-transparent border-[1px] bg-opacity-50 backdrop-blur-[3px]"
+									: 'border-black bg-lime-50 hover:bg-white'} w-full h-full absolute left-0 top-0 border-[1px] backdrop-blur-[2px] font-black"
 								>{#if copiedWidgetURL}✅ Copied{:else}📋 Copy
 									Widget URL{/if}</button
 							>
@@ -1033,7 +1035,7 @@
 								id="alertUrl"
 								class="w-full flex-grow p-4 {$isDarkMode
 									? 'bg-slate-950'
-									: 'bg-lime-200'}"
+									: 'bg-lime-400'}"
 								type="text"
 							/>
 						</div>
@@ -1364,7 +1366,7 @@
 						? 'bg-slate-950'
 						: 'bg-lime-200'}"
 				/>
-				{#if videoElement}
+				{#if showVideoDurationControls}
 					<div class="pt-3 flex flex-col space-y-2">
 						<label for="videoDurationControl" class="block mb-2"
 							>Video Duration</label
