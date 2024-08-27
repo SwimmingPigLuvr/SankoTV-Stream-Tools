@@ -1,0 +1,34 @@
+implement these components
+  preview alert component
+  upload media
+  fix animation component
+
+create widget page
+  recieve donation alerts
+  test donation alerts
+
+polish websocket client
+  get wallet address
+  send alerts based on user settings
+  handle multiple users
+
+handle stream data
+  keep tabs on donations, senders, amounts
+  top donation, all time top donation
+  message data
+
+
+
+
+notes about media upload
+  kind of redundant to have 4 instance of the uploadorlink component for each state
+  audio/visual
+  link/upload/select
+
+  let's have a showSelectMedia state
+  let's also have writable stores for these values
+
+  export let selectType = writable<'audio' | 'visual'>('visual');
+  export let selectMode = writable<'upload' | 'link' | 'select'>('select');
+
+this way i can have 1 component for the uploadorlinkmodal and then from within the modal we can change to link/upload/select

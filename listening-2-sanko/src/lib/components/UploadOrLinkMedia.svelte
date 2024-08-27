@@ -254,7 +254,7 @@
         {#if media || $currentAlert?.config?.media}
             <div class="mt-4">
                 {#if type === "audio"}
-                    <audio controls src={media} class="w-full" />
+                    <audio controls src={$currentAlert?.config.audioSrc} class="w-full" />
                 {:else if mode !== "select"}
                     <img
                         src={$currentAlert?.config?.media?.src
@@ -302,3 +302,4 @@
         transform: scale(1.05);
     }
 </style>
+
