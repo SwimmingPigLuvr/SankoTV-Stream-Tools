@@ -10,6 +10,9 @@
 		showNameAlert,
 		showLinkVisualMedia,
 		showSelectVisualMedia,
+		showSelectMedia,
+		selectionMode,
+		selectionType,
 	} from "$lib/stores";
 	import {
 		alertConfig,
@@ -87,6 +90,15 @@
 				audio.volume = volume;
 			}
 		});
+	}
+
+	function handleOpenSelectMediaModal(
+		type: "audio" | "visual",
+		mode: "link" | "upload" | "select",
+	) {
+		showSelectMedia.set(true);
+		selectionMode.set(mode);
+		selectionType.set(type);
 	}
 
 	function handleVisualMediaSelected(event: CustomEvent) {
@@ -1217,23 +1229,41 @@
 									easing: easings.cubicOut,
 								}}
 							>
-								<!-- select image -->
+								<!-- select visual -->
 								<button
 									on:click={() =>
-										showSelectVisualMedia.set(true)}
+										handleOpenSelectMediaModal(
+											"visual",
+											"select",
+										)}
 									class="{$isDarkMode
 										? 'hover:bg-slate-600'
 										: 'hover:bg-lime-400'} p-2 px-4"
 									>select</button
 								>
-								<!-- link image url -->
+								<!-- link visual -->
 								<button
 									on:click={() =>
-										showLinkVisualMedia.set(true)}
+										handleOpenSelectMediaModal(
+											"visual",
+											"link",
+										)}
 									class="{$isDarkMode
 										? 'hover:bg-slate-600'
 										: 'hover:bg-lime-400'} p-2 px-4"
 									>link</button
+								>
+								<!-- upload visual -->
+								<button
+									on:click={() =>
+										handleOpenSelectMediaModal(
+											"visual",
+											"upload",
+										)}
+									class="{$isDarkMode
+										? 'hover:bg-slate-600'
+										: 'hover:bg-lime-400'} p-2 px-4"
+									>upload</button
 								>
 								<!-- delete -->
 								{#if $currentAlert?.config?.media?.src}
@@ -1245,39 +1275,17 @@
 										>remove</button
 									>
 								{/if}
-								<!-- upload -->
-								<button
-									on:click={() =>
-										(showUploadVisualMedia = true)}
-									class="{$isDarkMode
-										? 'hover:bg-slate-600'
-										: 'hover:bg-lime-400'} p-2 px-4"
-									>upload</button
-								>
 							</div>
 						{:else}
 							<p class="text-2xl p-2">+</p>
 						{/if}
 					</button>
 
-					<!-- link / upload modals -->
+					<!-- link / upload / select modal -->
 
-					<!-- select -->
-					{#if $showSelectVisualMedia}
+					{#if $showSelectMedia}
 						<div class="z-50">
 							<UploadOrLinkMedia
-								type="visual"
-								mode="select"
-								on:mediaSelected={handleVisualMediaSelected}
-							/>
-						</div>
-					{/if}
-
-					{#if $showLinkVisualMedia}
-						<div class="z-50">
-							<UploadOrLinkMedia
-								type="visual"
-								mode="link"
 								on:mediaSelected={handleVisualMediaSelected}
 							/>
 						</div>

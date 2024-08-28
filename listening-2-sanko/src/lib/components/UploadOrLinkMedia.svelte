@@ -8,15 +8,13 @@
     } from "$lib/media-options";
     import {
         isDarkMode,
-        showLinkVisualMedia,
-        showSelectVisualMedia,
+        selectionMode,
+        selectionType,
+        showSelectMedia,
     } from "$lib/stores";
     import { currentAlert } from "$lib/stores/alertConfigStore";
     import { createEventDispatcher } from "svelte";
     import { blur, fade, slide } from "svelte/transition";
-
-    export let type: "audio" | "visual";
-    export let mode: "link" | "upload" | "select";
 
     let media: MediaItem | null = null;
     let error: string = "";
@@ -25,13 +23,18 @@
     const dispatch = createEventDispatcher();
 
     function getFileType(file: File): "image" | "video" | "audio" | "gif" {
-        if (file.type.startsWith("image/")) {
-            return file.type.includes("gif") ? "gif" : "image";
-        } else if (file.type.startsWith("video")) {
-            return "video";
-        } else if (file.type.startsWith("audio")) {
-            return "audio";
+        const fileName = file.name.toLowerCase();
+        const extension = fileName.split(".").pop();
+
+        if (extension) {
+            if (["jpg", "jpeg", "png", "webp"].includes(extension))
+                return "image";
+            if (extension === "gif") return "gif";
+            if (["mp4", "webm", "avi", "mov"].includes(extension))
+                return "video";
+            if (["mp3", "wav", "ogg"].includes(extension)) return "audio";
         }
+
         throw new Error("unsupported file type");
     }
 
@@ -41,12 +44,12 @@
         if (file) {
             try {
                 const fileType = getFileType(file);
-                if (type === "audio" && fileType !== "audio") {
+                if ($selectionType === "audio" && fileType !== "audio") {
                     error = "Please upload an audio file.";
                     return;
                 }
                 if (
-                    type === "visual" &&
+                    $selectionType === "visual" &&
                     !["image", "gif", "video"].includes(fileType)
                 ) {
                     error = "Please upload an image or video file.";
@@ -70,8 +73,7 @@
     }
 
     function handleClose() {
-        showLinkVisualMedia.set(false);
-        showSelectVisualMedia.set(false);
+        showSelectMedia.set(false);
     }
 
     function getLinkType(url: string): "image" | "video" | "audio" | "gif" {
@@ -139,7 +141,7 @@
         on:click|stopPropagation
         class="{$isDarkMode
             ? 'border-lime-400 bg-black '
-            : 'border-blue-700 bg-white'} rounded-none border-[2px] p-8 shadow-xl {mode ===
+            : 'border-blue-700 bg-white'} rounded-none border-[2px] p-8 shadow-xl {$selectionMode ===
         'link'
             ? 'w-96'
             : 'w-[555px]'} max-h-[800px] flex flex-col"
@@ -151,7 +153,9 @@
                     controls
                     autoplay
                     class="w-full h-auto"
-                />
+                >
+                    <track kind="captions" src="" label="English" />
+                </video>
                 <div class="flex space-x-4 text-xl justify-end">
                     <button
                         on:click={closePreview}
@@ -166,7 +170,7 @@
                     >
                 </div>
             </div>
-        {:else if mode === "upload"}
+        {:else if $selectionMode === "upload"}
             <div class="mb-4">
                 <label
                     class="block text-gray-700 text-sm font-bold mb-2"
@@ -177,12 +181,14 @@
                 <input
                     type="file"
                     id="file-upload"
-                    accept={type === "audio" ? "audio/*" : "image/*"}
+                    accept={$selectionType === "audio"
+                        ? "audio/*"
+                        : "image/*,video/*"}
                     on:change={handleFileChange}
                     class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                 />
             </div>
-        {:else if mode === "link"}
+        {:else if $selectionMode === "link"}
             <div class="mb-4 w-full">
                 <label
                     class="text-left block text-sm font-bold mb-2"
@@ -233,7 +239,9 @@
                     >
                         <video src={video.src} class="image-item" />
                         <div
-                            class="absolute text-white text-5xl inset-0 flex items-center justify-center hover:bg-opacity-10 {$isDarkMode ? 'bg-black' : 'bg-white'} bg-opacity-50"
+                            class="absolute text-white text-5xl inset-0 flex items-center justify-center hover:bg-opacity-10 {$isDarkMode
+                                ? 'bg-black'
+                                : 'bg-white'} bg-opacity-50"
                         >
                             ▶️
                         </div>
@@ -253,27 +261,48 @@
 
         {#if media || $currentAlert?.config?.media}
             <div class="mt-4">
-                {#if type === "audio"}
-                    <audio controls src={$currentAlert?.config.audioSrc} class="w-full" />
-                {:else if mode !== "select"}
-                    <img
-                        src={$currentAlert?.config?.media?.src
-                            ? $currentAlert?.config.media.src
-                            : media}
-                        alt="Uploaded visual"
-                        class="w-full h-auto"
+                {#if $selectionType === "audio"}
+                    <audio
+                        controls
+                        src={$currentAlert?.config.audioSrc}
+                        class="w-full"
                     />
+                {:else if $selectionMode !== "select"}
+                    <div class="flex item-center">
+                        {#if $currentAlert?.config?.media?.type === "video"}
+                            <video
+                                autoplay
+                                muted
+                                loop
+                                class="w-full m-auto"
+                                src={$currentAlert?.config?.media?.src}
+                                ><track
+                                    kind="captions"
+                                    src=""
+                                    label="English"
+                                /></video
+                            >
+                        {:else}
+                            <img
+                                src={$currentAlert?.config?.media?.src
+                                    ? $currentAlert?.config.media.src
+                                    : media}
+                                alt="Uploaded visual"
+                                class="w-full h-auto"
+                            />
+                        {/if}
+                    </div>
                 {/if}
             </div>
         {/if}
 
-        {#if mode !== "link" && type !== "visual"}
+        {#if $selectionMode !== "link" && $selectionType !== "visual"}
             <div class="mt-6 flex justify-end">
                 <button
                     on:click={handleSubmit}
                     class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                 >
-                    {mode === "upload" ? "Upload" : "Add Link"}
+                    {$selectionMode === "upload" ? "Upload" : "Add Link"}
                 </button>
             </div>
         {/if}
@@ -302,4 +331,3 @@
         transform: scale(1.05);
     }
 </style>
-

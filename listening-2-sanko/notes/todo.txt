@@ -1,6 +1,13 @@
 implement these components
   preview alert component
+    add text animations
+      cycle fonts
+      bounce
+      tween like the starlabs animation
   upload media
+    enable video uploads
+    save file as MediaType object
+    audio uploads
   fix animation component
 
 create widget page
