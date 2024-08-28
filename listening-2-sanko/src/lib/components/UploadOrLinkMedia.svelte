@@ -128,6 +128,7 @@
     }
 </script>
 
+<!-- BG BEHIND MODAL -->
 <button
     in:fade={{ duration: 300 }}
     on:click|self={handleClose}
@@ -135,17 +136,43 @@
         ? 'bg-black'
         : 'bg-white'} bg-opacity-50 backdrop-blur-xl flex items-center justify-center overflow-y-auto"
 >
-    <!-- modal -->
+    <!-- MODAL -->
     <button
         in:slide={{ delay: 300 }}
         on:click|stopPropagation
         class="{$isDarkMode
             ? 'border-lime-400 bg-black '
-            : 'border-blue-700 bg-white'} rounded-none border-[2px] p-8 shadow-xl {$selectionMode ===
-        'link'
-            ? 'w-96'
-            : 'w-[555px]'} max-h-[800px] flex flex-col"
+            : 'border-blue-700 bg-white'} rounded-none border-[2px] p-8 shadow-xl w-[555px] max-h-[800px] flex flex-col"
     >
+        <!-- UPLOAD / LINK / SELECT TABS -->
+        <div class="flex mb-4">
+            <button
+                class="{$selectionMode === 'upload'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-200'} px-4 py-2 rounded-tl-lg rounded-tr-lg"
+                on:click={() => selectionMode.set("upload")}
+            >
+                Upload
+            </button>
+            <button
+                class="{$selectionMode === 'link'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-200'} px-4 py-2 rounded-tl-lg rounded-tr-lg"
+                on:click={() => selectionMode.set("link")}
+            >
+                Link
+            </button>
+            <button
+                class="{$selectionMode === 'select'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-200'} px-4 py-2 rounded-tl-lg rounded-tr-lg"
+                on:click={() => selectionMode.set("select")}
+            >
+                Select
+            </button>
+        </div>
+
+        <!-- PREVIEW VIDEO BEFORE SELECTING -->
         {#if previewVideo}
             <div class="w-full h-full flex flex-col">
                 <video
@@ -156,12 +183,16 @@
                 >
                     <track kind="captions" src="" label="English" />
                 </video>
+
                 <div class="flex space-x-4 text-xl justify-end">
+                    <!-- GO BACK -->
                     <button
                         on:click={closePreview}
                         class="mt-4 bg-red-500 hover:bg-blue-700 text-white font-bold py-2 px-4"
                         >go back</button
                     >
+
+                    <!-- SELECT VIDEO -->
                     <button
                         on:click={() =>
                             previewVideo && handleSelect(previewVideo)}
@@ -171,6 +202,7 @@
                 </div>
             </div>
         {:else if $selectionMode === "upload"}
+            <!-- UPLOAD MEDIA -->
             <div class="mb-4">
                 <label
                     class="block text-gray-700 text-sm font-bold mb-2"
@@ -189,6 +221,7 @@
                 />
             </div>
         {:else if $selectionMode === "link"}
+            <!-- LINK MEDIA -->
             <div class="mb-4 w-full">
                 <label
                     class="text-left block text-sm font-bold mb-2"
@@ -208,8 +241,8 @@
                         : "paste url here"}
                 />
             </div>
-        {:else}
-            <!-- Create a container for the grid -->
+        {:else if $selectionMode === "select"}
+            <!-- SELECT MEDIA -->
             <div class="mb-4">
                 <label
                     class="text-left block text-sm font-bold mb-2"
@@ -221,6 +254,8 @@
 
             <!-- Grid container for images -->
             <div class="image-grid overflow-x-hidden overflow-y-auto">
+                <!-- TODO -->
+                <!-- add section for user's uploads -->
                 <!-- Example images (replace with dynamic content as needed) -->
                 {#each gifs as gif}
                     <button on:click={() => handleSelect(gif)}>
@@ -237,7 +272,13 @@
                         on:click={() => handleVideoSelect(video)}
                         class="relative image-item"
                     >
-                        <video src={video.src} class="image-item" />
+                        <video src={video.src} class="image-item"
+                            ><track
+                                src=""
+                                kind="captions"
+                                label="English"
+                            /></video
+                        >
                         <div
                             class="absolute text-white text-5xl inset-0 flex items-center justify-center hover:bg-opacity-10 {$isDarkMode
                                 ? 'bg-black'
@@ -260,7 +301,7 @@
         {/if}
 
         {#if media || $currentAlert?.config?.media}
-            <div class="mt-4">
+            <div class="mt-4 w-full">
                 {#if $selectionType === "audio"}
                     <audio
                         controls
@@ -268,13 +309,14 @@
                         class="w-full"
                     />
                 {:else if $selectionMode !== "select"}
-                    <div class="flex item-center">
+                    <!-- SHOW SELECTED MEDIA -->
+                    <div class="flex items-center justify-center w-full p-8">
                         {#if $currentAlert?.config?.media?.type === "video"}
                             <video
                                 autoplay
                                 muted
                                 loop
-                                class="w-full m-auto"
+                                class="w-full max-w-full max-h-full"
                                 src={$currentAlert?.config?.media?.src}
                                 ><track
                                     kind="captions"
@@ -284,11 +326,12 @@
                             >
                         {:else}
                             <img
-                                src={$currentAlert?.config?.media?.src
-                                    ? $currentAlert?.config.media.src
-                                    : media}
+                                src={$currentAlert?.config?.media?.src ??
+                                    (media && "src" in media
+                                        ? media.src
+                                        : null)}
                                 alt="Uploaded visual"
-                                class="w-full h-auto"
+                                class="max-w-full max-h-full object-contain"
                             />
                         {/if}
                     </div>
