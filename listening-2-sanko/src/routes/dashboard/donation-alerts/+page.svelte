@@ -1432,12 +1432,38 @@
 							: 'bg-lime-200'} flex space-x-0 absolute right-2"
 					>
 						{#if showAudioUploadControls}
-							<!-- link image url -->
+							<!-- select visual -->
 							<button
+								on:click={() =>
+									handleOpenSelectMediaModal(
+										"audio",
+										"select",
+									)}
+								class="{$isDarkMode
+									? 'hover:bg-slate-600'
+									: 'hover:bg-lime-400'} p-2 px-4"
+								>select</button
+							>
+							<!-- link audo url -->
+							<button
+								on:click={() =>
+									handleOpenSelectMediaModal("audio", "link")}
 								class="{$isDarkMode
 									? 'hover:bg-slate-600'
 									: 'hover:bg-lime-400'} p-2 px-4"
 								>link</button
+							>
+							<!-- upload -->
+							<button
+								on:click={() =>
+									handleOpenSelectMediaModal(
+										"audio",
+										"upload",
+									)}
+								class="{$isDarkMode
+									? 'hover:bg-slate-600'
+									: 'hover:bg-lime-400'} p-2 px-4"
+								>upload</button
 							>
 							<!-- delete -->
 							{#if currentAudioSrc}
@@ -1449,13 +1475,6 @@
 									>remove</button
 								>
 							{/if}
-							<!-- upload -->
-							<button
-								class="{$isDarkMode
-									? 'hover:bg-slate-600'
-									: 'hover:bg-lime-400'} p-2 px-4"
-								>upload</button
-							>
 						{:else}
 							<p class="text-2xl p-2">+</p>
 						{/if}
@@ -1527,7 +1546,7 @@
 			<div class="flex flex-col space-y-2">
 				<div class="flex space-x-6">
 					<label class="block mb-2" for="font">Size</label>
-					<p>{$currentAlert?.config.fontSize ?? fontSize}px</p>
+					<p>{$currentAlert?.config.fontSize ?? fontSize}</p>
 				</div>
 				<!-- font size slider -->
 				<input

@@ -137,35 +137,58 @@
         : 'bg-white'} bg-opacity-50 backdrop-blur-xl flex items-center justify-center overflow-y-auto"
 >
     <!-- MODAL -->
+    <!-- i want this to have a smooth transition -->
     <button
         in:slide={{ delay: 300 }}
         on:click|stopPropagation
         class="{$isDarkMode
             ? 'border-lime-400 bg-black '
-            : 'border-blue-700 bg-white'} rounded-none border-[2px] p-8 shadow-xl w-[555px] max-h-[800px] flex flex-col"
+            : 'border-blue-700 bg-white'} relative rounded-none border-[1px] p-8 shadow-xl w-[555px] max-h-[800px] flex flex-col transition-all duration-1000 ease-out"
     >
         <!-- UPLOAD / LINK / SELECT TABS -->
-        <div class="flex mb-4">
+        <div
+            class="{$isDarkMode
+                ? 'border-lime-400'
+                : 'border-blue-700'} font-black flex mb-4 absolute -top-12 left-0 border-[1px] border-black"
+        >
             <button
                 class="{$selectionMode === 'upload'
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-200'} px-4 py-2 rounded-tl-lg rounded-tr-lg"
-                on:click={() => selectionMode.set("upload")}
+                    ? $isDarkMode
+                        ? 'bg-lime-400 text-black'
+                        : 'bg-blue-700 text-white'
+                    : $isDarkMode
+                      ? 'bg-black text-white hover:text-lime-400'
+                      : 'bg-white text-black hover:text-blue-700'} px-4 py-2"
+                on:click={() => {
+                    selectionMode.set("upload");
+                    previewVideo = null;
+                }}
             >
                 Upload
             </button>
             <button
                 class="{$selectionMode === 'link'
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-200'} px-4 py-2 rounded-tl-lg rounded-tr-lg"
-                on:click={() => selectionMode.set("link")}
+                    ? $isDarkMode
+                        ? 'bg-lime-400 text-black'
+                        : 'bg-blue-700 text-white'
+                    : $isDarkMode
+                      ? 'bg-black text-white hover:text-lime-400'
+                      : 'bg-white text-black hover:text-blue-700'} px-4 py-2"
+                on:click={() => {
+                    selectionMode.set("link");
+                    previewVideo = null;
+                }}
             >
                 Link
             </button>
             <button
                 class="{$selectionMode === 'select'
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-200'} px-4 py-2 rounded-tl-lg rounded-tr-lg"
+                    ? $isDarkMode
+                        ? 'bg-lime-400 text-black'
+                        : 'bg-blue-700 text-white'
+                    : $isDarkMode
+                      ? 'bg-black text-white hover:text-lime-400'
+                      : 'bg-white text-black hover:text-blue-700'} px-4 py-2"
                 on:click={() => selectionMode.set("select")}
             >
                 Select
@@ -179,7 +202,7 @@
                     src={previewVideo.src}
                     controls
                     autoplay
-                    class="w-full h-auto"
+                    class="w-full h-auto max-h-[650px]"
                 >
                     <track kind="captions" src="" label="English" />
                 </video>
@@ -205,7 +228,7 @@
             <!-- UPLOAD MEDIA -->
             <div class="mb-4">
                 <label
-                    class="block text-gray-700 text-sm font-bold mb-2"
+                    class="block text-left text-gray-700 text-sm font-bold mb-2"
                     for="file-upload"
                 >
                     Choose a file:

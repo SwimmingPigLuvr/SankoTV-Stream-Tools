@@ -39,3 +39,6 @@ notes about media upload
   export let selectMode = writable<'upload' | 'link' | 'select'>('select');
 
 this way i can have 1 component for the uploadorlinkmodal and then from within the modal we can change to link/upload/select
+
+
+
