@@ -85,8 +85,8 @@
 	// This will run only in the browser
 	if (browser) {
 		onMount(() => {
-			if (currentAudioSrc) {
-				audio = new Audio(currentAudioSrc);
+			if ($currentAlert?.config?.notificationSound) {
+				audio = new Audio($currentAlert.config.notificationSound.src);
 				audio.volume = volume;
 			}
 		});
@@ -105,6 +105,12 @@
 		console.log("event.detail: ", event.detail);
 		console.log("event.detail.media: ", event.detail.media);
 		updateAlertConfig("media", event.detail.media);
+	}
+
+	function handleAudioSelected(event: CustomEvent) {
+		console.log("event.detail: ", event.detail);
+		console.log("event.detail.media: ", event.detail.media);
+		updateAlertConfig("notificationSound", event.detail.media);
 	}
 
 	function playAudio() {
@@ -1287,6 +1293,7 @@
 						<div class="z-50">
 							<UploadOrLinkMedia
 								on:mediaSelected={handleVisualMediaSelected}
+								on:audioSelected={handleAudioSelected}
 							/>
 						</div>
 					{/if}
@@ -1370,9 +1377,7 @@
 					min="2"
 					max="200"
 					step="1"
-					class="p-4 {$isDarkMode
-						? 'bg-slate-950'
-						: 'bg-lime-200'}"
+					class="p-4 {$isDarkMode ? 'bg-slate-950' : 'bg-lime-200'}"
 				/>
 				{#if showVideoDurationControls}
 					<div class="pt-3 flex flex-col space-y-2">
@@ -1420,8 +1425,8 @@
 					<p class="absolute text-2xl left-3">🎧</p>
 
 					<p class="pl-10">
-						{currentAudioSrc
-							? currentAudioSrc
+						{$currentAlert?.config?.notificationSound?.src
+							? $currentAlert?.config?.notificationSound?.src
 							: "upload/link audio"}
 					</p>
 					<button

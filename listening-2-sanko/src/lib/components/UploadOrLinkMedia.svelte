@@ -73,7 +73,11 @@
 
                 media = mediaItem;
                 error = "";
-                dispatch("mediaSelected", { media: mediaItem, file });
+                if ($selectionType === "audio") {
+                    dispatch("audioSelected", { media: mediaItem, file });
+                } else {
+                    dispatch("mediaSelected", { media: mediaItem, file });
+                }
                 handleClose();
             } catch (e) {
                 error = "Unsupported file type.";

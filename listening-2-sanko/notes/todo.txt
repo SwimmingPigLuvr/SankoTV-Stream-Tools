@@ -41,8 +41,10 @@ notes about media upload
 this way i can have 1 component for the uploadorlinkmodal and then from within the modal we can change to link/upload/select
 
 
-handle remove media
+🪲 handle remove media
 enable audio selection
+  updated functions
+  need to implement similar logic to the video selections
 destroy prev audio when new plays
 enable audio link + upload
 refactor update function to apply sound to the alert sound
