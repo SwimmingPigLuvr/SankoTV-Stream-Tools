@@ -70,9 +70,9 @@ export const videos: MediaItem[] = [
 ];
 
 export const sounds: MediaItem[] = [
-  { src: "/media/audio/club_beat.mp3", type: "audio", category: "sound" },
-  { src: "/media/audio/notification.mp3", type: "audio", category: "sound" },
-  { src: "/media/audio/pop.mp3", type: "audio", category: "sound" },
+  { src: "/sounds/club_beat.mp3", type: "audio", category: "sound" },
+  { src: "/sounds/notification.mp3", type: "audio", category: "sound" },
+  { src: "/sounds/pop.mp3", type: "audio", category: "sound" },
 
 ];
 

@@ -57,7 +57,7 @@ export interface AlertConfig {
     textShadow: string;
     media: MediaItem | null;
     videoDuration: 'once' | 'match' | 'loop';
-    audioSrc: string | null;
+    notificationSound: MediaItem | null;
     messageTemplate: string;
 }
 
@@ -81,7 +81,7 @@ const defaultAlertConfig: AlertConfig = {
     letterSpacing: "-0.05em",
     textShadow: "none",
     media: null,
-    audioSrc: null,
+    notificationSound: null,
     messageTemplate: '{sender} donated {amount} {gift}!',
     animationSettings: {
         in: {

@@ -18,6 +18,7 @@
 
     let media: MediaItem | null = null;
     let error: string = "";
+    let selectedSound: MediaItem | null = null;
     let previewVideo: MediaItem | null = null;
 
     const dispatch = createEventDispatcher();
@@ -36,6 +37,14 @@
         }
 
         throw new Error("unsupported file type");
+    }
+
+    // Function to extract the name of the file from a given path or URL
+    function getFileName(mediaItem: MediaItem): string {
+        const parts = mediaItem.src.split("/");
+        const fileNameWithExtension = parts[parts.length - 1];
+        const fileName = fileNameWithExtension.split(".")[0];
+        return fileName;
     }
 
     function handleFileChange(event: Event) {
@@ -110,11 +119,17 @@
         handleClose();
     }
 
+    function handleSoundSelect(sound: MediaItem) {
+        const audio = new Audio(sound.src);
+        audio.play();
+        selectedSound = sound;
+    }
+
     function handleVideoSelect(video: MediaItem) {
         previewVideo = video;
     }
 
-    function closePreview() {
+    function closeVideoPreview() {
         previewVideo = null;
     }
 
@@ -162,6 +177,7 @@
                 on:click={() => {
                     selectionMode.set("upload");
                     previewVideo = null;
+                    selectedSound = null;
                 }}
             >
                 Upload
@@ -177,6 +193,7 @@
                 on:click={() => {
                     selectionMode.set("link");
                     previewVideo = null;
+                    selectedSound = null;
                 }}
             >
                 Link
@@ -210,7 +227,7 @@
                 <div class="flex space-x-4 text-xl justify-end">
                     <!-- GO BACK -->
                     <button
-                        on:click={closePreview}
+                        on:click={closeVideoPreview}
                         class="mt-4 bg-red-500 hover:bg-blue-700 text-white font-bold py-2 px-4"
                         >go back</button
                     >
@@ -222,6 +239,18 @@
                         class="mt-4 bg-lime-500 hover:bg-blue-700 text-white font-bold py-2 px-4"
                         >use video</button
                     >
+                </div>
+            </div>
+        {:else if $selectionMode === "select" && $selectionType === "audio"}
+            <div class="w-full h-full flex flex-col">
+                <div class="image-grid overflow-x-hidden overflow-y-auto">
+                    {#each sounds as sound}
+                        <button
+                            on:click={() => handleSoundSelect(sound)}
+                            class="relative image-item"
+                            >{getFileName(sound)}</button
+                        >
+                    {/each}
                 </div>
             </div>
         {:else if $selectionMode === "upload"}
@@ -280,37 +309,59 @@
                 <!-- TODO -->
                 <!-- add section for user's uploads -->
                 <!-- Example images (replace with dynamic content as needed) -->
-                {#each gifs as gif}
-                    <button on:click={() => handleSelect(gif)}>
-                        <img src={gif.src} alt="" class="image-item" />
-                    </button>
-                {/each}
-                {#each images as image}
-                    <button on:click={() => handleSelect(image)}>
-                        <img src={image.src} alt="" class="image-item" />
-                    </button>
-                {/each}
-                {#each videos as video}
-                    <button
-                        on:click={() => handleVideoSelect(video)}
-                        class="relative image-item"
-                    >
-                        <video src={video.src} class="image-item"
-                            ><track
-                                src=""
-                                kind="captions"
-                                label="English"
-                            /></video
+                {#if $selectionType === "audio"}
+                    {#each sounds as sound}
+                        <button
+                            on:click={() => handleSoundSelect(sound)}
+                            class="relative image-item"
                         >
-                        <div
-                            class="absolute text-white text-5xl inset-0 flex items-center justify-center hover:bg-opacity-10 {$isDarkMode
-                                ? 'bg-black'
-                                : 'bg-white'} bg-opacity-50"
+                            <div
+                                class="w-full h-full bg-gray-200 flex items-center justify-center"
+                            >
+                                <span class="text-4xl">🎵</span>
+                            </div>
+                            <div
+                                class="absolute text-white text-5xl inset-0 flex items-center justify-center hover:bg-opacity-10 {$isDarkMode
+                                    ? 'bg-black'
+                                    : 'bg-white'} bg-opacity-50"
+                            >
+                                ▶️
+                            </div>
+                        </button>
+                    {/each}
+                {:else}
+                    {#each gifs as gif}
+                        <button on:click={() => handleSelect(gif)}>
+                            <img src={gif.src} alt="" class="image-item" />
+                        </button>
+                    {/each}
+                    {#each images as image}
+                        <button on:click={() => handleSelect(image)}>
+                            <img src={image.src} alt="" class="image-item" />
+                        </button>
+                    {/each}
+                    {#each videos as video}
+                        <button
+                            on:click={() => handleVideoSelect(video)}
+                            class="relative image-item"
                         >
-                            ▶️
-                        </div>
-                    </button>
-                {/each}
+                            <video src={video.src} class="image-item"
+                                ><track
+                                    src=""
+                                    kind="captions"
+                                    label="English"
+                                /></video
+                            >
+                            <div
+                                class="absolute text-white text-5xl inset-0 flex items-center justify-center hover:bg-opacity-10 {$isDarkMode
+                                    ? 'bg-black'
+                                    : 'bg-white'} bg-opacity-50"
+                            >
+                                ▶️
+                            </div>
+                        </button>
+                    {/each}
+                {/if}
             </div>
         {/if}
 
@@ -328,8 +379,8 @@
                 {#if $selectionType === "audio"}
                     <audio
                         controls
-                        src={$currentAlert?.config.audioSrc}
-                        class="w-full"
+                        src={selectedSound?.src}
+                        class="p-2 bg-blue-700 rounded-full w-full"
                     />
                 {:else if $selectionMode !== "select"}
                     <!-- SHOW SELECTED MEDIA -->

@@ -128,7 +128,7 @@
 		type: "image",
 		category: "remilia",
 	};
-	let currentMedia: MediaItem | null = defaultMedia;
+	let currentMedia: MediaItem | null = null;
 
 	$: layout = $currentAlert?.config?.composition || "image-over-text";
 
@@ -1370,7 +1370,7 @@
 					min="2"
 					max="200"
 					step="1"
-					class="p-4 text-white {$isDarkMode
+					class="p-4 {$isDarkMode
 						? 'bg-slate-950'
 						: 'bg-lime-200'}"
 				/>
