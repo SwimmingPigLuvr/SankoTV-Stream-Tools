@@ -42,17 +42,31 @@ this way i can have 1 component for the uploadorlinkmodal and then from within t
 
 
 🪲 handle remove media
-enable audio selection
+🪲 enable audio selection
   updated functions
   need to implement similar logic to the video selections
   make sure notification sound ends when alert ends
-destroy prev audio when new plays
-enable audio link + upload
-refactor update function to apply sound to the alert sound
+🪲 destroy prev audio when new plays
+🪲 refactor update function to apply sound to the alert sound
   change the type and the default alert
   make sure that the update function targets that
+!TODO enable audio link + upload
+  audio upload needs to go the to the db,
+  be handled as a mediaItem
 
 
 idea i need to jot
 modal in
 tabs fly in 1 by 1 at increasings speeds with backout easing
+
+everything still works except for the 
+  animation presets
+  upload audio
+  weight doesnt show?
+  sliders dont show current number until update function is called
+  link audio? do people even use link audio?
+    links are common for images but probably not audio
+once i get this working then i can keep at the websocket and figure out how to handle it for multiple users
+
+get rid of fonts that don't work
+get more fonts that do work

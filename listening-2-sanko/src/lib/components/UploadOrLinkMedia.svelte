@@ -332,22 +332,24 @@
             >
                 Upload
             </button>
-            <button
-                class="{$selectionMode === 'link'
-                    ? $isDarkMode
-                        ? 'bg-lime-400 text-black'
-                        : 'bg-blue-700 text-white'
-                    : $isDarkMode
-                      ? 'bg-black text-white hover:text-lime-400'
-                      : 'bg-white text-black hover:text-blue-700'} px-4 py-2"
-                on:click={() => {
-                    selectionMode.set("link");
-                    previewVideo = null;
-                    selectedSound = null;
-                }}
-            >
-                Link
-            </button>
+            {#if $selectionType === "visual"}
+                <button
+                    class="{$selectionMode === 'link'
+                        ? $isDarkMode
+                            ? 'bg-lime-400 text-black'
+                            : 'bg-blue-700 text-white'
+                        : $isDarkMode
+                          ? 'bg-black text-white hover:text-lime-400'
+                          : 'bg-white text-black hover:text-blue-700'} px-4 py-2"
+                    on:click={() => {
+                        selectionMode.set("link");
+                        previewVideo = null;
+                        selectedSound = null;
+                    }}
+                >
+                    Link
+                </button>
+            {/if}
             <button
                 class="{$selectionMode === 'select'
                     ? $isDarkMode
@@ -399,8 +401,8 @@
                             on:click={() => handleSoundSelect(sound)}
                             class="{sound ===
                             $currentAlert?.config?.notificationSound
-                                ? 'text-fuchsia-600'
-                                : ''} relative audio-item -tracking-widest p-2 hover:text-lime-400"
+                                ? 'text-lime-400 hover:text-lime-400 scale-[1.35]'
+                                : 'hover:text-fuchsia-400'} relative audio-item -tracking-widest p-2"
                             >{getFileName(sound)}</button
                         >
                     {/each}
@@ -574,6 +576,6 @@
 
     /* Add a hover effect to the images */
     .audio-item:hover {
-        transform: scale(1.15);
+        transform: scale(1.35);
     }
 </style>

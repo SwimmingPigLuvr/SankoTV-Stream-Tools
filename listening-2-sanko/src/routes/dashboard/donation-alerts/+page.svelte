@@ -37,6 +37,7 @@
 
 	let audio: HTMLAudioElement | null = null;
 	let volume = 0.5;
+	let audioLoaded = false;
 	let videoElement: HTMLVideoElement | undefined;
 	let currentAudioSrc: string | null = "/sounds/notification.mp3";
 	let muted = false;
@@ -86,16 +87,33 @@
 	// This will run only in the browser
 	if (browser) {
 		onMount(() => {
-			preloadAudio();
+			const currentAlertValue = get(currentAlert);
+			if (currentAlertValue?.config?.notificationSound?.src) {
+				preloadAudio(currentAlertValue.config.notificationSound.src);
+			}
 		});
 	}
 
-	function preloadAudio() {
-		if ($currentAlert?.config?.notificationSound) {
-			audio = new Audio($currentAlert.config.notificationSound.src);
-			audio.volume = volume;
-			audio.load();
+	function preloadAudio(src: string) {
+		if (audio) {
+			audio.pause();
+			audio.src = "";
 		}
+
+		audio = new Audio(src);
+		audio.volume = volume;
+
+		audio.addEventListener("canplaythrough", () => {
+			console.log("audio loaded and ready to play");
+			audioLoaded = true;
+		});
+
+		audio.addEventListener("error", (e) => {
+			console.error("error loading audio:", e);
+			audioLoaded = false;
+		});
+
+		audio.load();
 	}
 
 	function handleOpenSelectMediaModal(
@@ -118,17 +136,44 @@
 		console.log("event.detail.media: ", event.detail.media);
 		updateAlertConfig("notificationSound", event.detail.media);
 
-		preloadAudio();
+		preloadAudio(event.detail.media.src);
 	}
 
 	function playAudio() {
-		if (audio) {
-			audio.currentTime = 0;
-			audio.play()
-				.then(() => console.log('notification sound played successfully'))
-			.catch(error => console.error("error playing notification sound: ", error));
+		if (audio && audioLoaded) {
+			audio.currentTime = 0; // Reset to start
+			audio
+				.play()
+				.then(() =>
+					console.log("Notification sound played successfully"),
+				)
+				.catch((error) =>
+					console.error("Error playing notification sound:", error),
+				);
+		} else if (audio && !audioLoaded) {
+			console.log("Audio not yet loaded, waiting...");
+			audio.addEventListener(
+				"canplaythrough",
+				() => {
+					audio!.currentTime = 0;
+					audio!
+						.play()
+						.then(() =>
+							console.log(
+								"Notification sound played successfully after waiting",
+							),
+						)
+						.catch((error) =>
+							console.error(
+								"Error playing notification sound after waiting:",
+								error,
+							),
+						);
+				},
+				{ once: true },
+			);
 		} else {
-			console.error("no audio detected");
+			console.error("No audio loaded");
 		}
 	}
 
@@ -576,6 +621,17 @@
 		}
 	}
 
+	function updateVolume(newVolume: number) {
+		volume = newVolume;
+		if (audio) {
+			audio.volume = volume;
+		}
+	}
+
+	$: if ($currentAlert?.config?.notificationSound) {
+		preloadAudio($currentAlert.config.notificationSound.src);
+	}
+
 	function handleVideoDisplay(video: HTMLVideoElement, alert: Alert) {
 		switch (alert.config.videoDuration) {
 			case "once":
@@ -766,6 +822,10 @@
 	}
 
 	onDestroy(() => {
+		if (audio) {
+			audio.pause();
+			audio.src = "";
+		}
 		debouncedUpdateAlertName.cancel();
 	});
 </script>
@@ -1463,15 +1523,6 @@
 									: 'hover:bg-lime-400'} p-2 px-4"
 								>select</button
 							>
-							<!-- link audo url -->
-							<button
-								on:click={() =>
-									handleOpenSelectMediaModal("audio", "link")}
-								class="{$isDarkMode
-									? 'hover:bg-slate-600'
-									: 'hover:bg-lime-400'} p-2 px-4"
-								>link</button
-							>
 							<!-- upload -->
 							<button
 								on:click={() =>
@@ -1506,9 +1557,7 @@
 				<div class="flex space-x-6">
 					<label class="block mb-2" for="volume">Volume</label>
 					<p>
-						{$currentAlert?.config.alertVolume
-							? $currentAlert?.config.alertVolume
-							: ""}%
+						{$currentAlert?.config.alertVolume ?? 50}%
 					</p>
 				</div>
 				<!-- volume slider -->
@@ -1516,8 +1565,11 @@
 					value={$currentAlert?.config.alertVolume
 						? $currentAlert?.config.alertVolume
 						: ""}
-					on:change={(e) =>
-						updateAlertConfig("alertVolume", e.currentTarget.value)}
+					on:input={(e) =>
+						updateAlertConfig(
+							"alertVolume",
+							parseInt(e.currentTarget.value),
+						)}
 					type="range"
 					id="volume"
 					name="volume"
@@ -1615,12 +1667,12 @@
 						: 'bg-lime-200'}"
 					name="fontweight"
 					id="fontweight"
-					value={$currentAlert?.config.fontWeight}
+					value={$currentAlert?.config.fontWeight ?? 400}
 					on:change={(e) =>
 						updateAlertConfig("fontWeight", e.currentTarget.value)}
 				>
 					{#each fontWeights as weight}
-						<option value={weight}>{weight}</option>
+						<option value={weight.toString()}>{weight}</option>
 					{/each}
 				</select>
 			</div>
@@ -1631,15 +1683,15 @@
 					<label class="block mb-2" for="letterspacing"
 						>Letter Spacing</label
 					>
-					<p>{$currentAlert?.config.letterSpacing}em</p>
+					<p>{$currentAlert?.config.letterSpacing ?? 0}em</p>
 				</div>
 				<!-- letter spacing slider -->
 				<input
 					value={$currentAlert?.config.letterSpacing}
-					on:change={(e) =>
+					on:input={(e) =>
 						updateAlertConfig(
 							"letterSpacing",
-							e.currentTarget.value,
+							parseFloat(e.currentTarget.value).toFixed(2),
 						)}
 					type="range"
 					id="letterspacing"
