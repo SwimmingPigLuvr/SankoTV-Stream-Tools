@@ -45,8 +45,14 @@ this way i can have 1 component for the uploadorlinkmodal and then from within t
 enable audio selection
   updated functions
   need to implement similar logic to the video selections
+  make sure notification sound ends when alert ends
 destroy prev audio when new plays
 enable audio link + upload
 refactor update function to apply sound to the alert sound
   change the type and the default alert
   make sure that the update function targets that
+
+
+idea i need to jot
+modal in
+tabs fly in 1 by 1 at increasings speeds with backout easing

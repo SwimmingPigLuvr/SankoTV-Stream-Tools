@@ -13,11 +13,12 @@
         showSelectMedia,
     } from "$lib/stores";
     import { currentAlert } from "$lib/stores/alertConfigStore";
-    import { createEventDispatcher } from "svelte";
+    import { createEventDispatcher, onDestroy, onMount } from "svelte";
     import { blur, fade, slide } from "svelte/transition";
 
     let media: MediaItem | null = null;
     let error: string = "";
+    let audioElement: HTMLAudioElement;
     let selectedSound: MediaItem | null = null;
     let previewVideo: MediaItem | null = null;
 
@@ -112,7 +113,11 @@
 
         media = mediaItem;
         error = "";
-        dispatch("mediaSelected", { media: mediaItem });
+        if ($selectionType === "audio") {
+            dispatch("audioSelected", { media: mediaItem });
+        } else {
+            dispatch("mediaSelected", { media: mediaItem });
+        }
         handleClose();
     }
 
@@ -123,11 +128,152 @@
         handleClose();
     }
 
-    function handleSoundSelect(sound: MediaItem) {
-        const audio = new Audio(sound.src);
-        audio.play();
+    function handleSoundSelect(sound: MediaItem): void {
+        // Stop any currently playing audio
+        if (audioElement) {
+            audioElement.pause();
+            audioElement.currentTime = 0;
+        }
+
+        // Update the selected sound
         selectedSound = sound;
+
+        // Play the new audio
+        if (audioElement) {
+            audioElement.src = sound.src;
+            audioElement
+                .play()
+                .then(() => {
+                    console.log("Audio started playing");
+                    // Dispatch the event after successfully starting playback
+                    dispatch("audioSelected", { media: selectedSound });
+                })
+                .catch((error) => {
+                    console.error("Error playing audio", error);
+                    // You might still want to dispatch the event even if playback fails
+                    dispatch("audioSelected", { media: selectedSound });
+                });
+        } else {
+            console.error("Audio element not found");
+            // Dispatch the event even if the audio element is not available
+            dispatch("audioSelected", { media: selectedSound });
+        }
     }
+
+    function preloadAudio(sound: MediaItem): void {
+        if (sound.type === "audio") {
+            const audio = new Audio();
+            audio.preload = "auto";
+            audio.src = sound.src;
+        }
+    }
+
+    function addAudioEventListeners() {
+        if (audioElement) {
+            audioElement.addEventListener("play", () =>
+                console.log("Audio play event fired"),
+            );
+            audioElement.addEventListener("playing", () =>
+                console.log("Audio playing event fired"),
+            );
+            audioElement.addEventListener("pause", () =>
+                console.log("Audio pause event fired"),
+            );
+            audioElement.addEventListener("ended", () =>
+                console.log("Audio ended event fired"),
+            );
+            audioElement.addEventListener("error", (e) =>
+                console.error("Audio error:", e),
+            );
+        }
+    }
+
+    function checkAudioDuration(sound: MediaItem): Promise<number> {
+        return new Promise((resolve) => {
+            const audio = new Audio(sound.src);
+            audio.addEventListener("loadedmetadata", () => {
+                console.log(`Audio duration: ${audio.duration} seconds`);
+                resolve(audio.duration);
+            });
+            audio.addEventListener("errro", (e) => {
+                console.error("error loading audio:", e);
+                resolve(0);
+            });
+        });
+    }
+
+    function playAudio(sound: MediaItem): void {
+        if (audioElement) {
+            audioElement.pause();
+            audioElement.currentTime = 0;
+        }
+
+        audioElement.src = sound.src;
+
+        const timeUpdateListener = () => {
+            console.log(`current time: ${audioElement.currentTime}`);
+        };
+        audioElement.addEventListener("timeupdate", timeUpdateListener);
+
+        audioElement
+            .play()
+            .then(() => {
+                console.log("audio playback started successfully");
+            })
+            .catch((error) => {
+                console.error("error playing audio: ", error);
+            });
+
+        audioElement.addEventListener(
+            "ended",
+            () => {
+                audioElement.removeEventListener(
+                    "timeupdate",
+                    timeUpdateListener,
+                );
+            },
+            { once: true },
+        );
+    }
+
+    function checkAudioFileLoading(sound: MediaItem) {
+        return new Promise((resolve, reject) => {
+            const audio = new Audio();
+            audio.oncanplaythrough = () =>
+                resolve("Audio file loaded successfully");
+            audio.onerror = () => reject("Error loading audio file");
+            audio.src = sound.src;
+        });
+    }
+
+    function logAudioElementProperties() {
+        if (audioElement) {
+            console.log("Audio element properties:");
+            console.log("- src:", audioElement.src);
+            console.log("- muted:", audioElement.muted);
+            console.log("- volume:", audioElement.volume);
+            console.log("- paused:", audioElement.paused);
+        } else {
+            console.log("Audio element not found");
+        }
+    }
+
+    onMount(async () => {
+        addAudioEventListeners();
+        logAudioElementProperties();
+
+        sounds.forEach((sound) => {
+            checkAudioFileLoading(sound)
+                .then((message) => console.log(message))
+                .catch((error) => console.error(error));
+        });
+        for (const sound of sounds) {
+            if (sound.type === "audio") {
+                const duration = await checkAudioDuration(sound);
+                console.log(`Duration of ${sound.src}: ${duration} seconds`);
+            }
+        }
+    });
 
     function handleVideoSelect(video: MediaItem) {
         previewVideo = video;
@@ -162,7 +308,7 @@
         on:click|stopPropagation
         class="{$isDarkMode
             ? 'border-lime-400 bg-black '
-            : 'border-blue-700 bg-white'} relative rounded-none border-[1px] p-8 shadow-xl w-[555px] max-h-[800px] flex flex-col transition-all duration-1000 ease-out"
+            : 'border-blue-700 bg-white'} relative rounded-none border-[1px] p-8 shadow-xl w-[555px] max-h-[800px] flex flex-col transition-all duration-1000 ease-out cursor-auto"
     >
         <!-- UPLOAD / LINK / SELECT TABS -->
         <div
@@ -247,11 +393,14 @@
             </div>
         {:else if $selectionMode === "select" && $selectionType === "audio"}
             <div class="w-full h-full flex flex-col">
-                <div class="image-grid overflow-x-hidden overflow-y-auto">
+                <div class="audio-grid p-2 overflow-x-hidden overflow-y-auto">
                     {#each sounds as sound}
                         <button
                             on:click={() => handleSoundSelect(sound)}
-                            class="relative image-item"
+                            class="{sound ===
+                            $currentAlert?.config?.notificationSound
+                                ? 'text-fuchsia-600'
+                                : ''} relative audio-item -tracking-widest p-2 hover:text-lime-400"
                             >{getFileName(sound)}</button
                         >
                     {/each}
@@ -292,9 +441,7 @@
                     class="{$isDarkMode
                         ? 'bg-black'
                         : ''} shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
-                    placeholder={$currentAlert?.config?.media?.src
-                        ? $currentAlert.config.media.src
-                        : "paste url here"}
+                    placeholder="Paste URL Here"
                 />
             </div>
         {:else if $selectionMode === "select"}
@@ -313,59 +460,37 @@
                 <!-- TODO -->
                 <!-- add section for user's uploads -->
                 <!-- Example images (replace with dynamic content as needed) -->
-                {#if $selectionType === "audio"}
-                    {#each sounds as sound}
-                        <button
-                            on:click={() => handleSoundSelect(sound)}
-                            class="relative image-item"
+                {#each gifs as gif}
+                    <button on:click={() => handleSelect(gif)}>
+                        <img src={gif.src} alt="" class="image-item" />
+                    </button>
+                {/each}
+                {#each images as image}
+                    <button on:click={() => handleSelect(image)}>
+                        <img src={image.src} alt="" class="image-item" />
+                    </button>
+                {/each}
+                {#each videos as video}
+                    <button
+                        on:click={() => handleVideoSelect(video)}
+                        class="relative image-item"
+                    >
+                        <video src={video.src} class="image-item"
+                            ><track
+                                src=""
+                                kind="captions"
+                                label="English"
+                            /></video
                         >
-                            <div
-                                class="w-full h-full bg-gray-200 flex items-center justify-center"
-                            >
-                                <span class="text-4xl">🎵</span>
-                            </div>
-                            <div
-                                class="absolute text-white text-5xl inset-0 flex items-center justify-center hover:bg-opacity-10 {$isDarkMode
-                                    ? 'bg-black'
-                                    : 'bg-white'} bg-opacity-50"
-                            >
-                                ▶️
-                            </div>
-                        </button>
-                    {/each}
-                {:else}
-                    {#each gifs as gif}
-                        <button on:click={() => handleSelect(gif)}>
-                            <img src={gif.src} alt="" class="image-item" />
-                        </button>
-                    {/each}
-                    {#each images as image}
-                        <button on:click={() => handleSelect(image)}>
-                            <img src={image.src} alt="" class="image-item" />
-                        </button>
-                    {/each}
-                    {#each videos as video}
-                        <button
-                            on:click={() => handleVideoSelect(video)}
-                            class="relative image-item"
+                        <div
+                            class="absolute text-white text-5xl inset-0 flex items-center justify-center hover:bg-opacity-10 {$isDarkMode
+                                ? 'bg-black'
+                                : 'bg-white'} bg-opacity-50"
                         >
-                            <video src={video.src} class="image-item"
-                                ><track
-                                    src=""
-                                    kind="captions"
-                                    label="English"
-                                /></video
-                            >
-                            <div
-                                class="absolute text-white text-5xl inset-0 flex items-center justify-center hover:bg-opacity-10 {$isDarkMode
-                                    ? 'bg-black'
-                                    : 'bg-white'} bg-opacity-50"
-                            >
-                                ▶️
-                            </div>
-                        </button>
-                    {/each}
-                {/if}
+                            ▶️
+                        </div>
+                    </button>
+                {/each}
             </div>
         {/if}
 
@@ -382,9 +507,14 @@
             <div class="mt-4 w-full">
                 {#if $selectionType === "audio"}
                     <audio
+                        bind:this={audioElement}
+                        autoplay
                         controls
                         src={selectedSound?.src}
-                        class="p-2 bg-blue-700 rounded-full w-full"
+                        on:ended={() => {
+                            console.log("Audio playback ended");
+                        }}
+                        class="bg-blue-700 rounded-none p-2 w-full"
                     />
                 {:else if $selectionMode !== "select"}
                     <!-- SHOW SELECTED MEDIA -->
@@ -416,17 +546,6 @@
                 {/if}
             </div>
         {/if}
-
-        {#if $selectionMode !== "link" && $selectionType !== "visual"}
-            <div class="mt-6 flex justify-end">
-                <button
-                    on:click={handleSubmit}
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                >
-                    {$selectionMode === "upload" ? "Upload" : "Add Link"}
-                </button>
-            </div>
-        {/if}
     </button>
 </button>
 
@@ -442,13 +561,19 @@
     .image-item {
         width: auto;
         height: 100%;
-        object-fit: contain;
+        object-fit: cover;
         cursor: pointer;
         transition: transform 0.2s cubic-bezier(0.075, 0.82, 0.165, 1);
     }
 
+    .audio-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 15;
+    }
+
     /* Add a hover effect to the images */
-    .image-item:hover {
-        transform: scale(1.05);
+    .audio-item:hover {
+        transform: scale(1.15);
     }
 </style>

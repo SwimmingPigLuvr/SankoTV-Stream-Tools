@@ -35,7 +35,8 @@
 
 	const { debounce } = lodash;
 
-	let audio: HTMLAudioElement | undefined;
+	let audio: HTMLAudioElement | null = null;
+	let volume = 0.5;
 	let videoElement: HTMLVideoElement | undefined;
 	let currentAudioSrc: string | null = "/sounds/notification.mp3";
 	let muted = false;
@@ -85,11 +86,16 @@
 	// This will run only in the browser
 	if (browser) {
 		onMount(() => {
-			if ($currentAlert?.config?.notificationSound) {
-				audio = new Audio($currentAlert.config.notificationSound.src);
-				audio.volume = volume;
-			}
+			preloadAudio();
 		});
+	}
+
+	function preloadAudio() {
+		if ($currentAlert?.config?.notificationSound) {
+			audio = new Audio($currentAlert.config.notificationSound.src);
+			audio.volume = volume;
+			audio.load();
+		}
 	}
 
 	function handleOpenSelectMediaModal(
@@ -111,22 +117,29 @@
 		console.log("event.detail: ", event.detail);
 		console.log("event.detail.media: ", event.detail.media);
 		updateAlertConfig("notificationSound", event.detail.media);
+
+		preloadAudio();
 	}
 
 	function playAudio() {
 		if (audio) {
-			audio.play();
+			audio.currentTime = 0;
+			audio.play()
+				.then(() => console.log('notification sound played successfully'))
+			.catch(error => console.error("error playing notification sound: ", error));
+		} else {
+			console.error("no audio detected");
 		}
 	}
 
 	let isPreviewPlaying = false;
 
-	function startPreview() {
-		isPreviewPlaying = true;
-	}
-
 	function endPreview() {
 		isPreviewPlaying = false;
+		if (audio) {
+			audio.pause();
+			audio.currentTime = 0;
+		}
 	}
 
 	let defaultMedia: MediaItem = {
@@ -340,6 +353,7 @@
 
 	function handleRemoveCurrentAudio() {
 		currentAudioSrc = null;
+		updateAlertConfig("notificationSound", null);
 	}
 
 	function handleSpecificDonationAmount() {
@@ -1471,7 +1485,7 @@
 								>upload</button
 							>
 							<!-- delete -->
-							{#if currentAudioSrc}
+							{#if $currentAlert?.config?.notificationSound?.src}
 								<button
 									on:click={handleRemoveCurrentAudio}
 									class="{$isDarkMode
