@@ -2,19 +2,19 @@
 import { writable } from 'svelte/store';
 import { type MediaItem } from '../media-options';
 
-export interface Alert {
-    id: string;
-    name: string;
-    config: AlertConfig;
-    isActive: boolean;
-}
-
 function createCurrentAlertStore() {
     const { subscribe, set, update } = writable<Alert | null>(null);
 
     return {
         subscribe, set, update, reset: () => set(null)
     };
+}
+
+export interface Alert {
+    id: string;
+    name: string;
+    config: AlertConfig;
+    isActive: boolean;
 }
 
 export interface AnimationSettings {

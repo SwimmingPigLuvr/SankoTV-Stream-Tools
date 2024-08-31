@@ -70,3 +70,6 @@ once i get this working then i can keep at the websocket and figure out how to h
 
 get rid of fonts that don't work
 get more fonts that do work
+
+create widget component that can listen to events from the websocket client and choose the appropriate donation alert to play
+widget can handle preview alerts to
