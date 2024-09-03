@@ -45,6 +45,7 @@ export const images: MediaItem[] = [
 
   // Misc
   { src: "/media/misc/normal.jpeg", type: "image", category: "misc" },
+  { src: "/media/misc/john_martin.jpeg", type: "image", category: "misc" },
 
   // Sound Library
 ];
@@ -66,6 +67,7 @@ export const videos: MediaItem[] = [
   { src: "/media/misc/gemmy.mp4", type: "video", category: "misc" },
   { src: "/media/misc/holyMoly.webm", type: "video", category: "misc" },
   { src: "/media/misc/mario64_seal.mp4", type: "video", category: "misc" },
+  { src: "/media/misc/plan_trusters.mp4", type: "video", category: "misc" },
   { src: "/media/sanko/pump.mp4", type: "video", category: "sanko" },
   { src: "/media/sanko/shuttle.mp4", type: "video", category: "sanko" },
   { src: "/media/sanko/virtue.mp4", type: "video", category: "sanko" },
@@ -73,27 +75,37 @@ export const videos: MediaItem[] = [
 ];
 
 export const sounds: MediaItem[] = [
+  { src: "/sounds/block.mp3", type: "audio", category: "sound" },
   { src: "/sounds/braam.mp3", type: "audio", category: "sound" },
   { src: "/sounds/brass.mp3", type: "audio", category: "sound" },
   { src: "/sounds/calm_jazz.mp3", type: "audio", category: "sound" },
   { src: "/sounds/certain.mp3", type: "audio", category: "sound" },
+  { src: "/sounds/chime.mp3", type: "audio", category: "sound" },
   { src: "/sounds/club_beat.mp3", type: "audio", category: "sound" },
   { src: "/sounds/coins.mp3", type: "audio", category: "sound" },
   { src: "/sounds/gameboy.mp3", type: "audio", category: "sound" },
   { src: "/sounds/level_up.mp3", type: "audio", category: "sound" },
   { src: "/sounds/magic.mp3", type: "audio", category: "sound" },
   { src: "/sounds/mariachi.mp3", type: "audio", category: "sound" },
+  { src: "/sounds/menu.mp3", type: "audio", category: "sound" },
+  { src: "/sounds/metal_gear.mp3", type: "audio", category: "sound" },
   { src: "/sounds/new_item.mp3", type: "audio", category: "sound" },
   { src: "/sounds/nintendogs.mp3", type: "audio", category: "sound" },
   { src: "/sounds/notification.mp3", type: "audio", category: "sound" },
   { src: "/sounds/notification_2.mp3", type: "audio", category: "sound" },
   { src: "/sounds/notification_3.mp3", type: "audio", category: "sound" },
+  { src: "/sounds/notification_4.mp3", type: "audio", category: "sound" },
   { src: "/sounds/panflute.mp3", type: "audio", category: "sound" },
   { src: "/sounds/pluck.mp3", type: "audio", category: "sound" },
   { src: "/sounds/pop.mp3", type: "audio", category: "sound" },
   { src: "/sounds/royal_decree.mp3", type: "audio", category: "sound" },
+  { src: "/sounds/sprite.mp3", type: "audio", category: "sound" },
+  { src: "/sounds/sprite_2.mp3", type: "audio", category: "sound" },
+  { src: "/sounds/sprite_3.mp3", type: "audio", category: "sound" },
   { src: "/sounds/subtle_beat.mp3", type: "audio", category: "sound" },
+  { src: "/sounds/welcome.mp3", type: "audio", category: "sound" },
   { src: "/sounds/yeeeeeeehaw.mp3", type: "audio", category: "sound" },
+
 
 ];
 

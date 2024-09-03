@@ -98,6 +98,8 @@
 		if (audio) {
 			audio.pause();
 			audio.src = "";
+			audio.removeEventListener("canplaythrough", () => {});
+			audio.removeEventListener("error", () => {});
 		}
 
 		audio = new Audio(src);
@@ -114,6 +116,13 @@
 		});
 
 		audio.load();
+
+		// Add a timeout to check if audio is taking too long to load
+		setTimeout(() => {
+			if (!audioLoaded) {
+				console.error("Audio loading timed out after 10 seconds");
+			}
+		}, 10000);
 	}
 
 	function handleOpenSelectMediaModal(
@@ -142,33 +151,69 @@
 	function playAudio() {
 		if (audio && audioLoaded) {
 			audio.currentTime = 0; // Reset to start
-			audio
-				.play()
-				.then(() =>
-					console.log("Notification sound played successfully"),
-				)
-				.catch((error) =>
-					console.error("Error playing notification sound:", error),
-				);
+			let playPromise = audio.play();
+
+			if (playPromise !== undefined) {
+				playPromise
+					.then((_) => {
+						console.log("Notification sound playing");
+
+						// Add an event listener for when the audio ends
+						audio?.addEventListener("ended", () => {
+							console.log("Audio playback ended");
+						});
+
+						// Add an event listener for errors during playback
+						audio?.addEventListener("error", (e) => {
+							console.error("Error during audio playback:", e);
+						});
+					})
+					.catch((error) => {
+						console.error(
+							"Error playing notification sound:",
+							error,
+						);
+					});
+			}
 		} else if (audio && !audioLoaded) {
 			console.log("Audio not yet loaded, waiting...");
 			audio.addEventListener(
 				"canplaythrough",
 				() => {
-					audio!.currentTime = 0;
-					audio!
-						.play()
-						.then(() =>
-							console.log(
-								"Notification sound played successfully after waiting",
-							),
-						)
-						.catch((error) =>
-							console.error(
-								"Error playing notification sound after waiting:",
-								error,
-							),
-						);
+					console.log(
+						"Audio can now play through, attempting to play...",
+					);
+					let playPromise = audio!.play();
+
+					if (playPromise !== undefined) {
+						playPromise
+							.then((_) => {
+								console.log(
+									"Notification sound playing after waiting",
+								);
+
+								// Add an event listener for when the audio ends
+								audio!.addEventListener("ended", () => {
+									console.log(
+										"Audio playback ended after waiting",
+									);
+								});
+
+								// Add an event listener for errors during playback
+								audio!.addEventListener("error", (e) => {
+									console.error(
+										"Error during audio playback after waiting:",
+										e,
+									);
+								});
+							})
+							.catch((error) => {
+								console.error(
+									"Error playing notification sound after waiting:",
+									error,
+								);
+							});
+					}
 				},
 				{ once: true },
 			);

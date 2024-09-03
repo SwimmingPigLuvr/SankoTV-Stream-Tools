@@ -395,14 +395,14 @@
             </div>
         {:else if $selectionMode === "select" && $selectionType === "audio"}
             <div class="w-full h-full flex flex-col">
-                <div class="audio-grid p-2 overflow-x-hidden overflow-y-auto">
+                <div class="audio-grid p-0 overflow-x-hidden overflow-y-auto">
                     {#each sounds as sound}
                         <button
                             on:click={() => handleSoundSelect(sound)}
                             class="{sound ===
                             $currentAlert?.config?.notificationSound
                                 ? 'text-lime-400 hover:text-lime-400 scale-[1.35]'
-                                : 'hover:text-fuchsia-400'} relative audio-item -tracking-widest p-2"
+                                : 'hover:text-fuchsia-400'} relative audio-item -tracking-widest p-0"
                             >{getFileName(sound)}</button
                         >
                     {/each}
@@ -571,7 +571,18 @@
     .audio-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 15;
+        gap: 1px;
+    }
+
+    /* Style for individual grid items */
+    .audio-item {
+        text-align: left;
+        width: auto;
+        height: 100%;
+        object-fit: cover;
+        cursor: pointer;
+        transition: transform 0.2s cubic-bezier(0.075, 0.82, 0.165, 1);
+        transform-origin: left;
     }
 
     /* Add a hover effect to the images */
