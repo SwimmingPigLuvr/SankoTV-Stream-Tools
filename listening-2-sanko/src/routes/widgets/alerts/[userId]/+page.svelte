@@ -1,12 +1,16 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import type { AlertConfig } from "$lib/stores/alertConfigStore";
+    import type {
+        AlertConfig,
+        Alert,
+        DonationEvent,
+    } from "$lib/stores/alertConfigStore";
     import DonationAlerts from "$lib/components/DonationAlerts.svelte";
 
-    export let data;
+    export let data: { user: { alerts: Alert[] } };
 
-    let currentAlert: AlertConfig | null = null;
-    let donationEvent = null;
+    let currentAlert: Alert | null;
+    let donationEvent: DonationEvent | null = null;
 
     let alerts: AlertConfig[] = [];
 
@@ -16,8 +20,14 @@
         const socket = new WebSocket(wsUrl);
 
         socket.onmessage = (event) => {
-            const newAlert = JSON.parse(event.data);
-            alerts = [...alerts, newAlert];
+            const message = JSON.parse(event.data);
+            if (message.event === "GIFT") {
+                donationEvent = message.data.event as DonationEvent;
+                currentAlert =
+                    data.user.alerts.find(
+                        (alert) => alert.config.eventTrigger === "GIFT",
+                    ) || null;
+            }
         };
 
         return () => {
@@ -29,15 +39,19 @@
         currentAlert = null;
         donationEvent = null;
     }
+
+    function handleUpdateDuration(event: CustomEvent<number>) {
+        if (currentAlert) {
+            currentAlert.config.alertDuration = event.detail;
+        }
+    }
 </script>
 
 {#if currentAlert && donationEvent}
     <DonationAlerts
         alert={currentAlert}
-        {donationEvent}
+        giftEvent={donationEvent}
         on:alertComplete={handelAlertCompleted}
-        on:updateDuration={(event) => {
-            currentAlert.config.alertDuration = event.detail;
-        }}
+        on:updateDuration={handleUpdateDuration}
     />
 {/if}

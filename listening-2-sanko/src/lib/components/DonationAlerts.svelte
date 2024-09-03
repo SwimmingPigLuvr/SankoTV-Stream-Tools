@@ -1,23 +1,25 @@
 <script lang="ts">
     import { onMount, createEventDispatcher } from "svelte";
     import { fade, fly, blur, scale, slide } from "svelte/transition";
-    import { linear, cubicIn, cubicOut, cubicInOut } from "svelte/easing";
-    import type { Alert } from "$lib/stores/alertConfigStore";
+    import * as easings from "svelte/easing";
+    import type {
+        Alert,
+        DonationEvent,
+        AlertConfig,
+        AnimationSettings,
+    } from "$lib/stores/alertConfigStore";
 
     export let alert: Alert;
-    export let donationEvent: {
-        sender: string;
-        amount: number;
-        gift: string;
-    };
+    export let giftEvent: DonationEvent;
 
-    const dispatch = createEventDispatcher();
+    const dispatch = createEventDispatcher<{
+        alertComplete: void;
+        updateDuration: number;
+    }>();
 
     let isVisible = false;
     let audioElement: HTMLAudioElement;
     let videoElement: HTMLVideoElement;
-
-    const easings = { linear, cubicIn, cubicOut, cubicInOut };
 
     onMount(() => {
         isVisible = true;
@@ -31,7 +33,7 @@
     });
 
     function playAudio() {
-        if (audioElement) {
+        if (audioElement && alert.config.notificationSound) {
             audioElement.volume = alert.config.alertVolume / 100;
             audioElement
                 .play()
@@ -61,10 +63,11 @@
         }
     }
 
-    function applyAnimation(node, props) {
+    function applyAnimation(node: HTMLElement, props: AnimationSettings) {
         if (!props) return {};
         const { type, easing: easingName, ...params } = props;
-        const easing = easings[easingName] || easings.linear;
+        const easing =
+            easings[easingName as keyof typeof easings] || easings.linear;
 
         switch (type) {
             case "blur":
@@ -76,20 +79,27 @@
             case "scale":
                 return scale(node, { ...params, easing });
             case "slide":
-                return slide(node, { ...params, easing });
+                const slideParams = {
+                    ...params,
+                    easing,
+                    axis: params.axis || "x", // Default to 'x' if not specified
+                };
+                return slide(node, slideParams);
             default:
                 return {};
         }
     }
 
-    function formatPluralities(amount: number, gift: string): string {
+    function formatPluralities(amount: string, gift: string): string {
+        const numericAmount = parseInt(amount, 10);
+
         const specialPlurals: Record<string, string> = {
             Glizzy: "Glizzies",
             "Head Phones": "pairs of Head Phones",
             // ... (rest of the special plurals)
         };
 
-        if (amount === 1) {
+        if (numericAmount === 1) {
             return gift === "Head Phones" ? "1 pair of Head Phones" : gift;
         }
 
@@ -109,12 +119,12 @@
 
     function generateMessage() {
         const template = alert.config.messageTemplate;
-        const { sender, amount, gift } = donationEvent;
-        const formattedGift = formatPluralities(amount, gift);
+        const { giftName, name, quantity } = giftEvent.attributes;
+        const formattedGift = formatPluralities(quantity, giftName);
 
         const placeholders: Record<string, string> = {
-            "{sender}": sender,
-            "{amount}": amount.toString(),
+            "{sender}": name,
+            "{amount}": quantity,
             "{gift}": formattedGift,
         };
 

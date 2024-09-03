@@ -17,6 +17,15 @@ export interface Alert {
     isActive: boolean;
 }
 
+export interface DonationEvent {
+    attributes: {
+        giftName: string;
+        name: string;
+        quantity: string;
+    }
+}
+
+
 export interface AnimationSettings {
     type: string;
     duration: number;
@@ -29,7 +38,7 @@ export interface AnimationSettings {
     y?: number;
     start?: number;
     opacity?: number;
-    axis?: number;
+    axis?: 'x' | 'y';
 }
 
 export interface AlertConfig {

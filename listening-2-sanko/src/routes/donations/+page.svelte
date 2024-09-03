@@ -15,7 +15,6 @@
 </script>
 
 <div class="p-4 w-full min-h-screen">
-
 	<Notifications />
 
 	{#if dev}

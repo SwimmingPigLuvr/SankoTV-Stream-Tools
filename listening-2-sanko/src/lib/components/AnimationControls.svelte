@@ -76,6 +76,7 @@
                 alert.config.animation[direction] = {
                     ...alert.config.animation[direction],
                     ...config,
+                    axis: config.axis || "x",
                 };
 
                 // trigger toast
@@ -88,6 +89,11 @@
                 return alert;
             });
         }
+    }
+
+    function handleAxisChange(direction: "in" | "out", event: Event) {
+        const target = event.target as HTMLSelectElement;
+        updateAlertConfig(`animation.${direction}.axis`, target.value);
     }
 </script>
 
@@ -172,6 +178,21 @@
                         <option value={easing}>{easing}</option>
                     {/each}
                 </select>
+
+                {#if alertConfig.animation.in.type === "slide"}
+                    <label for="in-axis">Axis</label>
+                    <select
+                        id="in-axis"
+                        class="custom-dropdown p-4 {$isDarkMode
+                            ? 'bg-slate-950'
+                            : 'bg-lime-200'}"
+                        value={alertConfig.animation.in.axis || "x"}
+                        on:change={(e) => handleAxisChange("in", e)}
+                    >
+                        <option value="x">x</option>
+                        <option value="y">y</option>
+                    </select>
+                {/if}
 
                 <!-- Add more advanced options here based on the animation type -->
             {:else}
