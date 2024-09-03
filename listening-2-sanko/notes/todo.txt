@@ -73,3 +73,6 @@ get more fonts that do work
 
 create widget component that can listen to events from the websocket client and choose the appropriate donation alert to play
 widget can handle preview alerts to
+
+
+handle widgets

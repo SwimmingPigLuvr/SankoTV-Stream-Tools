@@ -36,6 +36,7 @@
 	const { debounce } = lodash;
 
 	let audio: HTMLAudioElement | null = null;
+	let lastLoadedAudioSrc: string | null = null;
 	let volume = 0.5;
 	let audioLoaded = false;
 	let videoElement: HTMLVideoElement | undefined;
@@ -89,40 +90,97 @@
 		onMount(() => {
 			const currentAlertValue = get(currentAlert);
 			if (currentAlertValue?.config?.notificationSound?.src) {
-				preloadAudio(currentAlertValue.config.notificationSound.src);
+				loadAudioIfNeeded(
+					currentAlertValue.config.notificationSound.src,
+				);
 			}
 		});
 	}
 
 	function preloadAudio(src: string) {
+		console.log(`Starting to preload audio from: ${src}`);
+
 		if (audio) {
+			console.log("Cleaning up existing audio element");
 			audio.pause();
 			audio.src = "";
-			audio.removeEventListener("canplaythrough", () => {});
-			audio.removeEventListener("error", () => {});
+			audio.load(); // This will cancel any ongoing loading
 		}
 
-		audio = new Audio(src);
+		audio = new Audio();
 		audio.volume = volume;
 
-		audio.addEventListener("canplaythrough", () => {
-			console.log("audio loaded and ready to play");
+		const canPlayThroughHandler = () => {
+			console.log("Audio loaded and ready to play");
 			audioLoaded = true;
-		});
+		};
 
-		audio.addEventListener("error", (e) => {
-			console.error("error loading audio:", e);
+		const errorHandler = (e: ErrorEvent) => {
+			console.error("Error with audio:", e.message);
+			console.error("Error occurred at time:", new Date().toISOString());
+			console.error("Current audio state:", audio?.readyState);
+			console.error("Current src:", audio?.src);
 			audioLoaded = false;
+		};
+
+		audio.addEventListener("canplaythrough", canPlayThroughHandler);
+		audio.addEventListener("error", errorHandler);
+
+		// Log all events related to audio loading
+		[
+			"loadstart",
+			"durationchange",
+			"loadedmetadata",
+			"loadeddata",
+			"progress",
+			"canplay",
+			"canplaythrough",
+		].forEach((event) => {
+			audio!.addEventListener(event, () =>
+				console.log(`Audio event: ${event}`),
+			);
 		});
 
-		audio.load();
+		audio.src = src;
+		audio.load(); // Start loading the audio
+
+		// Monitor the audio state
+		const stateChecker = setInterval(() => {
+			if (audio) {
+				console.log(`Current audio state: ${audio.readyState}`);
+				if (audio.readyState === 4) {
+					// HAVE_ENOUGH_DATA
+					clearInterval(stateChecker);
+				}
+			}
+		}, 1000);
 
 		// Add a timeout to check if audio is taking too long to load
 		setTimeout(() => {
 			if (!audioLoaded) {
-				console.error("Audio loading timed out after 10 seconds");
+				console.warn("Audio loading hasn't completed after 10 seconds");
+				clearInterval(stateChecker);
 			}
 		}, 10000);
+
+		return new Promise<void>((resolve, reject) => {
+			audio!.addEventListener(
+				"canplaythrough",
+				() => {
+					resolve();
+					console.log("Audio successfully loaded and ready");
+				},
+				{ once: true },
+			);
+			audio!.addEventListener(
+				"error",
+				(e) => {
+					reject(e);
+					console.error("Audio loading ultimately failed");
+				},
+				{ once: true },
+			);
+		});
 	}
 
 	function handleOpenSelectMediaModal(
@@ -145,7 +203,21 @@
 		console.log("event.detail.media: ", event.detail.media);
 		updateAlertConfig("notificationSound", event.detail.media);
 
-		preloadAudio(event.detail.media.src);
+		loadAudioIfNeeded(event.detail.media.src);
+	}
+
+	function loadAudioIfNeeded(src: string) {
+		if (src !== lastLoadedAudioSrc) {
+			lastLoadedAudioSrc = src;
+			preloadAudio(src)
+				.then(() => console.log("audio preloaded successfully"))
+				.catch((error) => {
+					console.error("failed to prelaod audio:", error);
+					lastLoadedAudioSrc = null;
+				});
+		} else {
+			console.log("audio already loaded, skipping preload");
+		}
 	}
 
 	function playAudio() {
@@ -674,7 +746,7 @@
 	}
 
 	$: if ($currentAlert?.config?.notificationSound) {
-		preloadAudio($currentAlert.config.notificationSound.src);
+		loadAudioIfNeeded($currentAlert.config.notificationSound.src);
 	}
 
 	function handleVideoDisplay(video: HTMLVideoElement, alert: Alert) {
