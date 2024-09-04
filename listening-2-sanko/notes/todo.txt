@@ -80,5 +80,25 @@ handle widgets
 todo
 
 ✅ get rid of audio console logs
-fully implement animation controls component
-right now the advanced animations work so if i want the premade ones to work i should just make a utils file with all of the premade ones as animation settings objects ones to
+✅ fully implement animation controls component
+make sure the copy widget url button goes to /widgets/alerts/[userId]
+  need to go back to the db and see how to access the user's id
+complete the donation alerts component
+  pass in user data
+  listent to stream events
+  trigger the correct alerts based on donations
+create button that sends preview donation to widget
+  let user choose which event to send
+  random donation
+  specific gift
+  donation amount
+    need to calculate the $DMT values of each gift
+  donation is exactly
+    the user probably won't use this often 
+    but it would be cool to have an alert for 
+    someone donating a specific amount of gifts? 
+    or a specific amount of a specific gift...maybe
+figure out how to handle the top donations by keeping track of donations within a certain period
+  top donation of the day?
+  oh wait this should be it's own widget box that can be displayed on stream on it's own an alert might be cool if a new top donation is reached but
+  the main thing would be to have it on stream for awhile so people can see

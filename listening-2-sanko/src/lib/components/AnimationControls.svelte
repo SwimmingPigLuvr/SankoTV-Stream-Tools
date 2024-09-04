@@ -1,6 +1,7 @@
 <script lang="ts">
     import {
         currentAlert,
+        premadeAnimations,
         type AlertConfig,
     } from "$lib/stores/alertConfigStore";
     import { isDarkMode } from "$lib/stores";
@@ -62,35 +63,15 @@
         event: Event,
     ) {
         const target = event.target as HTMLSelectElement;
-        const selectedAnimation = target.value;
-        console.log("selected animation: ", selectedAnimation);
+        const selectedAnimation = premadeAnimations[direction].find(
+            (anim) => anim.name === target.value,
+        );
 
-        const config = premadeAnimationConfigs[selectedAnimation];
-        console.log("config: ", config);
-
-        if (config && alertConfig) {
-            currentAlert.update((alert) => {
-                if (!alert) {
-                    console.error("no alert...");
-                    return alert;
-                }
-
-                console.log(`updating ${direction} animation with: `, config);
-                alert.config.animation[direction] = {
-                    ...alert.config.animation[direction],
-                    ...config,
-                    axis: config.axis || "x",
-                };
-
-                // trigger toast
-                // pushToastNoti(`animation.${direction}`, selectedAnimation);
-
-                //update userdata
-                console.log("updating userdata with new alert config");
-                userData.updateUserData(alert);
-
-                return alert;
-            });
+        if (selectedAnimation && alertConfig) {
+            updateAlertConfig(
+                `animation.${direction}`,
+                selectedAnimation.config,
+            );
         }
     }
 
@@ -298,8 +279,8 @@
                         : 'bg-lime-200'}"
                     on:change={(e) => handlePremadeAnimationChange("in", e)}
                 >
-                    {#each premadeAnimationsIn as animation}
-                        <option value={animation}>{animation}</option>
+                    {#each premadeAnimations.in as animation}
+                        <option value={animation.name}>{animation.name}</option>
                     {/each}
                 </select>
             {/if}
@@ -479,8 +460,8 @@
                         : 'bg-lime-200'}"
                     on:change={(e) => handlePremadeAnimationChange("out", e)}
                 >
-                    {#each premadeAnimationsOut as animation}
-                        <option value={animation}>{animation}</option>
+                    {#each premadeAnimations.out as animation}
+                        <option value={animation.name}>{animation.name}</option>
                     {/each}
                 </select>
             {/if}
