@@ -76,3 +76,9 @@ widget can handle preview alerts to
 
 
 handle widgets
+
+todo
+
+✅ get rid of audio console logs
+fully implement animation controls component
+right now the advanced animations work so if i want the premade ones to work i should just make a utils file with all of the premade ones as animation settings objects ones to

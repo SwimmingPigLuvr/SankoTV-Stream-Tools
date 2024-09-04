@@ -47,6 +47,8 @@
     }
 </script>
 
+<div>hello you have reached starlabs.com/widgets/alerts/{user.id}</div>
+
 {#if currentAlert && donationEvent}
     <DonationAlerts
         alert={currentAlert}

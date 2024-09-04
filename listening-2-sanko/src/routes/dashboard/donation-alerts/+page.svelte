@@ -98,8 +98,6 @@
 	}
 
 	function preloadAudio(src: string) {
-		console.log(`Starting to preload audio from: ${src}`);
-
 		if (audio) {
 			console.log("Cleaning up existing audio element");
 			audio.pause();
@@ -111,7 +109,6 @@
 		audio.volume = volume;
 
 		const canPlayThroughHandler = () => {
-			console.log("Audio loaded and ready to play");
 			audioLoaded = true;
 		};
 
@@ -126,28 +123,12 @@
 		audio.addEventListener("canplaythrough", canPlayThroughHandler);
 		audio.addEventListener("error", errorHandler);
 
-		// Log all events related to audio loading
-		[
-			"loadstart",
-			"durationchange",
-			"loadedmetadata",
-			"loadeddata",
-			"progress",
-			"canplay",
-			"canplaythrough",
-		].forEach((event) => {
-			audio!.addEventListener(event, () =>
-				console.log(`Audio event: ${event}`),
-			);
-		});
-
 		audio.src = src;
 		audio.load(); // Start loading the audio
 
 		// Monitor the audio state
 		const stateChecker = setInterval(() => {
 			if (audio) {
-				console.log(`Current audio state: ${audio.readyState}`);
 				if (audio.readyState === 4) {
 					// HAVE_ENOUGH_DATA
 					clearInterval(stateChecker);
@@ -168,7 +149,6 @@
 				"canplaythrough",
 				() => {
 					resolve();
-					console.log("Audio successfully loaded and ready");
 				},
 				{ once: true },
 			);
@@ -215,8 +195,6 @@
 					console.error("failed to prelaod audio:", error);
 					lastLoadedAudioSrc = null;
 				});
-		} else {
-			console.log("audio already loaded, skipping preload");
 		}
 	}
 

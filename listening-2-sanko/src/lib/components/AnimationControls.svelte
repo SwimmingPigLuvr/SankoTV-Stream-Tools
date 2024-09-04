@@ -17,6 +17,9 @@
 
     let showAdvanced = false;
 
+    $: inAnimation = alertConfig?.animation?.in ?? defaultConfigs.fade;
+    $: outAnimation = alertConfig?.animation?.out ?? defaultConfigs.fade;
+
     const premadeAnimationsIn = [
         "blur in",
         "fade in",
@@ -65,7 +68,7 @@
         const config = premadeAnimationConfigs[selectedAnimation];
         console.log("config: ", config);
 
-        if (config) {
+        if (config && alertConfig) {
             currentAlert.update((alert) => {
                 if (!alert) {
                     console.error("no alert...");
@@ -95,6 +98,18 @@
         const target = event.target as HTMLSelectElement;
         updateAlertConfig(`animation.${direction}.axis`, target.value);
     }
+
+    function handleNumberInput(
+        direction: "in" | "out",
+        property: string,
+        event: Event,
+    ) {
+        const target = event.target as HTMLInputElement;
+        updateAlertConfig(
+            `animation.${direction}.${property}`,
+            Number(target.value),
+        );
+    }
 </script>
 
 <div class="flex flex-col space-y-2">
@@ -119,7 +134,7 @@
                     class="custom-dropdown p-4 {$isDarkMode
                         ? 'bg-slate-950'
                         : 'bg-lime-200'}"
-                    value={alertConfig.animation.in.type}
+                    value={inAnimation.type}
                     on:change={(e) =>
                         updateAlertConfig(
                             "animation.in.type",
@@ -131,6 +146,9 @@
                     {/each}
                 </select>
 
+                <!-- common props -->
+
+                <!-- duration -->
                 <label for="in-duration">Duration</label>
                 <input
                     type="number"
@@ -138,7 +156,7 @@
                     class="custom-dropdown p-4 {$isDarkMode
                         ? 'bg-slate-950'
                         : 'bg-lime-200'}"
-                    value={alertConfig.animation.in.duration}
+                    value={inAnimation.duration}
                     on:change={(e) =>
                         updateAlertConfig(
                             "animation.in.duration",
@@ -146,6 +164,7 @@
                         )}
                 />
 
+                <!-- delay -->
                 <label for="in-delay">Delay</label>
                 <input
                     type="number"
@@ -153,7 +172,7 @@
                     class="custom-dropdown p-4 {$isDarkMode
                         ? 'bg-slate-950'
                         : 'bg-lime-200'}"
-                    value={alertConfig.animation.in.delay}
+                    value={inAnimation.delay}
                     on:change={(e) =>
                         updateAlertConfig(
                             "animation.in.delay",
@@ -161,13 +180,14 @@
                         )}
                 />
 
+                <!-- easing -->
                 <label for="in-easing">Easing</label>
                 <select
                     id="in-easing"
                     class="custom-dropdown p-4 {$isDarkMode
                         ? 'bg-slate-950'
                         : 'bg-lime-200'}"
-                    value={alertConfig.animation.in.easing}
+                    value={inAnimation.easing}
                     on:change={(e) =>
                         updateAlertConfig(
                             "animation.in.easing",
@@ -179,14 +199,89 @@
                     {/each}
                 </select>
 
-                {#if alertConfig.animation.in.type === "slide"}
+                <!-- specific properties for each animation type -->
+                <!-- blur: amount -->
+                {#if inAnimation.type === "blur"}
+                    <label for="in-amount">Amount</label>
+                    <input
+                        type="number"
+                        id="in-amount"
+                        class="custom-dropdown p-4 {$isDarkMode
+                            ? 'bg-slate-950'
+                            : 'bg-lime-200'}"
+                        value={inAnimation.amount}
+                        on:change={(e) => handleNumberInput("in", "amount", e)}
+                    />
+                {/if}
+
+                <!-- fly: x and or y -->
+                <!-- x -->
+                {#if inAnimation.type === "fly"}
+                    <label for="in-x">X</label>
+                    <input
+                        type="number"
+                        id="in-x"
+                        class="custom-dropdown p-4 {$isDarkMode
+                            ? 'bg-slate-950'
+                            : 'bg-lime-200'}"
+                        value={inAnimation.x}
+                        on:change={(e) => handleNumberInput("in", "x", e)}
+                    />
+                {/if}
+                <!-- y -->
+                {#if inAnimation.type === "fly"}
+                    <label for="in-y">Y</label>
+                    <input
+                        type="number"
+                        id="in-y"
+                        class="custom-dropdown p-4 {$isDarkMode
+                            ? 'bg-slate-950'
+                            : 'bg-lime-200'}"
+                        value={inAnimation.y}
+                        on:change={(e) => handleNumberInput("in", "y", e)}
+                    />
+                {/if}
+
+                <!-- scale: start -->
+                {#if inAnimation.type === "scale"}
+                    <label for="in-start">Start</label>
+                    <input
+                        type="number"
+                        id="in-start"
+                        class="custom-dropdown p-4 {$isDarkMode
+                            ? 'bg-slate-950'
+                            : 'bg-lime-200'}"
+                        value={inAnimation.start}
+                        on:change={(e) => handleNumberInput("in", "start", e)}
+                    />
+                {/if}
+
+                <!-- blur, fade, scale: opacity -->
+                {#if ["blur", "fade", "scale"].includes(inAnimation.type)}
+                    <label for="in-opacity">Opacity</label>
+                    <input
+                        type="number"
+                        id="in-opacity"
+                        class="custom-dropdown p-4 {$isDarkMode
+                            ? 'bg-slate-950'
+                            : 'bg-lime-200'}"
+                        value={inAnimation.opacity}
+                        on:change={(e) => handleNumberInput("in", "opacity", e)}
+                        min="0"
+                        max="1"
+                        step="0.1"
+                    />
+                {/if}
+
+                <!-- slide: axis -->
+                {#if inAnimation.type === "slide"}
                     <label for="in-axis">Axis</label>
                     <select
                         id="in-axis"
                         class="custom-dropdown p-4 {$isDarkMode
                             ? 'bg-slate-950'
                             : 'bg-lime-200'}"
-                        value={alertConfig.animation.in.axis || "x"}
+                        value={inAnimation.axis || "x"}
                         on:change={(e) => handleAxisChange("in", e)}
                     >
                         <option value="x">x</option>
@@ -219,7 +314,7 @@
                     class="custom-dropdown p-4 {$isDarkMode
                         ? 'bg-slate-950'
                         : 'bg-lime-200'}"
-                    value={alertConfig.animation.out.type}
+                    value={outAnimation.type}
                     on:change={(e) =>
                         updateAlertConfig(
                             "animation.out.type",
@@ -231,6 +326,9 @@
                     {/each}
                 </select>
 
+                <!-- common props -->
+
+                <!-- duration -->
                 <label for="out-duration">Duration</label>
                 <input
                     type="number"
@@ -238,7 +336,7 @@
                     class="custom-dropdown p-4 {$isDarkMode
                         ? 'bg-slate-950'
                         : 'bg-lime-200'}"
-                    value={alertConfig.animation.out.duration}
+                    value={outAnimation.duration}
                     on:change={(e) =>
                         updateAlertConfig(
                             "animation.out.duration",
@@ -246,6 +344,7 @@
                         )}
                 />
 
+                <!-- delay -->
                 <label for="out-delay">Delay</label>
                 <input
                     type="number"
@@ -253,7 +352,7 @@
                     class="custom-dropdown p-4 {$isDarkMode
                         ? 'bg-slate-950'
                         : 'bg-lime-200'}"
-                    value={alertConfig.animation.out.delay}
+                    value={outAnimation.delay}
                     on:change={(e) =>
                         updateAlertConfig(
                             "animation.out.delay",
@@ -261,13 +360,14 @@
                         )}
                 />
 
+                <!-- easing -->
                 <label for="out-easing">Easing</label>
                 <select
                     id="out-easing"
                     class="custom-dropdown p-4 {$isDarkMode
                         ? 'bg-slate-950'
                         : 'bg-lime-200'}"
-                    value={alertConfig.animation.out.easing}
+                    value={outAnimation.easing}
                     on:change={(e) =>
                         updateAlertConfig(
                             "animation.out.easing",
@@ -278,6 +378,97 @@
                         <option value={easing}>{easing}</option>
                     {/each}
                 </select>
+
+                <!-- specific properties for each animation type -->
+                <!-- blur: amount -->
+                {#if outAnimation.type === "blur"}
+                    <label for="out-amount">Amount</label>
+                    <input
+                        type="number"
+                        id="out-amount"
+                        class="custom-dropdown p-4 {$isDarkMode
+                            ? 'bg-slate-950'
+                            : 'bg-lime-200'}"
+                        value={outAnimation.amount}
+                        on:change={(e) => handleNumberInput("out", "amount", e)}
+                    />
+                {/if}
+
+                <!-- fly: x and or y -->
+                <!-- x -->
+                {#if outAnimation.type === "fly"}
+                    <label for="out-x">X</label>
+                    <input
+                        type="number"
+                        id="out-x"
+                        class="custom-dropdown p-4 {$isDarkMode
+                            ? 'bg-slate-950'
+                            : 'bg-lime-200'}"
+                        value={outAnimation.x}
+                        on:change={(e) => handleNumberInput("out", "x", e)}
+                    />
+                {/if}
+                <!-- y -->
+                {#if outAnimation.type === "fly"}
+                    <label for="out-y">Y</label>
+                    <input
+                        type="number"
+                        id="out-y"
+                        class="custom-dropdown p-4 {$isDarkMode
+                            ? 'bg-slate-950'
+                            : 'bg-lime-200'}"
+                        value={outAnimation.y}
+                        on:change={(e) => handleNumberInput("out", "y", e)}
+                    />
+                {/if}
+
+                <!-- scale: start -->
+                {#if outAnimation.type === "scale"}
+                    <label for="out-start">Start</label>
+                    <input
+                        type="number"
+                        id="out-start"
+                        class="custom-dropdown p-4 {$isDarkMode
+                            ? 'bg-slate-950'
+                            : 'bg-lime-200'}"
+                        value={outAnimation.start}
+                        on:change={(e) => handleNumberInput("out", "start", e)}
+                    />
+                {/if}
+
+                <!-- blur, fade, scale: opacity -->
+                {#if ["blur", "fade", "scale"].includes(outAnimation.type)}
+                    <label for="out-opacity">Opacity</label>
+                    <input
+                        type="number"
+                        id="out-opacity"
+                        class="custom-dropdown p-4 {$isDarkMode
+                            ? 'bg-slate-950'
+                            : 'bg-lime-200'}"
+                        value={outAnimation.opacity}
+                        on:change={(e) =>
+                            handleNumberInput("out", "opacity", e)}
+                        min="0"
+                        max="1"
+                        step="0.1"
+                    />
+                {/if}
+
+                <!-- slide: axis -->
+                {#if outAnimation.type === "slide"}
+                    <label for="out-axis">Axis</label>
+                    <select
+                        id="out-axis"
+                        class="custom-dropdown p-4 {$isDarkMode
+                            ? 'bg-slate-950'
+                            : 'bg-lime-200'}"
+                        value={outAnimation.axis || "x"}
+                        on:change={(e) => handleAxisChange("out", e)}
+                    >
+                        <option value="x">x</option>
+                        <option value="y">y</option>
+                    </select>
+                {/if}
 
                 <!-- Add more advanced options here based on the animation type -->
             {:else}

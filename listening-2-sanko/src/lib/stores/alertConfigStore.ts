@@ -31,13 +31,11 @@ export interface AnimationSettings {
     duration: number;
     delay: number;
     easing: string;
-    // advanced
     amount?: number;
     opacity?: number;
     x?: number;
     y?: number;
     start?: number;
-    opacity?: number;
     axis?: 'x' | 'y';
 }
 
@@ -111,6 +109,164 @@ const defaultAlertConfig: AlertConfig = {
     }
 };
 
+// Premade animation objects
+export const premadeAnimations = {
+    in: [
+        {
+            name: "Blur In",
+            config: {
+                type: "blur",
+                duration: 500,
+                delay: 0,
+                easing: "cubicOut",
+                amount: 5,
+                opacity: 0,
+            }
+        },
+        {
+            name: "Fade In",
+            config: {
+                type: "fade",
+                duration: 500,
+                delay: 0,
+                easing: "cubicOut",
+                opacity: 0,
+            }
+        },
+        {
+            name: "Fly In Up",
+            config: {
+                type: "fly",
+                duration: 500,
+                delay: 0,
+                easing: "cubicOut",
+                y: 100,
+                opacity: 0,
+            }
+        },
+        {
+            name: "Fly In Down",
+            config: {
+                type: "fly",
+                duration: 500,
+                delay: 0,
+                easing: "cubicOut",
+                y: -100,
+                opacity: 0,
+            }
+        },
+        {
+            name: "Scale In",
+            config: {
+                type: "scale",
+                duration: 500,
+                delay: 0,
+                easing: "cubicOut",
+                start: 0.5,
+                opacity: 0,
+            }
+        },
+        {
+            name: "Slide In Up",
+            config: {
+                type: "slide",
+                duration: 500,
+                delay: 0,
+                easing: "cubicOut",
+                y: 100,
+            }
+        },
+        {
+            name: "Slide In Down",
+            config: {
+                type: "slide",
+                duration: 500,
+                delay: 0,
+                easing: "cubicOut",
+                y: -100,
+            }
+        }
+    ],
+    out: [
+        {
+            name: "Blur Out",
+            config: {
+                type: "blur",
+                duration: 300,
+                delay: 0,
+                easing: "cubicIn",
+                amount: 5,
+                opacity: 0,
+            }
+        },
+        {
+            name: "Fade Out",
+            config: {
+                type: "fade",
+                duration: 300,
+                delay: 0,
+                easing: "cubicIn",
+                opacity: 0,
+            }
+        },
+        {
+            name: "Fly Out Up",
+            config: {
+                type: "fly",
+                duration: 300,
+                delay: 0,
+                easing: "cubicIn",
+                y: -100,
+                opacity: 0,
+            }
+        },
+        {
+            name: "Fly Out Down",
+            config: {
+                type: "fly",
+                duration: 300,
+                delay: 0,
+                easing: "cubicIn",
+                y: 100,
+                opacity: 0,
+            }
+        },
+        {
+            name: "Scale Out",
+            config: {
+                type: "scale",
+                duration: 300,
+                delay: 0,
+                easing: "cubicIn",
+                start: 1,
+                opacity: 0,
+            }
+        },
+        {
+            name: "Slide Out Up",
+            config: {
+                type: "slide",
+                duration: 300,
+                delay: 0,
+                easing: "cubicIn",
+                y: -100,
+            }
+        },
+        {
+            name: "Slide Out Down",
+            config: {
+                type: "slide",
+                duration: 300,
+                delay: 0,
+                easing: "cubicIn",
+                y: 100,
+            }
+        }
+    ]
+};
+
 export const alertConfig = writable<AlertConfig>(defaultAlertConfig);
 export const currentAlert = createCurrentAlertStore();
 export const messageTemplate = writable<string>();
+
+

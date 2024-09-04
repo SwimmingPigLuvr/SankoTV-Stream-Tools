@@ -144,7 +144,6 @@
             audioElement
                 .play()
                 .then(() => {
-                    console.log("Audio started playing");
                     // Dispatch the event after successfully starting playback
                     dispatch("audioSelected", { media: selectedSound });
                 })
@@ -159,121 +158,6 @@
             dispatch("audioSelected", { media: selectedSound });
         }
     }
-
-    function preloadAudio(sound: MediaItem): void {
-        if (sound.type === "audio") {
-            const audio = new Audio();
-            audio.preload = "auto";
-            audio.src = sound.src;
-        }
-    }
-
-    function addAudioEventListeners() {
-        if (audioElement) {
-            audioElement.addEventListener("play", () =>
-                console.log("Audio play event fired"),
-            );
-            audioElement.addEventListener("playing", () =>
-                console.log("Audio playing event fired"),
-            );
-            audioElement.addEventListener("pause", () =>
-                console.log("Audio pause event fired"),
-            );
-            audioElement.addEventListener("ended", () =>
-                console.log("Audio ended event fired"),
-            );
-            audioElement.addEventListener("error", (e) =>
-                console.error("Audio error:", e),
-            );
-        }
-    }
-
-    function checkAudioDuration(sound: MediaItem): Promise<number> {
-        return new Promise((resolve) => {
-            const audio = new Audio(sound.src);
-            audio.addEventListener("loadedmetadata", () => {
-                console.log(`Audio duration: ${audio.duration} seconds`);
-                resolve(audio.duration);
-            });
-            audio.addEventListener("errro", (e) => {
-                console.error("error loading audio:", e);
-                resolve(0);
-            });
-        });
-    }
-
-    function playAudio(sound: MediaItem): void {
-        if (audioElement) {
-            audioElement.pause();
-            audioElement.currentTime = 0;
-        }
-
-        audioElement.src = sound.src;
-
-        const timeUpdateListener = () => {
-            console.log(`current time: ${audioElement.currentTime}`);
-        };
-        audioElement.addEventListener("timeupdate", timeUpdateListener);
-
-        audioElement
-            .play()
-            .then(() => {
-                console.log("audio playback started successfully");
-            })
-            .catch((error) => {
-                console.error("error playing audio: ", error);
-            });
-
-        audioElement.addEventListener(
-            "ended",
-            () => {
-                audioElement.removeEventListener(
-                    "timeupdate",
-                    timeUpdateListener,
-                );
-            },
-            { once: true },
-        );
-    }
-
-    function checkAudioFileLoading(sound: MediaItem) {
-        return new Promise((resolve, reject) => {
-            const audio = new Audio();
-            audio.oncanplaythrough = () =>
-                resolve("Audio file loaded successfully");
-            audio.onerror = () => reject("Error loading audio file");
-            audio.src = sound.src;
-        });
-    }
-
-    function logAudioElementProperties() {
-        if (audioElement) {
-            console.log("Audio element properties:");
-            console.log("- src:", audioElement.src);
-            console.log("- muted:", audioElement.muted);
-            console.log("- volume:", audioElement.volume);
-            console.log("- paused:", audioElement.paused);
-        } else {
-            console.log("Audio element not found");
-        }
-    }
-
-    onMount(async () => {
-        addAudioEventListeners();
-        logAudioElementProperties();
-
-        sounds.forEach((sound) => {
-            checkAudioFileLoading(sound)
-                .then((message) => console.log(message))
-                .catch((error) => console.error(error));
-        });
-        for (const sound of sounds) {
-            if (sound.type === "audio") {
-                const duration = await checkAudioDuration(sound);
-                console.log(`Duration of ${sound.src}: ${duration} seconds`);
-            }
-        }
-    });
 
     function handleVideoSelect(video: MediaItem) {
         previewVideo = video;
