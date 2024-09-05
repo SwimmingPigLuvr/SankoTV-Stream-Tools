@@ -102,3 +102,7 @@ figure out how to handle the top donations by keeping track of donations within 
   top donation of the day?
   oh wait this should be it's own widget box that can be displayed on stream on it's own an alert might be cool if a new top donation is reached but
   the main thing would be to have it on stream for awhile so people can see
+
+endpreview todo
+show advanced animations if the user is using them.
+animate highlighted text
