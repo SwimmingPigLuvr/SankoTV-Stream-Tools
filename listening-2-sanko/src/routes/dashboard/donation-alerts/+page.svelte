@@ -1197,7 +1197,7 @@
 								on:click={() => {
 									if ($currentAlert) {
 										navigator.clipboard.writeText(
-											`https://yoursite.com/donation-alerts/${$currentAlert.id}`,
+											`localhost:5173/widgets/alerts/${$userData?.id}`,
 										);
 										copiedWidgetURL = true;
 										setTimeout(() => {

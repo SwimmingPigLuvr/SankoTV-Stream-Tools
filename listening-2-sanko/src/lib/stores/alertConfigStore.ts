@@ -18,11 +18,12 @@ export interface Alert {
 }
 
 export interface DonationEvent {
+    type: string;
     attributes: {
         giftName: string;
         name: string;
         quantity: string;
-    }
+    };
 }
 
 

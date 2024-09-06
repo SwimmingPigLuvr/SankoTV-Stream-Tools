@@ -106,3 +106,8 @@ figure out how to handle the top donations by keeping track of donations within 
 endpreview todo
 show advanced animations if the user is using them.
 animate highlighted text
+
+sep 5 todo
+
+setup correct ws in component
+need to cahnge the event trigger to match the ws events
