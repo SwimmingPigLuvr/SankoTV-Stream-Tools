@@ -20,29 +20,40 @@
     let isVisible = false;
     let audioElement: HTMLAudioElement;
     let videoElement: HTMLVideoElement;
+    let alertContainer: HTMLDivElement;
+    let audioLoaded = false;
+    let lastLoadedAudioSrc: string | null = null;
+
+    $: volume = alert.config.alertVolume ? alert.config.alertVolume / 100 : 0.5;
 
     onMount(() => {
-        isVisible = true;
+        console.log("Alert config:", alert.config);
+        console.log("Gift event:", giftEvent);
         if (alert.config.notificationSound) {
-            playAudio();
+            loadAudioIfNeeded(alert.config.notificationSound.src);
         }
+        // Delay the alert display to ensure DOM is ready
+        setTimeout(() => {
+            isVisible = true;
+            handleAlertDisplay();
+        }, 100);
+    });
+
+    function handleAlertDisplay() {
+        if (videoElement) {
+            handleVideoDisplay();
+        }
+        playAudio();
         setTimeout(() => {
             isVisible = false;
             dispatch("alertComplete");
         }, alert.config.alertDuration * 1000);
-    });
-
-    function playAudio() {
-        if (audioElement && alert.config.notificationSound) {
-            audioElement.volume = alert.config.alertVolume / 100;
-            audioElement
-                .play()
-                .catch((error) => console.error("Error playing audio:", error));
-        }
     }
 
     function handleVideoDisplay() {
         if (videoElement && alert.config.media?.type === "video") {
+            videoElement.muted = false; // Ensure video is not muted
+            videoElement.volume = volume;
             switch (alert.config.videoDuration) {
                 case "once":
                     videoElement.loop = false;
@@ -60,10 +71,70 @@
                     videoElement.loop = true;
                     break;
             }
+            videoElement
+                .play()
+                .catch((error) => console.error("Error playing video:", error));
+        }
+    }
+
+    async function loadAudioIfNeeded(src: string) {
+        if (src !== lastLoadedAudioSrc) {
+            lastLoadedAudioSrc = src;
+            try {
+                await preloadAudio(src);
+                console.log("Audio preloaded successfully");
+            } catch (error) {
+                console.error("Failed to preload audio:", error);
+                lastLoadedAudioSrc = null;
+            }
+        }
+    }
+
+    function preloadAudio(src: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            if (audioElement) {
+                audioElement.pause();
+                audioElement.src = "";
+                audioElement.load();
+            }
+            audioElement = new Audio();
+            audioElement.volume = volume;
+
+            audioElement.addEventListener(
+                "canplaythrough",
+                () => {
+                    audioLoaded = true;
+                    resolve();
+                },
+                { once: true },
+            );
+
+            audioElement.addEventListener(
+                "error",
+                (e) => {
+                    console.error("Error with audio:", e);
+                    audioLoaded = false;
+                    reject(e);
+                },
+                { once: true },
+            );
+
+            audioElement.src = src;
+            audioElement.load();
+        });
+    }
+
+    function playAudio() {
+        if (audioElement && audioLoaded) {
+            audioElement.currentTime = 0;
+            audioElement
+                .play()
+                .catch((error) => console.error("Error playing audio:", error));
         }
     }
 
     function applyAnimation(node: HTMLElement, props: AnimationSettings) {
+        console.log("Applying animation:", props);
         if (!props) return {};
         const { type, easing: easingName, ...params } = props;
         const easing =
@@ -82,50 +153,23 @@
                 const slideParams = {
                     ...params,
                     easing,
-                    axis: params.axis || "x", // Default to 'x' if not specified
+                    axis: params.axis || "x",
                 };
                 return slide(node, slideParams);
             default:
+                console.warn("Unknown animation type:", type);
                 return {};
         }
-    }
-
-    function formatPluralities(amount: string, gift: string): string {
-        const numericAmount = parseInt(amount, 10);
-
-        const specialPlurals: Record<string, string> = {
-            Glizzy: "Glizzies",
-            "Head Phones": "pairs of Head Phones",
-            // ... (rest of the special plurals)
-        };
-
-        if (numericAmount === 1) {
-            return gift === "Head Phones" ? "1 pair of Head Phones" : gift;
-        }
-
-        if (specialPlurals[gift]) {
-            return specialPlurals[gift];
-        }
-
-        if (
-            gift.endsWith("y") &&
-            !["ay", "ey", "oy", "uy"].some((ending) => gift.endsWith(ending))
-        ) {
-            return `${gift.slice(0, -1)}ies`;
-        }
-
-        return `${gift}s`;
     }
 
     function generateMessage() {
         const template = alert.config.messageTemplate;
         const { giftName, name, quantity } = giftEvent.attributes;
-        const formattedGift = formatPluralities(quantity, giftName);
 
         const placeholders: Record<string, string> = {
             "{sender}": name,
             "{amount}": quantity,
-            "{gift}": formattedGift,
+            "{gift}": giftName,
         };
 
         return template.split(/({\w+})/g).map((part) => ({
@@ -135,62 +179,157 @@
     }
 </script>
 
-{#if isVisible}
-    <div
-        in:applyAnimation={alert.config.animation.in}
-        out:applyAnimation={alert.config.animation.out}
-        class="alert-container"
-        style="
-      border-radius: {alert.config.borderRadius};
-      font-family: {alert.config.fontFamily};
-      font-size: {alert.config.fontSize};
-      font-weight: {alert.config.fontWeight};
-      color: {alert.config.textColor};
-      text-transform: {alert.config.textTransform};
-      letter-spacing: {alert.config.letterSpacing}em;
-      text-shadow: {alert.config.textShadow};
-    "
-    >
-        {#if alert.config.media}
-            {#if alert.config.media.type === "video"}
-                <video
-                    bind:this={videoElement}
-                    src={alert.config.media.src}
-                    autoplay
-                    on:loadedmetadata={handleVideoDisplay}
-                >
-                    <track kind="captions" src="" label="English" />
-                </video>
-            {:else}
-                <img src={alert.config.media.src} alt="Alert media" />
-            {/if}
-        {/if}
+<main>
+    {#if isVisible}
+        <div class="bounds">
+            <div
+                bind:this={alertContainer}
+                in:applyAnimation={alert.config.animation.in}
+                out:applyAnimation={alert.config.animation.out}
+                class="alert-container {alert.config.composition}"
+                style="
+                border-radius: {alert.config.borderRadius};
+                font-family: {alert.config.fontFamily};
+                font-size: {alert.config.fontSize};
+                font-weight: {alert.config.fontWeight};
+                color: {alert.config.textColor};
+                text-transform: {alert.config.textTransform};
+                letter-spacing: {alert.config.letterSpacing}em;
+                text-shadow: {alert.config.textShadow};
+            "
+            >
+                {#if alert.config.media}
+                    <div class="media-container">
+                        {#if alert.config.media.type === "video"}
+                            <video
+                                bind:this={videoElement}
+                                src={alert.config.media.src}
+                                autoplay
+                                on:loadedmetadata={handleVideoDisplay}
+                            >
+                                <track kind="captions" src="" label="English" />
+                            </video>
+                        {:else}
+                            <img
+                                src={alert.config.media.src}
+                                alt="Alert media"
+                            />
+                        {/if}
+                    </div>
+                {/if}
 
-        <div class="message">
-            {#each generateMessage() as part}
-                <span
-                    style="color: {part.highlight
-                        ? alert.config.highlightColor
-                        : alert.config.textColor};"
-                >
-                    {part.text}
-                </span>
-            {/each}
+                <div class="text">
+                    {#each generateMessage() as part}
+                        <span
+                            style="color: {part.highlight
+                                ? alert.config.highlightColor
+                                : alert.config.textColor};"
+                        >
+                            {part.text}
+                        </span>
+                    {/each}
+                </div>
+            </div>
         </div>
-    </div>
-{/if}
-
-{#if alert.config.notificationSound}
-    <audio bind:this={audioElement} src={alert.config.notificationSound.src}
-    ></audio>
-{/if}
+    {/if}
+</main>
 
 <style>
-    .alert-container {
-        /* Add any additional styles here */
+    main {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
     }
 
-    .message {
-        /* Add any additional styles here */
+    .alert-container {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+    }
+
+    .image-above-text {
+        flex-direction: column;
+    }
+
+    .text-over-image {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .text-over-image .media-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1;
+    }
+
+    .text-over-image .text {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+    }
+
+    .image-left {
+        flex-direction: row;
+    }
+
+    .image-right {
+        flex-direction: row-reverse;
+    }
+
+    .media-container {
+        max-height: 100%;
+        max-width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+    }
+
+    .media-container img,
+    .media-container video {
+        max-height: 100%;
+        max-width: 100%;
+        object-fit: contain;
+    }
+
+    .text {
+        white-space: nowrap;
+        padding: 0.5rem;
+        text-align: center;
+        overflow: hidden;
+        max-width: 90%;
+    }
+
+    .bounds {
+        height: 300px;
+        width: 800px;
+        max-height: 300px;
+        max-width: 800px;
+        border: 2px solid white;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 10;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 </style>

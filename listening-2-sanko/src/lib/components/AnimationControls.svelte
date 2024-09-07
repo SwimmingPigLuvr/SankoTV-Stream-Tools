@@ -21,6 +21,17 @@
     $: inAnimation = alertConfig?.animation?.in ?? defaultConfigs.fade;
     $: outAnimation = alertConfig?.animation?.out ?? defaultConfigs.fade;
 
+    const premadeTypes = new Set([
+        ...premadeAnimations.in.map((anim) => anim.config.type),
+        ...premadeAnimations.out.map((anim) => anim.config.type),
+    ]);
+
+    $: {
+        const inType = alertConfig?.animation?.in?.type ?? "";
+        const outType = alertConfig?.animation?.out?.type ?? "";
+        showAdvanced = premadeTypes.has(inType) || premadeTypes.has(outType);
+    }
+
     const premadeAnimationsIn = [
         "blur in",
         "fade in",

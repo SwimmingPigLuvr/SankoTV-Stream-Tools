@@ -81,8 +81,8 @@ todo
 
 ✅ get rid of audio console logs
 ✅ fully implement animation controls component
-make sure the copy widget url button goes to /widgets/alerts/[userId]
-  need to go back to the db and see how to access the user's id
+✅ make sure the copy widget url button goes to /widgets/alerts/[userId]
+show advanced animations if the user is using them.
 complete the donation alerts component
   pass in user data
   listent to stream events
@@ -104,7 +104,6 @@ figure out how to handle the top donations by keeping track of donations within 
   the main thing would be to have it on stream for awhile so people can see
 
 endpreview todo
-show advanced animations if the user is using them.
 animate highlighted text
 
 sep 5 todo

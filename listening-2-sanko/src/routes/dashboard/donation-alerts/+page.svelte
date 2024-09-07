@@ -1938,6 +1938,8 @@
 		}
 	}
 
+
+	/* layout options */
 	.image-above-text,
 	.text-over-image,
 	.image-left,

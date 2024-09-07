@@ -29,11 +29,24 @@
     $: userAlerts = $userData?.data?.donationAlerts || [];
     $: userId = $userData?.id;
 
-    let intervalId: number;
+    let intervalId: ReturnType<typeof setInterval>;
 
     onMount(() => {
         if (userId) {
             intervalId = setInterval(fetchLatestEvent, 1000);
+        }
+
+        currentAlert =
+            userAlerts.find((alert) => alert.name === "cofeeeeeee") || null;
+        if (currentAlert) {
+            donationEvent = {
+                type: "GIFT",
+                attributes: {
+                    giftName: testGiftName,
+                    quantity: testQuantity,
+                    name: testSenderName,
+                },
+            };
         }
     });
 
@@ -141,71 +154,45 @@
     }
 </script>
 
-<main class="p-8 text-white font-mono">
-    <div class="">
-        Hello, you have reached starlabs.com/widgets/alerts/{userId}
-    </div>
-
+<main class="text-white font-mono">
     {#if currentAlert && donationEvent}
-        <DonationAlerts
-            alert={currentAlert}
-            giftEvent={donationEvent}
-            on:alertComplete={handleAlertCompleted}
-            on:updateDuration={handleUpdateDuration}
-        />
+        <div class="text-lime-400 z-50">
+            <DonationAlerts
+                alert={currentAlert}
+                giftEvent={donationEvent}
+                on:alertComplete={handleAlertCompleted}
+                on:updateDuration={handleUpdateDuration}
+            />
+        </div>
     {/if}
-
-    <div class="status-message">
-        {statusMessage}
-    </div>
-
-    <div class="test-controls">
-        <h2>Test Donation Alert</h2>
-        <label>
-            Gift Name:
-            <input bind:value={testGiftName} />
-        </label>
-        <label>
-            Quantity:
-            <input bind:value={testQuantity} type="number" min="1" />
-        </label>
-        <label>
-            Sender Name:
-            <input bind:value={testSenderName} />
-        </label>
-        <button on:click={sendTestAlert}>Send Test Alert</button>
-    </div>
 </main>
 
 <style>
     .test-controls {
-        margin-top: 20px;
-        padding: 15px;
         border: 1px solid #ccc;
         border-radius: 5px;
     }
 
     .test-controls label {
         display: block;
-        margin-bottom: 10px;
     }
 
     .test-controls input {
-        margin-left: 10px;
+        margin-left: 0px;
     }
 
     .test-controls button {
-        margin-top: 10px;
+        margin-top: 0px;
     }
 
     input {
         background-color: black;
-        padding: 0.5em;
+        padding: 0em;
     }
 
     .status-message {
-        margin-top: 20px;
-        padding: 10px;
+        margin-top: 0px;
+        padding: 0px;
         background-color: rgba(0, 0, 0, 0.5);
         border-radius: 5px;
     }
