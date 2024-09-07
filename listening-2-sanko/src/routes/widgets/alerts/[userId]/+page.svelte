@@ -157,6 +157,7 @@
 <main class="text-white font-mono">
     {#if currentAlert && donationEvent}
         <div class="text-lime-400 z-50">
+            a
             <DonationAlerts
                 alert={currentAlert}
                 giftEvent={donationEvent}
