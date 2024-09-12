@@ -29,11 +29,43 @@ function createWebSocketConnection(userId: string, streamerAddress: string) {
     socket.on('message', (data) => {
         try {
             const message = JSON.parse(data.toString());
-            console.log(`Received for user ${userId}:`, message);
+            console.log(`Received for user ${userId}:`, JSON.stringify(message, null, 2));
             
             const userConnection = connections.get(userId);
             if (userConnection) {
-                userConnection.lastEvent = message;
+                if (message.event === 'CHAT') {
+                    const chatMessage = message.data.event.content;
+                    const senderName = message.data.event.sender.attributes.name;
+
+                    if (chatMessage.toLowerCase() === 'test') {
+                        // simulate donation
+                        userConnection.lastEvent = {
+                            event: 'GIFT',
+                            data: {
+                                event: {
+                                    type: 'GIFT',
+                                    attributes: {
+                                        giftName: 'TestGift',
+                                        quantity: '1',
+                                        name: senderName
+                                    }
+                                }
+                            }
+                        };
+                        console.log('test alert triggered by: ', senderName);
+                    } else {
+                        // store real chat message
+                        userConnection.lastEvent = {
+                            event: 'CHAT',
+                            data: {
+                                sender: senderName,
+                                content: chatMessage,
+                            }
+                        };
+                    }
+                } else {
+                    userConnection.lastEvent = message;
+                }
             }
         } catch (error) {
             console.error(`Error parsing message for user ${userId}:`, error);

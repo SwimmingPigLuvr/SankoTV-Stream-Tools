@@ -4,6 +4,7 @@
     import type { Alert } from "$lib/stores/alertConfigStore";
     import DonationAlerts from "$lib/components/DonationAlerts.svelte";
     import { userData } from "$lib/stores/userDataStore";
+    import { page } from "$app/stores";
 
     interface GiftEvent {
         type: "GIFT";
@@ -14,65 +15,49 @@
         };
     }
 
-    type DonationEvent = GiftEvent; // Add other event types here when implemented
+    type DonationEvent = GiftEvent;
 
     let currentAlert: Alert | null = null;
     let donationEvent: DonationEvent | null = null;
-
-    let testGiftName: string = "Zyn";
-    let testQuantity: string = "1";
-    let testSenderName: string = "TestUser";
-
     let statusMessage: string = "";
-
-    // Subscribe to userData store
-    $: userAlerts = $userData?.data?.donationAlerts || [];
-    $: userId = $userData?.id;
-
     let intervalId: ReturnType<typeof setInterval>;
+
+    $: userId = $page.params.userId;
+    $: userAlerts = $userData?.data?.donationAlerts || [];
 
     onMount(() => {
         if (userId) {
             intervalId = setInterval(fetchLatestEvent, 1000);
         }
 
-        currentAlert =
-            userAlerts.find((alert) => alert.name === "oscar") || null;
-        if (currentAlert) {
-            donationEvent = {
-                type: "GIFT",
-                attributes: {
-                    giftName: testGiftName,
-                    quantity: testQuantity,
-                    name: testSenderName,
-                },
-            };
-        }
-    });
-
-    onDestroy(() => {
-        if (intervalId) {
-            clearInterval(intervalId);
-        }
-        // Close the WebSocket connection when the component is destroyed
-        if (userId) {
-            fetch(`/widgets/alerts/${userId}`, { method: "DELETE" })
-                .then(() => console.log("WebSocket connection closed"))
-                .catch((error) =>
-                    console.error("Error closing WebSocket connection:", error),
-                );
-        }
+        return () => {
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+            if (userId) {
+                fetch(`/widgets/alerts/${userId}`, { method: "DELETE" })
+                    .then(() => console.log("WebSocket connection closed"))
+                    .catch((error) =>
+                        console.error(
+                            "Error closing WebSocket connection:",
+                            error,
+                        ),
+                    );
+            }
+        };
     });
 
     async function fetchLatestEvent() {
         try {
             const response = await fetch(`/widgets/alerts/${userId}`);
-            if (!response.ok) {
-                throw new Error("Failed to fetch latest event");
-            }
+            if (!response.ok) throw new Error("Failed to fetch latest event");
             const data = await response.json();
-            if (data.lastEvent && data.lastEvent.event === "GIFT") {
-                handleGiftEvent(data.lastEvent.data.event);
+            if (data.lastEvent) {
+                if (data.lastEvent.event === "GIFT") {
+                    handleGiftEvent(data.lastEvent.data.event);
+                } else if (data.lastEvent.event === "CHAT") {
+                    handleChatEvent(data.lastEvent.data);
+                }
             }
         } catch (error) {
             console.error("Error fetching latest event:", error);
@@ -82,7 +67,16 @@
 
     function handleGiftEvent(event: GiftEvent) {
         donationEvent = event;
-        currentAlert =
+        currentAlert = findMatchingAlert(event);
+        logAndUpdateStatus(event);
+    }
+
+    function handleChatEvent(chatData: { sender: string; content: string }) {
+        statusMessage = `${chatData.sender}: ${chatData.content}`;
+    }
+
+    function findMatchingAlert(event: GiftEvent): Alert | null {
+        return (
             userAlerts.find((alert) => {
                 if (alert.config.eventTrigger === "GIFT" && alert.isActive) {
                     if (alert.config.specificGift) {
@@ -94,8 +88,11 @@
                     return true;
                 }
                 return false;
-            }) || null;
+            }) || null
+        );
+    }
 
+    function logAndUpdateStatus(event: GiftEvent) {
         console.log(
             `${event.attributes.name} SENT ${event.attributes.quantity} ${event.attributes.giftName}${parseInt(event.attributes.quantity) > 1 ? "s!" : "!"}`,
         );
@@ -120,43 +117,11 @@
             userData.updateDonationAlert(updatedAlert);
         }
     }
-
-    async function sendTestAlert() {
-        const testEvent: GiftEvent = {
-            type: "GIFT",
-            attributes: {
-                giftName: testGiftName,
-                quantity: testQuantity,
-                name: testSenderName,
-            },
-        };
-
-        try {
-            const response = await fetch(`/widgets/alerts/${userId}`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(testEvent),
-            });
-
-            if (!response.ok) {
-                throw new Error("Failed to send test event");
-            }
-
-            console.log("Test event sent successfully");
-            statusMessage =
-                "Test event sent successfully. Waiting for alert...";
-        } catch (error) {
-            console.error("Error sending test event:", error);
-            statusMessage = "Error sending test event. Please try again.";
-        }
-    }
 </script>
 
-<main class="text-white font-mono">
+<main>
     {#if currentAlert && donationEvent}
-        <div class="text-lime-400 z-50">
+        <div class="alert-container">
             <DonationAlerts
                 alert={currentAlert}
                 giftEvent={donationEvent}
@@ -165,28 +130,33 @@
             />
         </div>
     {/if}
+    <p class="status-message">{statusMessage}</p>
 </main>
 
 <style>
-    .test-controls {
-        border: 1px solid #ccc;
-        border-radius: 5px;
+    main {
+        width: 100vw;
+        height: 100vh;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-color: transparent;
+        overflow: hidden;
     }
 
-    .test-controls label {
-        display: block;
+    .alert-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1000;
     }
 
-    .test-controls input {
-        margin-left: 0px;
-    }
-
-    .test-controls button {
-        margin-top: 0px;
-    }
-
-    input {
-        background-color: black;
-        padding: 0em;
+    .status-message {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 12px;
     }
 </style>
