@@ -1195,9 +1195,10 @@
 						<div class="relative w-full">
 							<button
 								on:click={() => {
-									if ($currentAlert) {
+									if ($userData?.id) {
+										const widgetURL = `${window.location.origin}/widget/alerts/${$userData.id}`;
 										navigator.clipboard.writeText(
-											`localhost:5173/widgets/alerts/${$userData?.id}`,
+											widgetURL,
 										);
 										copiedWidgetURL = true;
 										setTimeout(() => {
@@ -1206,7 +1207,7 @@
 										// You might want to show a toast notification here
 									}
 								}}
-								disabled={copiedWidgetURL}
+								disabled={copiedWidgetURL || !$userData?.id}
 								class="{$isDarkMode
 									? 'bg-slate-900 hover:border-white hover:bg-slate-950'
 									: 'border-black bg-lime-50 hover:bg-white'} w-full h-full absolute left-0 top-0 border-[1px] backdrop-blur-[2px] font-black"
@@ -1937,7 +1938,6 @@
 			padding: 1rem;
 		}
 	}
-
 
 	/* layout options */
 	.image-above-text,

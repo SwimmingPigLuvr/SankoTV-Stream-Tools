@@ -52,8 +52,8 @@
 
     function handleVideoDisplay() {
         if (videoElement && alert.config.media?.type === "video") {
-            videoElement.muted = false; // Ensure video is not muted
-            videoElement.volume = volume;
+            videoElement.muted = true; // Ensure video is not muted
+            videoElement.volume = 0;
             switch (alert.config.videoDuration) {
                 case "once":
                     videoElement.loop = false;
@@ -73,6 +73,10 @@
             }
             videoElement
                 .play()
+                .then(() => {
+                    videoElement.muted = false;
+                    videoElement.volume = volume;
+                })
                 .catch((error) => console.error("Error playing video:", error));
         }
     }
@@ -98,7 +102,7 @@
                 audioElement.load();
             }
             audioElement = new Audio();
-            audioElement.volume = volume;
+            audioElement.volume = 0;
 
             audioElement.addEventListener(
                 "canplaythrough",
@@ -128,9 +132,18 @@
         if (audioElement && audioLoaded) {
             audioElement.currentTime = 0;
             audioElement
-                .play()
+                .play().then(() => {
+                    audioElement.volume = volume;
+                })
                 .catch((error) => console.error("Error playing audio:", error));
         }
+    }
+
+    function startAlertTimer() {
+        setTimeout(() => {
+            isVisible = false;
+            dispatch("alertComplete");
+        }, alert.config.alertDuration * 1000);
     }
 
     function applyAnimation(node: HTMLElement, props: AnimationSettings) {

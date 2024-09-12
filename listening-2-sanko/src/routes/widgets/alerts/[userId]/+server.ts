@@ -1,3 +1,4 @@
+// routes/widgets/alerts/[userId]/+server.ts
 import WebSocket from 'ws';
 import crypto from 'crypto';
 import { json } from '@sveltejs/kit';

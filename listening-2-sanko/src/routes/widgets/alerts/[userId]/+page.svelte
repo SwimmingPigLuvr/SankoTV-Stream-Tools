@@ -37,7 +37,7 @@
         }
 
         currentAlert =
-            userAlerts.find((alert) => alert.name === "cofeeeeeee") || null;
+            userAlerts.find((alert) => alert.name === "oscar") || null;
         if (currentAlert) {
             donationEvent = {
                 type: "GIFT",
@@ -157,7 +157,6 @@
 <main class="text-white font-mono">
     {#if currentAlert && donationEvent}
         <div class="text-lime-400 z-50">
-            a
             <DonationAlerts
                 alert={currentAlert}
                 giftEvent={donationEvent}
@@ -189,12 +188,5 @@
     input {
         background-color: black;
         padding: 0em;
-    }
-
-    .status-message {
-        margin-top: 0px;
-        padding: 0px;
-        background-color: rgba(0, 0, 0, 0.5);
-        border-radius: 5px;
     }
 </style>
