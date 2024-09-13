@@ -110,3 +110,18 @@ sep 5 todo
 
 setup correct ws in component
 need to cahnge the event trigger to match the ws events
+
+
+
+
+
+
+
+
+
+
+donation alert component doesn't seem to be affected by the alert duration so i need to implement that asap
+
+the text is being squished out of the frame
+
+accounting for the out duration is good and all but now the timing is off from the preview

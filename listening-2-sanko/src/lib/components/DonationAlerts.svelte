@@ -43,7 +43,9 @@
         }
         playAudio();
         // acount for animation out duration in the total total duration time
-        const totalDuration = alert.config.alertDuration * 1000 + (alert.config.animation.out.duration || 0);
+        const outDuration = alert.config.animation?.out?.duration || 0;
+        const totalDuration = alert.config.alertDuration * 1000 + outDuration;
+
         setTimeout(() => {
             isVisible = false;
             dispatch("alertComplete");
@@ -198,19 +200,25 @@
         <div class="bounds">
             <div
                 bind:this={alertContainer}
-                in:applyAnimation={alert.config.animation.in}
-                out:applyAnimation={alert.config.animation.out}
+                in:applyAnimation={{
+                    ...(alert?.config?.animation?.in || {}),
+                    duration: alert.config.animation?.in?.duration || 500,
+                }}
+                out:applyAnimation={{
+                    ...(alert?.config?.animation?.out || {}),
+                    duration: alert.config.animation?.out?.duration || 500,
+                }}
                 class="alert-container {alert.config.composition}"
                 style="
-                border-radius: {alert.config.borderRadius};
-                font-family: {alert.config.fontFamily};
-                font-size: {alert.config.fontSize};
-                font-weight: {alert.config.fontWeight};
-                color: {alert.config.textColor};
-                text-transform: {alert.config.textTransform};
-                letter-spacing: {alert.config.letterSpacing}em;
-                text-shadow: {alert.config.textShadow};
-            "
+                    border-radius: {alert.config.borderRadius};
+                    font-family: {alert.config.fontFamily};
+                    font-size: {alert.config.fontSize};
+                    font-weight: {alert.config.fontWeight};
+                    color: {alert.config.textColor};
+                    text-transform: {alert.config.textTransform};
+                    letter-spacing: {alert.config.letterSpacing}em;
+                    text-shadow: {alert.config.textShadow};
+                "
             >
                 {#if alert.config.media}
                     <div class="media-container">
