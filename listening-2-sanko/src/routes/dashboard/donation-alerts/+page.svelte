@@ -1196,7 +1196,7 @@
 							<button
 								on:click={() => {
 									if ($userData?.id) {
-										const widgetURL = `${window.location.origin}/widget/alerts/${$userData.id}`;
+										const widgetURL = `${window.location.origin}/widgets/alerts/${$userData.id}`;
 										navigator.clipboard.writeText(
 											widgetURL,
 										);

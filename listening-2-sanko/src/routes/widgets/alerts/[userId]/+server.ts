@@ -37,7 +37,7 @@ function createWebSocketConnection(userId: string, streamerAddress: string) {
                     const chatMessage = message.data.event.content;
                     const senderName = message.data.event.sender.attributes.name;
 
-                    if (chatMessage.toLowerCase() === 'test') {
+                    if (chatMessage.toLowerCase() === '!test') {
                         // simulate donation
                         userConnection.lastEvent = {
                             event: 'GIFT',

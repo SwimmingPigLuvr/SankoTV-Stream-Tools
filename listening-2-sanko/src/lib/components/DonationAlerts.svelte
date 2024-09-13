@@ -33,10 +33,8 @@
             loadAudioIfNeeded(alert.config.notificationSound.src);
         }
         // Delay the alert display to ensure DOM is ready
-        setTimeout(() => {
-            isVisible = true;
-            handleAlertDisplay();
-        }, 100);
+        isVisible = true;
+        handleAlertDisplay();
     });
 
     function handleAlertDisplay() {
@@ -44,10 +42,12 @@
             handleVideoDisplay();
         }
         playAudio();
+        // acount for animation out duration in the total total duration time
+        const totalDuration = alert.config.alertDuration * 1000 + (alert.config.animation.out.duration || 0);
         setTimeout(() => {
             isVisible = false;
             dispatch("alertComplete");
-        }, alert.config.alertDuration * 1000);
+        }, totalDuration);
     }
 
     function handleVideoDisplay() {
@@ -132,7 +132,8 @@
         if (audioElement && audioLoaded) {
             audioElement.currentTime = 0;
             audioElement
-                .play().then(() => {
+                .play()
+                .then(() => {
                     audioElement.volume = volume;
                 })
                 .catch((error) => console.error("Error playing audio:", error));
@@ -148,7 +149,7 @@
 
     function applyAnimation(node: HTMLElement, props: AnimationSettings) {
         console.log("Applying animation:", props);
-        if (!props) return {};
+        if (!props || !props.type) return {};
         const { type, easing: easingName, ...params } = props;
         const easing =
             easings[easingName as keyof typeof easings] || easings.linear;
@@ -335,7 +336,6 @@
         width: 800px;
         max-height: 300px;
         max-width: 800px;
-        border: 2px solid white;
         position: fixed;
         top: 0;
         left: 0;

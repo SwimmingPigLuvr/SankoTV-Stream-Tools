@@ -68,6 +68,10 @@
     function handleGiftEvent(event: GiftEvent) {
         donationEvent = event;
         currentAlert = findMatchingAlert(event);
+        if (!currentAlert) {
+            currentAlert =
+                userAlerts.find((alert) => alert.name === "oscar") || null;
+        }
         logAndUpdateStatus(event);
     }
 
@@ -130,7 +134,7 @@
             />
         </div>
     {/if}
-    <p class="status-message">{statusMessage}</p>
+    <p class="status-message font-mono">{statusMessage}</p>
 </main>
 
 <style>
@@ -146,9 +150,8 @@
 
     .alert-container {
         position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+        top: 0;
+        left: 0;
         z-index: 1000;
     }
 
