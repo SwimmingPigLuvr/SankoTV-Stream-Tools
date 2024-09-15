@@ -1,3 +1,4 @@
+
 import { walletStore } from "$lib/walletStores";
 import { redirect } from '@sveltejs/kit';
 import type { LayoutLoad } from './$types';
@@ -8,16 +9,12 @@ export const load: LayoutLoad = async ({ url }) => {
 
     if (protectedRoutes.includes(url.pathname)) {
         // Check if user is authenticated
-        const { isAuthenticated } = await new Promise(resolve => {
-            const unsubscribe = walletStore.subscribe(state => {
-                unsubscribe();
-                resolve(state);
-            });
+        const unsubscribe = walletStore.subscribe(({ isAuthenticated }) => {
+            if (!isAuthenticated) {
+                throw redirect(307, '/');
+            }
         });
-
-        if (!isAuthenticated) {
-            throw redirect(307, '/');
-        }
+        unsubscribe();
     }
 
     return {};
