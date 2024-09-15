@@ -21,6 +21,7 @@
     let donationEvent: DonationEvent | null = null;
     let statusMessage: string = "";
     let intervalId: ReturnType<typeof setInterval>;
+    let isAlertActive = false;
 
     $: userId = $page.params.userId;
     $: userAlerts = $userData?.data?.donationAlerts || [];
@@ -48,16 +49,18 @@
     });
 
     async function fetchLatestEvent() {
+        if (isAlertActive) return;
+
         try {
             const response = await fetch(`/widgets/alerts/${userId}`);
             if (!response.ok) throw new Error("Failed to fetch latest event");
             const data = await response.json();
-            if (data.lastEvent) {
-                if (data.lastEvent.event === "GIFT") {
-                    handleGiftEvent(data.lastEvent.data.event);
-                } else if (data.lastEvent.event === "CHAT") {
-                    handleChatEvent(data.lastEvent.data);
-                }
+            if (
+                data.lastEvent &&
+                data.lastEvent.event === "GIFT" &&
+                !isAlertActive
+            ) {
+                handleGiftEvent(data.lastEvent.data.event);
             }
         } catch (error) {
             console.error("Error fetching latest event:", error);
@@ -66,6 +69,9 @@
     }
 
     function handleGiftEvent(event: GiftEvent) {
+        if (isAlertActive) return;
+
+        isAlertActive = true;
         donationEvent = event;
         currentAlert = findMatchingAlert(event);
         if (!currentAlert) {
@@ -107,6 +113,7 @@
         currentAlert = null;
         donationEvent = null;
         statusMessage = "Alert completed";
+        isAlertActive = false;
     }
 
     function handleUpdateDuration(event: CustomEvent<number>) {
@@ -124,7 +131,7 @@
 </script>
 
 <main>
-    {#if currentAlert && donationEvent}
+    {#if currentAlert && donationEvent && isAlertActive}
         <div class="alert-container">
             <DonationAlerts
                 alert={currentAlert}

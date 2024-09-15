@@ -5,6 +5,9 @@ import { json } from '@sveltejs/kit';
 
 let connections = new Map();
 
+let lastTestTime = 0;
+const TEST_COOLDOWN = 5000;
+
 function createWebSocketConnection(userId: string, streamerAddress: string) {
     const uniqueId = crypto.randomBytes(16).toString('hex');
     const WS_URL = `wss://chat.sanko.tv/ws?streamerAddress=${streamerAddress}&uniqueId=${uniqueId}`;
@@ -38,21 +41,27 @@ function createWebSocketConnection(userId: string, streamerAddress: string) {
                     const senderName = message.data.event.sender.attributes.name;
 
                     if (chatMessage.toLowerCase() === '!test') {
-                        // simulate donation
-                        userConnection.lastEvent = {
-                            event: 'GIFT',
-                            data: {
-                                event: {
-                                    type: 'GIFT',
-                                    attributes: {
-                                        giftName: 'TestGift',
-                                        quantity: '1',
-                                        name: senderName
+                        const currentTime = Date.now();
+                        if (currentTime - lastTestTime > TEST_COOLDOWN) {
+                            lastTestTime = currentTime;
+                            // simulate donation
+                            userConnection.lastEvent = {
+                                event: 'GIFT',
+                                data: {
+                                    event: {
+                                        type: 'GIFT',
+                                        attributes: {
+                                            giftName: 'TestGift',
+                                            quantity: '1',
+                                            name: senderName
+                                        }
                                     }
                                 }
-                            }
-                        };
-                        console.log('test alert triggered by: ', senderName);
+                            };
+                            console.log('test alert triggered by: ', senderName);
+                        } else {
+                            console.log('test alert on cooldown. ignoring command from ', senderName);
+                        }
                     } else {
                         // store real chat message
                         userConnection.lastEvent = {

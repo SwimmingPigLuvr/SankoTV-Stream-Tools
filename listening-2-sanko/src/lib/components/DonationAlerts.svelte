@@ -154,24 +154,32 @@
         if (!props || !props.type) return {};
         const { type, easing: easingName, ...params } = props;
         const easing =
-            easings[easingName as keyof typeof easings] || easings.linear;
+            easings[easingName as keyof typeof easings] || easings.cubicInOut;
+
+        const numericParams = Object.entries(params).reduce(
+            (acc, [key, value]) => {
+                acc[key] =
+                    typeof value === "string" ? parseFloat(value) : value;
+                return acc;
+            },
+            {} as Record<string, number>,
+        );
 
         switch (type) {
             case "blur":
-                return blur(node, { ...params, easing });
+                return blur(node, { ...numericParams, easing });
             case "fade":
-                return fade(node, { ...params, easing });
+                return fade(node, { ...numericParams, easing });
             case "fly":
-                return fly(node, { ...params, easing });
+                return fly(node, { ...numericParams, easing });
             case "scale":
-                return scale(node, { ...params, easing });
+                return scale(node, { ...numericParams, easing });
             case "slide":
-                const slideParams = {
-                    ...params,
+                return slide(node, {
+                    ...numericParams,
                     easing,
-                    axis: params.axis || "x",
-                };
-                return slide(node, slideParams);
+                    axis: params.axis || "y",
+                });
             default:
                 console.warn("Unknown animation type:", type);
                 return {};
@@ -333,7 +341,7 @@
 
     .text {
         white-space: nowrap;
-        padding: 0.5rem;
+        padding: 0.1rem;
         text-align: center;
         overflow: hidden;
         max-width: 90%;

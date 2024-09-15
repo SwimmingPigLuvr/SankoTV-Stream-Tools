@@ -8,12 +8,16 @@ export const load: LayoutLoad = async ({ url }) => {
 
     if (protectedRoutes.includes(url.pathname)) {
         // Check if user is authenticated
-        const unsubscribe = walletStore.subscribe(({ isAuthenticated }) => {
-            if (!isAuthenticated) {
-                throw redirect(307, '/');
-            }
+        const { isAuthenticated } = await new Promise(resolve => {
+            const unsubscribe = walletStore.subscribe(state => {
+                unsubscribe();
+                resolve(state);
+            });
         });
-        unsubscribe();
+
+        if (!isAuthenticated) {
+            throw redirect(307, '/');
+        }
     }
 
     return {};

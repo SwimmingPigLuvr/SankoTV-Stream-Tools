@@ -7,14 +7,9 @@
 	import { writable } from "svelte/store";
 
 	const MOBILE_BREAKPOINT = 768;
-
-	// Create a writable store for windowWidth
 	const windowWidth = writable(MOBILE_BREAKPOINT);
-
-	// Create a derived store for isMobile
 	export const isMobile = writable(true);
 
-	// Function to update windowWidth and isMobile
 	function updateWidth() {
 		if (browser) {
 			windowWidth.set(window.innerWidth);
@@ -23,35 +18,39 @@
 	}
 
 	onMount(() => {
-		// Update width immediately on mount
 		updateWidth();
-
-		// Set up event listener for resize
 		window.addEventListener("resize", updateWidth);
-
-		// Cleanup
 		return () => window.removeEventListener("resize", updateWidth);
 	});
 
 	$: centered = $page.url.pathname === "/dashboard";
 </script>
 
-<main class="flex justify-between w-full">
-	<div class="z-40 text-xs">
+<main class="flex flex-col md:flex-row justify-between w-full">
+	<div class="z-40 text-xs w-full md:w-auto">
 		<Nav isMobile={$isMobile} />
 	</div>
-	{#if browser}
+
+	<div class="flex flex-col md:flex-row w-full">
+		{#if browser}
+			<div
+				class={`
+                ${centered ? "w-full md:w-1/2" : "w-full md:w-1/5"}
+                ${$isMobile ? "z-30" : "fixed"}
+            `}
+			>
+				<Directory isMobile={$isMobile} />
+			</div>
+		{/if}
+
 		<div
-			class={centered
-				? " w-1/2"
-				: $isMobile
-					? "w-full z-30"
-					: "fixed w-1/5"}
+			class={`
+            w-full 
+            ${$isMobile ? "m-auto" : "md:ml-auto md:w-4/5"}
+            ${centered && !$isMobile ? "md:w-1/2" : ""}
+        `}
 		>
-			<Directory isMobile={$isMobile} />
-		</div>
-		<div class={$isMobile ? "w-full m-auto" : "ml-auto md:w-4/5"}>
 			<slot />
 		</div>
-	{/if}
+	</div>
 </main>

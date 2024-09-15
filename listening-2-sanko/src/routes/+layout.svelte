@@ -4,7 +4,6 @@
 	import { onMount } from "svelte";
 	import "../app.css";
 	import { browser } from "$app/environment";
-	import DarkMode from "$lib/components/DarkMode.svelte";
 	import { user } from "$lib/stores/authStore";
 
 	let isConnecting = false;
@@ -12,6 +11,7 @@
 
 	async function checkConnection() {
 		try {
+			isConnecting = true;
 			const result = await walletStore.connect();
 			if (result.success) {
 				// redirect to dashboard
@@ -30,10 +30,6 @@
 	});
 </script>
 
-<body class="{$isDarkMode ? 'bg-slate-900' : 'bg-lime-100'}">
+<main class={$isDarkMode ? "bg-slate-900" : "bg-lime-100"}>
 	<slot />
-
-	<footer>
-		<!-- Your footer content -->
-	</footer>
-</body>
+</main>

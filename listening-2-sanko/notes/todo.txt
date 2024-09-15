@@ -125,3 +125,6 @@ donation alert component doesn't seem to be affected by the alert duration so i 
 the text is being squished out of the frame
 
 accounting for the out duration is good and all but now the timing is off from the preview
+
+animation out scale
+  start field should be changed to end in the ui even tho the prop is start
