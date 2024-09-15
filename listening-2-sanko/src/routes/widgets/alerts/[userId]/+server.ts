@@ -60,7 +60,7 @@ function createWebSocketConnection(userId: string, streamerAddress: string) {
                             };
                             console.log('test alert triggered by: ', senderName);
                         } else {
-                            console.log('test alert on cooldown. ignoring command from ', senderName);
+                            console.log('test alert on cooldown. ignoring command from ', senderName)
                         }
                     } else {
                         // store real chat message
