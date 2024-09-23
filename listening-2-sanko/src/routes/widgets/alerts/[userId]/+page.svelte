@@ -77,6 +77,26 @@
         }
     }
 
+    export function normalizeGiftName(giftName: string): Gift | undefined {
+        // Normalize: Trim, capitalize each word, etc.
+        const normalized = giftName
+            .trim()
+            .split(" ")
+            .map(
+                (word) =>
+                    word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
+            )
+            .join(" ");
+
+        // Check if the normalized name exists in gifts
+        if (normalized in gifts) {
+            return normalized as Gift;
+        }
+
+        console.warn(`Gift name "${giftName}" does not match any known gifts.`);
+        return undefined;
+    }
+
     function handleGiftEvent(event: GiftEvent) {
         if (isAlertActive) return;
 
@@ -90,7 +110,7 @@
             currentAlert =
                 userAlerts.find((alert) => alert.id === event.alertId) || null;
         } else {
-            const normalizedGiftName = normalizedGiftName(
+            const normalizedGiftName = normalizeGiftName(
                 event.attributes.giftName,
             );
             if (!normalizedGiftName) {
@@ -127,8 +147,8 @@
                         return true;
                     case "specificgift":
                         return (
-                            specificGift?.toLowerCase() ===
-                            event.attributes.giftName.toLowerCase()
+                            normalizeGiftName(specificGift || "") ===
+                            normalizeGiftName(event.attributes.giftName)
                         );
                     case "atleast":
                         return (
