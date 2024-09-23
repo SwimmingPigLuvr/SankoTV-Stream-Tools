@@ -10,7 +10,6 @@ declare global {
 			userId?: string;
 			userAlerts?: Alert[];
 			streamerAddress?: string;
-			[key: string]: any;
 		}
 		// interface PageState {}
 		// interface Platform {}

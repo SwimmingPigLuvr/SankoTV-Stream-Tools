@@ -16,6 +16,8 @@
 	} from "$lib/stores";
 	import {
 		alertConfig,
+		gifts,
+		type Gift,
 		type AlertConfig,
 		messageTemplate,
 		currentAlert,
@@ -95,6 +97,40 @@
 				);
 			}
 		});
+	}
+
+	async function sendTestDonation() {
+		const testDonationEvent = {
+			event: "GIFT",
+			data: {
+				event: {
+					type: "GIFT",
+					attributes: {
+						giftName: "Zyn",
+						quantity: "1",
+						name: "Test User",
+					},
+					alertId: $currentAlert?.id,
+					isTest: true,
+				},
+			},
+		};
+
+		try {
+			const response = await fetch(`/widgets/alerts/${$userData?.id}`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(testDonationEvent),
+			});
+
+			if (!response.ok) {
+				throw new Error("failed to send test donation");
+			}
+
+			console.log("successfully sent test donation to widget url");
+		} catch (error) {
+			console.error("error sending test donation:", error);
+		}
 	}
 
 	function preloadAudio(src: string) {
@@ -414,50 +450,6 @@
 
 	const senders = ["swimmingPig", "fizzleStix", "charlotte", "Tony", "Dav3"];
 
-	const gifts = [
-		"Golden Glizzy",
-		"Glock",
-		"Diamond",
-		"Steroids",
-		"Trump",
-		"O'Hearn",
-		"Cross",
-		"Size Chad",
-		"Boxing Gloves",
-		"Grippy",
-		"Yellow Hat",
-		"Liquidation",
-		"Dubya",
-		"Su Zhu",
-		"Wizzy",
-		"Orbs",
-		"Cocktail",
-		"Teddy",
-		"Larry",
-		"Addys",
-		"Beer",
-		"Banana",
-		"Baby Bottle",
-		"Kitten",
-		"Femboy",
-		"Dead Dev",
-		"Daisy",
-		"Cash",
-		"Chili",
-		"Glizzy",
-		"Crack",
-		"Bunny",
-		"Mimosa",
-		"Rug",
-		"Cigarette",
-		"Gensler",
-		"Bitboy",
-		"Clover",
-		"Bible",
-		"Head Phones",
-		"Zyn",
-	];
-
 	$: inAnimation = $currentAlert?.config.animation?.in;
 	$: outAnimation = $currentAlert?.config.animation?.out;
 
@@ -560,8 +552,10 @@
 		return senders[Math.floor(Math.random() * senders.length)];
 	}
 
-	function getRandomGift() {
-		return gifts[Math.floor(Math.random() * gifts.length)];
+	function getRandomGift(): Gift | undefined {
+		const giftKeys = Object.keys(gifts) as Gift[];
+		const randomIndex = Math.floor(Math.random() * giftKeys.length);
+		return giftKeys[randomIndex];
 	}
 
 	function getRandomAmount() {
@@ -589,14 +583,8 @@
 		return 1;
 	}
 
-	type Gift = (typeof gifts)[number];
-
 	function formatPluralities(amount: number, gift: Gift): string {
 		const specialPlurals: Record<Gift, string> = {
-			Glizzy: "Glizzies",
-			"Head Phones": "pairs of Head Phones",
-			"Boxing Gloves": "Boxing Gloves",
-			Addys: "Addys",
 			"Golden Glizzy": "Golden Glizzies",
 			Glock: "Glocks",
 			Diamond: "Diamonds",
@@ -605,6 +593,7 @@
 			"O'Hearn": "O'Hearns",
 			Cross: "Crosses",
 			"Size Chad": "Size Chads",
+			"Boxing Gloves": "Boxing Gloves",
 			Grippy: "Grippies",
 			"Yellow Hat": "Yellow Hats",
 			Liquidation: "Liquidations",
@@ -615,6 +604,7 @@
 			Cocktail: "Cocktails",
 			Teddy: "Teddies",
 			Larry: "Larrys",
+			Addys: "Addys",
 			Beer: "Beers",
 			Banana: "Bananas",
 			"Baby Bottle": "Baby Bottles",
@@ -624,6 +614,7 @@
 			Daisy: "Daisies",
 			Cash: "Cash",
 			Chili: "Chilis",
+			Glizzy: "Glizzies",
 			Crack: "Cracks",
 			Bunny: "Bunnies",
 			Mimosa: "Mimosas",
@@ -633,13 +624,11 @@
 			Bitboy: "Bitboys",
 			Clover: "Clovers",
 			Bible: "Bibles",
+			"Head Phones": "pairs of Head Phones",
 			Zyn: "Zyns",
 		};
 
 		if (amount === 1) {
-			if (gift === "Head Phones") {
-				return `1 pair of Head Phones`;
-			}
 			return `${gift}`;
 		}
 
@@ -677,10 +666,18 @@
 
 		const sender = getRandomSender();
 		const amount = getRandomAmount();
-		const gift =
-			$currentAlert.config.eventTrigger === "specificgift"
-				? $currentAlert.config.specificGift
-				: getRandomGift();
+		let gift: Gift | undefined;
+
+		if (alert.config.eventTrigger === "specificgift") {
+			gift = alert.config.specificGift;
+		} else {
+			gift = getRandomGift();
+		}
+
+		if (!gift) {
+			console.warn("invalid or undefined gift");
+			return { parts: [] };
+		}
 
 		const placeholders: Record<Placeholder, string> = {
 			"{sender}": sender,
@@ -698,6 +695,17 @@
 			return { text: part, highlight: false };
 		});
 		return { parts };
+	}
+
+	function capitalizeGiftName(giftName: string): Gift | undefined {
+		const normalizedGiftName = giftName
+			.split(" ")
+			.map(
+				(word) =>
+					word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
+			)
+			.join(" ");
+		return normalizedGiftName as Gift | undefined;
 	}
 
 	function handleDonationPreview() {
@@ -1863,6 +1871,23 @@
 					>
 				</select>
 			</div>
+		</div>
+		<!-- send test alerts to widget url -->
+		<div
+			class="alert-grid-container {$isDarkMode
+				? 'bg-black border-b-white'
+				: 'bg-white border-b-black'} border-b-[1px] z-20 p-4 w-full flex flex-col"
+		>
+			<p>Send Test Donation</p>
+			<!-- TODO -->
+			<!-- send a test network event to simulate a donation -->
+			<button
+				id="testbutton"
+				name="testbutton"
+				on:click={sendTestDonation}
+				class="hover:bg-blue-950 px-4 py-2 border-[1px] border-blue-700"
+				>clicky here</button
+			>
 		</div>
 	</div>
 </main>

@@ -17,6 +17,14 @@ export interface Alert {
     isActive: boolean;
 }
 
+export type EventTrigger = 
+    "donation" 
+    | "specificgift" 
+    | "atleast"
+    | "exactamount"
+    | "topdonation"
+;
+
 export interface DonationEvent {
     type: string;
     attributes: {
@@ -40,6 +48,67 @@ export interface AnimationSettings {
     axis?: 'x' | 'y';
 }
 
+export type Gift = keyof typeof gifts;
+
+// name and $DMT value
+export const gifts: { [key: string]: number } = {
+    "Golden Glizzy": 3,
+    "Glock": 0.5,
+    "Diamond": 0.5,
+    "Steroids": 0.5,
+    "Trump": 0.5,
+    "O'Hearn": 0.5,
+    "Cross": 0.15,
+    "Size Chad": 0.15,
+    "Boxing Gloves": 0.15,
+    "Grippy": 0.15,
+    "Yellow Hat": 0.15,
+    "Liquidation": 0.15,
+    "Dubya": 0.1,
+    "Su Zhu": 0.1,
+    "Wizzy": 0.1,
+    "Orbs": 0.1,
+    "Cocktail": 0.1,
+    "Teddy": 0.1,
+    "Larry": 0.1,
+    "Addys": 0.05,
+    "Beer": 0.05,
+    "Banana": 0.05,
+    "Baby Bottle": 0.05,
+    "Kitten": 0.05,
+    "Femboy": 0.05,
+    "Dead Dev": 0.05,
+    "Daisy": 0.02,
+    "Cash": 0.02,
+    "Chili": 0.02,
+    "Glizzy": 0.02,
+    "Crack": 0.02,
+    "Bunny": 0.02,
+    "Mimosa": 0.02,
+    "Rug": 0.02,
+    "Cigarette": 0.01,
+    "Gensler": 0.01,
+    "Bitboy": 0.01,
+    "Clover": 0.01,
+    "Bible": 0.01,
+    "Head Phones": 0.01,
+    "Zyn": 0.01,
+} as const;
+
+export interface GiftEvent {
+    type: "GIFT";
+    attributes: {
+        giftName: string;
+        quantity: string;
+        name: string;
+        alertId: string;
+    };
+    alertId?: string;
+    isTest?: boolean;
+    donationAmount?: number;
+}
+
+
 export interface AlertConfig {
     animation: {
         in: AnimationSettings;
@@ -52,9 +121,9 @@ export interface AlertConfig {
     textAnimation: string;
     composition: string;
     borderRadius: string;
-    eventTrigger: string,
-    specificGift: string,
-    specificAmount: number;
+    eventTrigger: EventTrigger,
+    specificGift?: Gift,
+    specificAmount?: number;
     fontFamily: string;
     fontSize: string;
     fontWeight: number;

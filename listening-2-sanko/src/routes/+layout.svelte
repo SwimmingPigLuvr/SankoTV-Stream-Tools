@@ -31,7 +31,7 @@
 	});
 </script>
 
-<body class="{$isDarkMode ? 'bg-slate-900' : 'bg-lime-100'}">
+<body class={$isDarkMode ? "bg-slate-900" : "bg-lime-100"}>
 	<slot />
 
 	<footer>

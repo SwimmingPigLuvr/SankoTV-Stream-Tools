@@ -1,3 +1,4 @@
+<!-- $lib/components/DonationAlerts.svelte -->
 <script lang="ts">
     import { onMount, createEventDispatcher } from "svelte";
     import { fade, fly, blur, scale, slide } from "svelte/transition";
@@ -188,12 +189,12 @@
 
     function generateMessage() {
         const template = alert.config.messageTemplate;
-        const { giftName, name, quantity } = giftEvent.attributes;
+        const { giftName, name, quantity } = giftEvent.attributes || {};
 
         const placeholders: Record<string, string> = {
-            "{sender}": name,
-            "{amount}": quantity,
-            "{gift}": giftName,
+            "{sender}": name || "unknown",
+            "{amount}": quantity || "1",
+            "{gift}": giftName || "Zyn",
         };
 
         return template.split(/({\w+})/g).map((part) => ({

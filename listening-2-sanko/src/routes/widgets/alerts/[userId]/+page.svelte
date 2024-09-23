@@ -1,19 +1,14 @@
 <!-- routes/widgets/alerts/[userId]/+page.svelte -->
 <script lang="ts">
     import { onMount, onDestroy } from "svelte";
-    import type { Alert } from "$lib/stores/alertConfigStore";
+    import {
+        gifts,
+        type Alert,
+        type GiftEvent,
+    } from "$lib/stores/alertConfigStore";
     import DonationAlerts from "$lib/components/DonationAlerts.svelte";
     import { userData } from "$lib/stores/userDataStore";
     import { page } from "$app/stores";
-
-    interface GiftEvent {
-        type: "GIFT";
-        attributes: {
-            giftName: string;
-            quantity: string;
-            name: string;
-        };
-    }
 
     type DonationEvent = GiftEvent;
 
@@ -48,6 +43,20 @@
         };
     });
 
+    function getDonationAmount(
+        giftName: string,
+        quantity: string | number,
+    ): number {
+        const giftValue = gifts[giftName.toLowerCase()];
+        if (!giftValue) {
+            console.warn("unknown gift", giftName);
+            return 0;
+        }
+        const qty =
+            typeof quantity === "string" ? parseInt(quantity, 10) : quantity;
+        return giftValue * qty;
+    }
+
     async function fetchLatestEvent() {
         if (isAlertActive) return;
 
@@ -72,41 +81,78 @@
         if (isAlertActive) return;
 
         isAlertActive = true;
+        event.donationAmount = getDonationAmount(
+            event.attributes.giftName,
+            event.attributes.quantity,
+        );
         donationEvent = event;
-        currentAlert = findMatchingAlert(event);
-        if (!currentAlert) {
+        if (event.isTest && event.alertId) {
             currentAlert =
-                userAlerts.find((alert) => alert.name === "oscar") || null;
+                userAlerts.find((alert) => alert.id === event.alertId) || null;
+        } else {
+            const normalizedGiftName = normalizedGiftName(
+                event.attributes.giftName,
+            );
+            if (!normalizedGiftName) {
+                console.warn("invalid giftName", event.attributes.giftName);
+                currentAlert = null;
+            } else {
+                currentAlert = findMatchingAlert(event, userAlerts);
+            }
         }
-        logAndUpdateStatus(event);
+        // TODO add donationHistory
     }
 
     function handleChatEvent(chatData: { sender: string; content: string }) {
         statusMessage = `${chatData.sender}: ${chatData.content}`;
     }
 
-    function findMatchingAlert(event: GiftEvent): Alert | null {
+    function findMatchingAlert(
+        event: GiftEvent,
+        userAlerts: Alert[],
+    ): Alert | null {
         return (
             userAlerts.find((alert) => {
-                if (alert.config.eventTrigger === "GIFT" && alert.isActive) {
-                    if (alert.config.specificGift) {
+                if (!alert.isActive) return false;
+
+                const { eventTrigger, specificGift, specificAmount } =
+                    alert.config;
+                const donationAmount = getDonationAmount(
+                    event.attributes.giftName,
+                    event.attributes.quantity,
+                );
+
+                switch (eventTrigger) {
+                    case "donation":
+                        return true;
+                    case "specificgift":
                         return (
-                            alert.config.specificGift.toLowerCase() ===
+                            specificGift?.toLowerCase() ===
                             event.attributes.giftName.toLowerCase()
                         );
-                    }
-                    return true;
+                    case "atleast":
+                        return (
+                            specificAmount !== undefined &&
+                            donationAmount >= specificAmount
+                        );
+                    case "exactamount":
+                        return (
+                            specificAmount !== undefined &&
+                            donationAmount === specificAmount
+                        );
+                    case "topdonation":
+                        // implement topdonation logic right when the donation is received
+                        // create store with donation history?
+                        // save to user's data
+                        // create new data obj for an array of donations
+                        let isTop = false;
+                        // check against top donations for given time parameter
+                        return isTop;
+                    default:
+                        return false;
                 }
-                return false;
             }) || null
         );
-    }
-
-    function logAndUpdateStatus(event: GiftEvent) {
-        console.log(
-            `${event.attributes.name} SENT ${event.attributes.quantity} ${event.attributes.giftName}${parseInt(event.attributes.quantity) > 1 ? "s!" : "!"}`,
-        );
-        statusMessage = `Alert triggered: ${event.attributes.name} sent ${event.attributes.quantity} ${event.attributes.giftName}`;
     }
 
     function handleAlertCompleted() {
