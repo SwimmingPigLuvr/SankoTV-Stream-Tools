@@ -3,6 +3,7 @@
     import { onMount, onDestroy } from "svelte";
     import {
         gifts,
+        type Gift,
         type Alert,
         type GiftEvent,
     } from "$lib/stores/alertConfigStore";
@@ -99,6 +100,7 @@
 
     function handleGiftEvent(event: GiftEvent) {
         if (isAlertActive) return;
+        console.log("event", event);
 
         isAlertActive = true;
         event.donationAmount = getDonationAmount(

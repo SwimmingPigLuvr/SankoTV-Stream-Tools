@@ -45,18 +45,19 @@ function createWebSocketConnection(userId: string, streamerAddress: string) {
                         if (currentTime - lastTestTime > TEST_COOLDOWN) {
                             lastTestTime = currentTime;
                             // simulate donation
+                            const testGiftEvent: GiftEvent = {
+                                type: 'GIFT',
+                                attributes: {
+                                    giftName: 'TestGift',
+                                    quantity: '1',
+                                    name: senderName,
+                                    alertId: crypto.randomUUID(),
+                                },
+                                isTest: true,
+                            };
                             userConnection.lastEvent = {
                                 event: 'GIFT',
-                                data: {
-                                    event: {
-                                        type: 'GIFT',
-                                        attributes: {
-                                            giftName: 'TestGift',
-                                            quantity: '1',
-                                            name: senderName
-                                        }
-                                    }
-                                }
+                                data: testGiftEvent,
                             };
                             console.log('test alert triggered by: ', senderName);
                         } else {
@@ -72,6 +73,21 @@ function createWebSocketConnection(userId: string, streamerAddress: string) {
                             }
                         };
                     }
+                } else if (message.event === 'GIFT') {
+                    const realGiftEvent: GiftEvent = {
+                        type: 'GIFT',
+                        attributes: {
+                            giftName: message.data.event.attributes.giftName || 'unknown',
+                            quantity: message.data.event.attributes.quantity || '1',
+                            name: message.data.event.attributes.name || 'anonymous',
+                            alertId: message.data.event.attributes.alertId || crypto.randomUUID(),
+                        },
+                        donationAmount: parseFloat(message.data.event.attributes.amount) || 0;
+                    };
+                    userConnection.lastEvent = {
+                        event: 'GIFT',
+                        data: realGiftEvent,
+                    };
                 } else {
                     userConnection.lastEvent = message;
                 }
