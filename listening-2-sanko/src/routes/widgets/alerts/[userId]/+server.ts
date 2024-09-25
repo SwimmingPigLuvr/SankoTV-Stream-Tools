@@ -82,7 +82,7 @@ function createWebSocketConnection(userId: string, streamerAddress: string) {
                             name: message.data.event.attributes.name || 'anonymous',
                             alertId: message.data.event.attributes.alertId || crypto.randomUUID(),
                         },
-                        donationAmount: parseFloat(message.data.event.attributes.amount) || 0;
+                        donationAmount: parseFloat(message.data.event.attributes.amount) || 0,
                     };
                     userConnection.lastEvent = {
                         event: 'GIFT',

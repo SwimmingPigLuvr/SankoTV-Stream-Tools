@@ -50,6 +50,27 @@ export interface AnimationSettings {
 
 export type Gift = keyof typeof gifts;
 
+export interface Attributes {
+    giftName: Gift;
+    name: string;
+    quantity: string;
+}
+
+export interface Data {
+    event: string;
+    alertId: string;
+    attributes: Attributes;
+    isTest?: boolean;
+    type: string;
+}
+
+export interface GiftEvent {
+    event: string;
+    data: Data;
+}
+
+
+
 // name and $DMT value
 export const gifts: { [key: string]: number } = {
     "Golden Glizzy": 3,
@@ -94,20 +115,6 @@ export const gifts: { [key: string]: number } = {
     "Head Phones": 0.01,
     "Zyn": 0.01,
 } as const;
-
-export interface GiftEvent {
-    type: "GIFT";
-    attributes: {
-        giftName: string;
-        quantity: string;
-        name: string;
-        alertId: string;
-    };
-    alertId?: string;
-    isTest?: boolean;
-    donationAmount?: number;
-}
-
 
 export interface AlertConfig {
     animation: {

@@ -34,8 +34,12 @@
 	import lodash from "lodash";
 	import UploadOrLinkMedia from "$lib/components/UploadOrLinkMedia.svelte";
 	import Timer from "$lib/components/Timer.svelte";
+    import { isValidGift } from "$lib/utils/isValidGift";
+	import { formatPluralities } from "$lib/utils/formatPluralties";
 
 	const { debounce } = lodash;
+
+	const giftNames = Object.keys(gifts);
 
 	let audio: HTMLAudioElement | null = null;
 	let lastLoadedAudioSrc: string | null = null;
@@ -581,72 +585,6 @@
 		}
 
 		return 1;
-	}
-
-	function formatPluralities(amount: number, gift: Gift): string {
-		const specialPlurals: Record<Gift, string> = {
-			"Golden Glizzy": "Golden Glizzies",
-			Glock: "Glocks",
-			Diamond: "Diamonds",
-			Steroids: "Steroids",
-			Trump: "Trumps",
-			"O'Hearn": "O'Hearns",
-			Cross: "Crosses",
-			"Size Chad": "Size Chads",
-			"Boxing Gloves": "Boxing Gloves",
-			Grippy: "Grippies",
-			"Yellow Hat": "Yellow Hats",
-			Liquidation: "Liquidations",
-			Dubya: "Dubyas",
-			"Su Zhu": "Su Zhus",
-			Wizzy: "Wizzies",
-			Orbs: "Orbs",
-			Cocktail: "Cocktails",
-			Teddy: "Teddies",
-			Larry: "Larrys",
-			Addys: "Addys",
-			Beer: "Beers",
-			Banana: "Bananas",
-			"Baby Bottle": "Baby Bottles",
-			Kitten: "Kittens",
-			Femboy: "Femboys",
-			"Dead Dev": "Dead Devs",
-			Daisy: "Daisies",
-			Cash: "Cash",
-			Chili: "Chilis",
-			Glizzy: "Glizzies",
-			Crack: "Cracks",
-			Bunny: "Bunnies",
-			Mimosa: "Mimosas",
-			Rug: "Rugs",
-			Cigarette: "Cigarettes",
-			Gensler: "Genslers",
-			Bitboy: "Bitboys",
-			Clover: "Clovers",
-			Bible: "Bibles",
-			"Head Phones": "pairs of Head Phones",
-			Zyn: "Zyns",
-		};
-
-		if (amount === 1) {
-			return `${gift}`;
-		}
-
-		if (specialPlurals[gift]) {
-			return `${specialPlurals[gift]}`;
-		}
-
-		if (
-			gift.endsWith("y") &&
-			!gift.endsWith("ay") &&
-			!gift.endsWith("ey") &&
-			!gift.endsWith("oy") &&
-			!gift.endsWith("uy")
-		) {
-			return `${gift.slice(0, -1)}ies`;
-		}
-
-		return `${gift}s`;
 	}
 
 	function generateRandomMessage(): {
@@ -1306,7 +1244,7 @@
 								e.currentTarget.value,
 							)}
 					>
-						{#each gifts as gift}
+						{#each giftNames as gift}
 							<option value={gift}>{gift}</option>
 						{/each}
 					</select>
@@ -1316,7 +1254,7 @@
 			{#if $currentAlert?.config.eventTrigger === "atleast" || $currentAlert?.config.eventTrigger === "exactamount"}
 				<!-- donation amount -->
 				<div class="flex flex-col space-y-2">
-					<label for="donationamount">Donation Amount</label>
+					<label for="donationamount">Donation Amount in $DMT</label>
 					<input
 						type="number"
 						class="custom-dropdown p-4 {$isDarkMode
@@ -1324,11 +1262,13 @@
 							: 'bg-lime-200'}"
 						name="donationamount"
 						id="donationamount"
+						step="0.01"
+						min="0.01"
 						value={$currentAlert?.config.specificAmount}
 						on:change={(e) =>
 							updateAlertConfig(
 								"specificAmount",
-								e.currentTarget.value,
+								parseFloat(e.currentTarget.value),
 							)}
 					/>
 				</div>

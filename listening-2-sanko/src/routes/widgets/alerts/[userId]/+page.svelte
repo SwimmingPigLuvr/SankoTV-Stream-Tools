@@ -10,6 +10,7 @@
     import DonationAlerts from "$lib/components/DonationAlerts.svelte";
     import { userData } from "$lib/stores/userDataStore";
     import { page } from "$app/stores";
+    import { normalizeGiftName } from "$lib/utils/normalizedGiftName";
 
     type DonationEvent = GiftEvent;
 
@@ -45,10 +46,10 @@
     });
 
     function getDonationAmount(
-        giftName: string,
+        giftName: Gift,
         quantity: string | number,
     ): number {
-        const giftValue = gifts[giftName.toLowerCase()];
+        const giftValue = gifts[giftName];
         if (!giftValue) {
             console.warn("unknown gift", giftName);
             return 0;
@@ -64,13 +65,13 @@
         try {
             const response = await fetch(`/widgets/alerts/${userId}`);
             if (!response.ok) throw new Error("Failed to fetch latest event");
-            const data = await response.json();
+            const data: { lastEvent: GiftEvent } = await response.json();
             if (
                 data.lastEvent &&
                 data.lastEvent.event === "GIFT" &&
                 !isAlertActive
             ) {
-                handleGiftEvent(data.lastEvent.data.event);
+                handleGiftEvent(data.lastEvent);
             }
         } catch (error) {
             console.error("Error fetching latest event:", error);
@@ -78,45 +79,36 @@
         }
     }
 
-    export function normalizeGiftName(giftName: string): Gift | undefined {
-        // Normalize: Trim, capitalize each word, etc.
-        const normalized = giftName
-            .trim()
-            .split(" ")
-            .map(
-                (word) =>
-                    word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
-            )
-            .join(" ");
-
-        // Check if the normalized name exists in gifts
-        if (normalized in gifts) {
-            return normalized as Gift;
-        }
-
-        console.warn(`Gift name "${giftName}" does not match any known gifts.`);
-        return undefined;
-    }
-
     function handleGiftEvent(event: GiftEvent) {
         if (isAlertActive) return;
         console.log("event", event);
 
+        const attributes = event?.data?.attributes;
+        if (!attributes || !attributes.giftName) {
+            console.error("missing the giftName in the event attributes");
+            return;
+        }
+
+        const { giftName, quantity, name } = attributes;
+
         isAlertActive = true;
-        event.donationAmount = getDonationAmount(
-            event.attributes.giftName,
-            event.attributes.quantity,
-        );
-        donationEvent = event;
-        if (event.isTest && event.alertId) {
+        const donationAmount = getDonationAmount(giftName, quantity);
+        donationEvent = {
+            event: event.event,
+            data: {
+                ...event.data,
+                donationAmount,
+            },
+        };
+
+        if (event.data.isTest && event.data.alertId) {
             currentAlert =
-                userAlerts.find((alert) => alert.id === event.alertId) || null;
+                userAlerts.find((alert) => alert.id === event.data.alertId) ||
+                null;
         } else {
-            const normalizedGiftName = normalizeGiftName(
-                event.attributes.giftName,
-            );
+            const normalizedGiftName = normalizeGiftName(attributes.giftName);
             if (!normalizedGiftName) {
-                console.warn("invalid giftName", event.attributes.giftName);
+                console.warn("invalid giftName", attributes.giftName);
                 currentAlert = null;
             } else {
                 currentAlert = findMatchingAlert(event, userAlerts);
@@ -140,8 +132,8 @@
                 const { eventTrigger, specificGift, specificAmount } =
                     alert.config;
                 const donationAmount = getDonationAmount(
-                    event.attributes.giftName,
-                    event.attributes.quantity,
+                    event.data.attributes.giftName,
+                    event.data.attributes.quantity,
                 );
 
                 switch (eventTrigger) {
@@ -150,7 +142,7 @@
                     case "specificgift":
                         return (
                             normalizeGiftName(specificGift || "") ===
-                            normalizeGiftName(event.attributes.giftName)
+                            normalizeGiftName(event.data.attributes.giftName)
                         );
                     case "atleast":
                         return (
