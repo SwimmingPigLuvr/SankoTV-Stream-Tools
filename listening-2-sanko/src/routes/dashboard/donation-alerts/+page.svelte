@@ -34,7 +34,7 @@
 	import lodash from "lodash";
 	import UploadOrLinkMedia from "$lib/components/UploadOrLinkMedia.svelte";
 	import Timer from "$lib/components/Timer.svelte";
-    import { isValidGift } from "$lib/utils/isValidGift";
+	import { isValidGift } from "$lib/utils/isValidGift";
 	import { formatPluralities } from "$lib/utils/formatPluralties";
 
 	const { debounce } = lodash;
@@ -97,7 +97,8 @@
 			const currentAlertValue = get(currentAlert);
 			if (currentAlertValue?.config?.notificationSound?.src) {
 				loadAudioIfNeeded(
-					currentAlertValue.config.notificationSound.src,
+					currentAlertValue.config
+						.notificationSound.src,
 				);
 			}
 		});
@@ -121,17 +122,25 @@
 		};
 
 		try {
-			const response = await fetch(`/widgets/alerts/${$userData?.id}`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(testDonationEvent),
-			});
+			const response = await fetch(
+				`/widgets/alerts/${$userData?.id}`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type":
+							"application/json",
+					},
+					body: JSON.stringify(testDonationEvent),
+				},
+			);
 
 			if (!response.ok) {
 				throw new Error("failed to send test donation");
 			}
 
-			console.log("successfully sent test donation to widget url");
+			console.log(
+				"successfully sent test donation to widget url",
+			);
 		} catch (error) {
 			console.error("error sending test donation:", error);
 		}
@@ -154,8 +163,14 @@
 
 		const errorHandler = (e: ErrorEvent) => {
 			console.error("Error with audio:", e.message);
-			console.error("Error occurred at time:", new Date().toISOString());
-			console.error("Current audio state:", audio?.readyState);
+			console.error(
+				"Error occurred at time:",
+				new Date().toISOString(),
+			);
+			console.error(
+				"Current audio state:",
+				audio?.readyState,
+			);
 			console.error("Current src:", audio?.src);
 			audioLoaded = false;
 		};
@@ -179,7 +194,9 @@
 		// Add a timeout to check if audio is taking too long to load
 		setTimeout(() => {
 			if (!audioLoaded) {
-				console.warn("Audio loading hasn't completed after 10 seconds");
+				console.warn(
+					"Audio loading hasn't completed after 10 seconds",
+				);
 				clearInterval(stateChecker);
 			}
 		}, 10000);
@@ -196,7 +213,9 @@
 				"error",
 				(e) => {
 					reject(e);
-					console.error("Audio loading ultimately failed");
+					console.error(
+						"Audio loading ultimately failed",
+					);
 				},
 				{ once: true },
 			);
@@ -230,9 +249,16 @@
 		if (src !== lastLoadedAudioSrc) {
 			lastLoadedAudioSrc = src;
 			preloadAudio(src)
-				.then(() => console.log("audio preloaded successfully"))
+				.then(() =>
+					console.log(
+						"audio preloaded successfully",
+					),
+				)
 				.catch((error) => {
-					console.error("failed to prelaod audio:", error);
+					console.error(
+						"failed to prelaod audio:",
+						error,
+					);
 					lastLoadedAudioSrc = null;
 				});
 		}
@@ -246,17 +272,30 @@
 			if (playPromise !== undefined) {
 				playPromise
 					.then((_) => {
-						console.log("Notification sound playing");
+						console.log(
+							"Notification sound playing",
+						);
 
 						// Add an event listener for when the audio ends
-						audio?.addEventListener("ended", () => {
-							console.log("Audio playback ended");
-						});
+						audio?.addEventListener(
+							"ended",
+							() => {
+								console.log(
+									"Audio playback ended",
+								);
+							},
+						);
 
 						// Add an event listener for errors during playback
-						audio?.addEventListener("error", (e) => {
-							console.error("Error during audio playback:", e);
-						});
+						audio?.addEventListener(
+							"error",
+							(e) => {
+								console.error(
+									"Error during audio playback:",
+									e,
+								);
+							},
+						);
 					})
 					.catch((error) => {
 						console.error(
@@ -283,19 +322,25 @@
 								);
 
 								// Add an event listener for when the audio ends
-								audio!.addEventListener("ended", () => {
-									console.log(
-										"Audio playback ended after waiting",
-									);
-								});
+								audio!.addEventListener(
+									"ended",
+									() => {
+										console.log(
+											"Audio playback ended after waiting",
+										);
+									},
+								);
 
 								// Add an event listener for errors during playback
-								audio!.addEventListener("error", (e) => {
-									console.error(
-										"Error during audio playback after waiting:",
-										e,
-									);
-								});
+								audio!.addEventListener(
+									"error",
+									(e) => {
+										console.error(
+											"Error during audio playback after waiting:",
+											e,
+										);
+									},
+								);
 							})
 							.catch((error) => {
 								console.error(
@@ -441,9 +486,6 @@
 		"fantasy",
 	];
 
-	let selectedFont = "coolfont-trippy";
-	let selectedWeight = "normal";
-	let selectedTextTransform = "none";
 	let selectedTrigger = "donation";
 
 	$: if (selectedTrigger !== "specificgift") {
@@ -452,7 +494,13 @@
 
 	const fontWeights = [100, 200, 300, 400, 500, 600, 700, 800, 900];
 
-	const senders = ["swimmingPig", "fizzleStix", "charlotte", "Tony", "Dav3"];
+	const senders = [
+		"swimmingPig",
+		"fizzleStix",
+		"charlotte",
+		"Tony",
+		"Dav3",
+	];
 
 	$: inAnimation = $currentAlert?.config.animation?.in;
 	$: outAnimation = $currentAlert?.config.animation?.out;
@@ -463,7 +511,8 @@
 		const { type, easing: easingName, ...params } = props;
 		const easing =
 			typeof easingName === "string"
-				? easings[easingName as keyof typeof easings] || easings.linear
+				? easings[easingName as keyof typeof easings] ||
+					easings.linear
 				: easings.linear;
 		switch (type) {
 			case "blur":
@@ -490,44 +539,6 @@
 	function handleRemoveCurrentAudio() {
 		currentAudioSrc = null;
 		updateAlertConfig("notificationSound", null);
-	}
-
-	function handleSpecificDonationAmount() {
-		// todo use this to set the specific donation amount for
-		// donation at least amount
-		// donation exactly amount
-		specificDonationAmount;
-	}
-
-	function handleSpecificGiftChoice() {
-		// do something with the specific gift
-		specificGift;
-	}
-
-	function handleTriggerChange(event: Event) {
-		const target = event.target as HTMLSelectElement;
-		if (target) {
-			setTrigger(target.value);
-		}
-	}
-
-	function setTrigger(trigger: string) {
-		selectedTrigger = trigger;
-		console.log("set trigger: ", trigger);
-		alertConfig.update((s) => ({ ...s, eventTrigger: trigger }));
-	}
-
-	function handleFontChange(event: Event) {
-		const target = event.target as HTMLSelectElement;
-		if (target) {
-			setFont(target.value);
-		}
-	}
-
-	function setFont(font: string) {
-		selectedFont = font;
-		console.log("hey");
-		alertConfig.update((s) => ({ ...s, fontFamily: font }));
 	}
 
 	function toggleMute() {
@@ -580,7 +591,10 @@
 		for (let range of weights) {
 			cumulativeWeight += range.weight;
 			if (rand < cumulativeWeight) {
-				return Math.floor(Math.random() * range.max) + 1;
+				return (
+					Math.floor(Math.random() * range.max) +
+					1
+				);
 			}
 		}
 
@@ -640,7 +654,8 @@
 			.split(" ")
 			.map(
 				(word) =>
-					word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
+					word.charAt(0).toUpperCase() +
+					word.slice(1).toLowerCase(),
 			)
 			.join(" ");
 		return normalizedGiftName as Gift | undefined;
@@ -680,7 +695,10 @@
 				break;
 			case "match":
 				video.loop = false;
-				updateAlertConfig("alertDuration", Math.ceil(video.duration));
+				updateAlertConfig(
+					"alertDuration",
+					Math.ceil(video.duration),
+				);
 				break;
 			case "loop":
 				video.loop = true;
@@ -691,7 +709,10 @@
 	function handleUpdateVideoDuration(value: string) {
 		updateAlertConfig("videoDuration", value);
 		if (value === "match" && videoElement) {
-			updateAlertConfig("alertConfig", Math.ceil(videoElement.duration));
+			updateAlertConfig(
+				"alertConfig",
+				Math.ceil(videoElement.duration),
+			);
 		}
 	}
 
@@ -742,7 +763,9 @@
 		setTimeout(() => {
 			// Find the index of the toast to remove
 			const index = toasts.findIndex(
-				(toast) => toast.key === key && toast.value === value,
+				(toast) =>
+					toast.key === key &&
+					toast.value === value,
 			);
 			// Remove the toast if it exists in the array
 			if (index !== -1) {
@@ -829,7 +852,9 @@
 		debouncedUpdateAlertName(alertName);
 	}
 
-	async function handleAlertCreated(event: CustomEvent<AlertCreatedEvent>) {
+	async function handleAlertCreated(
+		event: CustomEvent<AlertCreatedEvent>,
+	) {
 		// if alert has been created and added to userData in the CreateNew component
 		const newAlert = event.detail;
 		await userData.addDonationAlert(newAlert);
@@ -848,11 +873,16 @@
 
 	function handleSaveAlert() {
 		if ($currentAlert) {
-			const index = alerts.findIndex((a) => a.id === $currentAlert.id);
+			const index = alerts.findIndex(
+				(a) => a.id === $currentAlert.id,
+			);
 			if (index !== -1) {
 				alerts[index] = $currentAlert;
 				alerts = [...alerts];
-				userData.updateDataField("donation-alerts", alerts);
+				userData.updateDataField(
+					"donation-alerts",
+					alerts,
+				);
 			}
 		}
 	}
@@ -899,7 +929,9 @@
 				>
 					✅
 				</p>
-				<p class="font-mono text-left flex flex-col space-y-">
+				<p
+					class="font-mono text-left flex flex-col space-y-"
+				>
 					<span
 						class="{$isDarkMode
 							? 'text-white font-mono font-black'
@@ -914,13 +946,15 @@
 						<span
 							class={$isDarkMode
 								? "text-white"
-								: "text-sky-400 font-black"}>{toast.value}</span
+								: "text-sky-400 font-black"}
+							>{toast.value}</span
 						></span
 					>
 				</p>
 				<button
 					on:click={() => deleteToast(toast.key)}
-					class="text-3xl right-4 ml-auto">x</button
+					class="text-3xl right-4 ml-auto"
+					>x</button
 				>
 			</button>
 		</div>
@@ -942,8 +976,12 @@
 			<span>now editing: </span>
 			{#if $currentAlert?.name}
 				<span
-					in:fade={{ duration: 500, easing: easings.cubicInOut }}
-					class="text-lime-400">{$currentAlert?.name}</span
+					in:fade={{
+						duration: 500,
+						easing: easings.cubicInOut,
+					}}
+					class="text-lime-400"
+					>{$currentAlert?.name}</span
 				>
 			{:else}
 				<span class=""> </span>
@@ -972,43 +1010,64 @@
 					bind:this={previewContent}
 					class="preview-content {layout}"
 					style="background-color: {currentBackgroundColor}; border-radius: {$currentAlert
-						?.config.borderRadius}; font-family: {$currentAlert
-						?.config.fontFamily}; font-size: {$currentAlert?.config
-						.fontSize}; font-weight: {$currentAlert?.config
-						.fontWeight}; color: {$currentAlert?.config
-						.textColor}; text-transform: {$currentAlert?.config
-						.textTransform}; letter-spacing: {$currentAlert?.config
-						.letterSpacing}em; text-shadow: {$currentAlert?.config
-						.textShadow};"
+						?.config
+						.borderRadius}; font-family: {$currentAlert
+						?.config
+						.fontFamily}; font-size: {$currentAlert
+						?.config
+						.fontSize}; font-weight: {$currentAlert
+						?.config
+						.fontWeight}; color: {$currentAlert
+						?.config
+						.textColor}; text-transform: {$currentAlert
+						?.config
+						.textTransform}; letter-spacing: {$currentAlert
+						?.config
+						.letterSpacing}em; text-shadow: {$currentAlert
+						?.config.textShadow};"
 				>
 					<!-- VIDEO -->
 					{#if $currentAlert?.config.media?.type === "video"}
 						<video
 							bind:this={videoElement}
 							autoplay
-							loop={$currentAlert?.config.videoDuration ===
+							loop={$currentAlert
+								?.config
+								.videoDuration ===
 								"loop"}
-							src={$currentAlert?.config?.media?.src ||
+							src={$currentAlert
+								?.config?.media
+								?.src ||
 								currentMedia?.src}
 							on:loadedmetadata={() => {
 								if (
 									videoElement &&
-									$currentAlert?.config?.videoDuration ===
+									$currentAlert
+										?.config
+										?.videoDuration ===
 										"match"
 								) {
 									updateAlertConfig(
 										"alertDuration",
-										Math.ceil(videoElement?.duration),
+										Math.ceil(
+											videoElement?.duration,
+										),
 									);
 								}
 							}}
 						>
-							<track kind="captions" src="" label="English" />
+							<track
+								kind="captions"
+								src=""
+								label="English"
+							/>
 						</video>
 					{:else}
 						<!-- IMAGE / GIF -->
 						<img
-							src={$currentAlert?.config?.media?.src ||
+							src={$currentAlert
+								?.config?.media
+								?.src ||
 								currentMedia?.src}
 							alt=""
 						/>
@@ -1020,8 +1079,12 @@
 							{#each generateRandomMessage().parts as part}
 								<span
 									style="color: {part.highlight
-										? $currentAlert?.config.highlightColor
-										: $currentAlert?.config.textColor};"
+										? $currentAlert
+												?.config
+												.highlightColor
+										: $currentAlert
+												?.config
+												.textColor};"
 								>
 									{part.text}
 								</span>
@@ -1032,9 +1095,13 @@
 
 				<!-- TIMER -->
 				{#if $currentAlert}
-					<div class="absolute bottom-20 left-0 right-0 z-0">
+					<div
+						class="absolute bottom-20 left-0 right-0 z-0"
+					>
 						<Timer
-							duration={$currentAlert.config.alertDuration}
+							duration={$currentAlert
+								.config
+								.alertDuration}
 							onComplete={endPreview}
 						/>
 					</div>
@@ -1048,9 +1115,15 @@
 					: 'bg-lime-200'} z-20 bottom-0 w-full p-4 flex space-x-2 justify-end items-center"
 			>
 				<!-- background color -->
-				<div class="flex mr-auto space-x-4 items-center">
-					<div class="flex space-x-2 items-center">
-						<label for="color">Background Color</label>
+				<div
+					class="flex mr-auto space-x-4 items-center"
+				>
+					<div
+						class="flex space-x-2 items-center"
+					>
+						<label for="color"
+							>Background Color</label
+						>
 						<button
 							on:mouseenter={() =>
 								(showBackgroundColorInfo = true)}
@@ -1062,15 +1135,33 @@
 							>i
 							{#if showBackgroundColorInfo}
 								<div
-									in:fly={{ y: 10 }}
+									in:fly={{
+										y: 10,
+									}}
 									class="absolute border-[1px] -top-40 -left-20 text-left w-48 z-50 p-3 {$isDarkMode
 										? 'bg-slate-300 text-slate-600'
 										: 'bg-lime-400 text-black border-black'}"
 								>
-									This will not effect the background color of
-									the alert. This is just for preview
-									purposes. For best results set background
-									color to match your stream.
+									This
+									will not
+									effect
+									the
+									background
+									color of
+									the
+									alert.
+									This is
+									just for
+									preview
+									purposes.
+									For best
+									results
+									set
+									background
+									color to
+									match
+									your
+									stream.
 								</div>
 							{/if}
 						</button>
@@ -1119,12 +1210,17 @@
 			>
 				<!-- alert name -->
 				<div class="flex flex-col space-y-2 w-[30%]">
-					<label for="alertname">Alert Name</label>
+					<label for="alertname">Alert Name</label
+					>
 					<!-- text input -->
 					<input
 						value={$currentAlert?.name}
 						on:change={(e) =>
-							updateAlertName("name", e.currentTarget.value)}
+							updateAlertName(
+								"name",
+								e.currentTarget
+									.value,
+							)}
 						name="alertName"
 						id="alertName"
 						class=" flex space-x-4 p-4 {$isDarkMode
@@ -1137,28 +1233,39 @@
 				<!-- Unique Alert URL -->
 				<div class="flex flex-col space-y-2 w-[60%]">
 					<label for="alertUrl">Widget URL</label>
-					<div class="flex items-center space-x-2">
+					<div
+						class="flex items-center space-x-2"
+					>
 						<div class="relative w-full">
 							<button
 								on:click={() => {
-									if ($userData?.id) {
+									if (
+										$userData?.id
+									) {
 										const widgetURL = `${window.location.origin}/widgets/alerts/${$userData.id}`;
 										navigator.clipboard.writeText(
 											widgetURL,
 										);
 										copiedWidgetURL = true;
-										setTimeout(() => {
-											copiedWidgetURL = false;
-										}, 3000);
+										setTimeout(
+											() => {
+												copiedWidgetURL = false;
+											},
+											3000,
+										);
 										// You might want to show a toast notification here
 									}
 								}}
-								disabled={copiedWidgetURL || !$userData?.id}
+								disabled={copiedWidgetURL ||
+									!$userData?.id}
 								class="{$isDarkMode
 									? 'bg-slate-900 hover:border-white hover:bg-slate-950'
 									: 'border-black bg-lime-50 hover:bg-white'} w-full h-full absolute left-0 top-0 border-[1px] backdrop-blur-[2px] font-black"
-								>{#if copiedWidgetURL}✅ Copied{:else}📋 Copy
-									Widget URL{/if}</button
+								>{#if copiedWidgetURL}✅
+									Copied{:else}📋
+									Copy
+									Widget
+									URL{/if}</button
 							>
 							<input
 								readonly
@@ -1177,14 +1284,19 @@
 				</div>
 
 				<!-- alert active -->
-				<div class="flex flex-col space-y-2 w-[30%] items-center">
+				<div
+					class="flex flex-col space-y-2 w-[30%] items-center"
+				>
 					<label for="active" class="text-center"
-						>Alert {alertActive ? "Enabled" : "Disabled"}</label
+						>Alert {alertActive
+							? "Enabled"
+							: "Disabled"}</label
 					>
 					<button
 						name="active"
 						id="active"
-						on:click={() => toggleIsActive()}
+						on:click={() =>
+							toggleIsActive()}
 						class="p-1 px-2 rounded-full flex items-center text-xl {$isDarkMode
 							? 'hover:bg-slate-950'
 							: 'hover:bg-lime-200'}"
@@ -1207,18 +1319,26 @@
 						: 'bg-lime-200'}"
 					name="eventtrigger"
 					id="eventtrigger"
-					value={$currentAlert?.config.eventTrigger}
+					value={$currentAlert?.config
+						.eventTrigger}
 					on:change={(e) =>
 						updateAlertConfig(
 							"eventTrigger",
 							e.currentTarget.value,
 						)}
 				>
-					<option value="donation">Donation</option>
-					<option value="specificgift">Specific Gift</option>
-					<option value="topdonation">Top Donation</option>
+					<option value="donation"
+						>Donation</option
+					>
+					<option value="specificgift"
+						>Specific Gift</option
+					>
+					<option value="topdonation"
+						>Top Donation</option
+					>
 					<option value="atleast"
-						>Donation amount is at least [amount]</option
+						>Donation amount is at least
+						[amount]</option
 					>
 					<option value="exactamount"
 						>Donation is exactly [amount]</option
@@ -1237,15 +1357,19 @@
 							: 'bg-lime-200'}"
 						name="gift"
 						id="gift"
-						value={$currentAlert?.config.specificGift}
+						value={$currentAlert?.config
+							.specificGift}
 						on:change={(e) =>
 							updateAlertConfig(
 								"specificGift",
-								e.currentTarget.value,
+								e.currentTarget
+									.value,
 							)}
 					>
 						{#each giftNames as gift}
-							<option value={gift}>{gift}</option>
+							<option value={gift}
+								>{gift}</option
+							>
 						{/each}
 					</select>
 				</div>
@@ -1254,7 +1378,9 @@
 			{#if $currentAlert?.config.eventTrigger === "atleast" || $currentAlert?.config.eventTrigger === "exactamount"}
 				<!-- donation amount -->
 				<div class="flex flex-col space-y-2">
-					<label for="donationamount">Donation Amount in $DMT</label>
+					<label for="donationamount"
+						>Donation Amount in $DMT</label
+					>
 					<input
 						type="number"
 						class="custom-dropdown p-4 {$isDarkMode
@@ -1264,11 +1390,16 @@
 						id="donationamount"
 						step="0.01"
 						min="0.01"
-						value={$currentAlert?.config.specificAmount}
+						value={$currentAlert?.config
+							.specificAmount}
 						on:change={(e) =>
 							updateAlertConfig(
 								"specificAmount",
-								parseFloat(e.currentTarget.value),
+								parseFloat(
+									e
+										.currentTarget
+										.value,
+								),
 							)}
 					/>
 				</div>
@@ -1283,21 +1414,34 @@
 						: 'bg-lime-200'}"
 					name="layout"
 					id="layout"
-					value={$currentAlert?.config.composition}
+					value={$currentAlert?.config
+						.composition}
 					on:change={(e) =>
-						updateAlertConfig("composition", e.currentTarget.value)}
+						updateAlertConfig(
+							"composition",
+							e.currentTarget.value,
+						)}
 				>
-					<option value="image-above-text">Image above text</option>
-					<option value="text-over-image">Text over image</option>
-					<option value="image-left">Image left</option>
-					<option value="image-right">Image right</option>
+					<option value="image-above-text"
+						>Image above text</option
+					>
+					<option value="text-over-image"
+						>Text over image</option
+					>
+					<option value="image-left"
+						>Image left</option
+					>
+					<option value="image-right"
+						>Image right</option
+					>
 				</select>
 			</div>
 
 			<!-- image upload -->
 			<div class="flex flex-col space-y-2">
 				<label for="image" class="capitalize"
-					>{$currentAlert?.config?.media?.type || "Media"}</label
+					>{$currentAlert?.config?.media?.type ||
+						"Media"}</label
 				>
 
 				<!-- image upload -->
@@ -1311,8 +1455,13 @@
 					{#if $currentAlert?.config.media?.type === "image" || $currentAlert?.config.media?.type === "gif"}
 						<img
 							class="absolute max-w-[3.25rem] h-full left-0"
-							src={$currentAlert?.config?.media?.src
-								? $currentAlert.config?.media?.src
+							src={$currentAlert
+								?.config?.media
+								?.src
+								? $currentAlert
+										.config
+										?.media
+										?.src
 								: "/gifs/minecraft.gif"}
 							alt="🪲"
 						/>
@@ -1321,8 +1470,13 @@
 							autoplay
 							muted
 							class="absolute max-w-[3.25rem] h-full left-0"
-							src={$currentAlert?.config?.media?.src
-								? $currentAlert.config?.media?.src
+							src={$currentAlert
+								?.config?.media
+								?.src
+								? $currentAlert
+										.config
+										?.media
+										?.src
 								: "/gifs/minecraft.gif"}
 						/>
 					{/if}
@@ -1333,14 +1487,21 @@
 							class="filter sepia absolute w-[3.25rem] h-full left-0"
 						/>
 					{/if}
-					<p class="pl-10 truncate max-w-sm sm:max-w-lg">
-						{$currentAlert?.config?.media?.src
-							? $currentAlert.config.media.src
+					<p
+						class="pl-10 truncate max-w-sm sm:max-w-lg"
+					>
+						{$currentAlert?.config?.media
+							?.src
+							? $currentAlert.config
+									.media
+									.src
 							: "no media selected"}
 					</p>
 					<button
-						on:mouseenter={() => (showImgUploadControls = true)}
-						on:mouseleave={() => (showImgUploadControls = false)}
+						on:mouseenter={() =>
+							(showImgUploadControls = true)}
+						on:mouseleave={() =>
+							(showImgUploadControls = false)}
 						class="text-xs flex {$isDarkMode
 							? 'bg-slate-950'
 							: 'bg-lime-200'} space-x-0 absolute right-2"
@@ -1401,7 +1562,9 @@
 								{/if}
 							</div>
 						{:else}
-							<p class="text-2xl p-2">+</p>
+							<p class="text-2xl p-2">
+								+
+							</p>
 						{/if}
 					</button>
 
@@ -1421,31 +1584,42 @@
 			<!-- Message template -->
 			<div class="flex flex-col space-y-2">
 				<div class="flex space-x-6 items-center">
-					<label for="template">Message Template</label>
+					<label for="template"
+						>Message Template</label
+					>
 					<button
-						on:mouseenter={() => (showTemplateInfo = true)}
-						on:mouseleave={() => (showTemplateInfo = false)}
+						on:mouseenter={() =>
+							(showTemplateInfo = true)}
+						on:mouseleave={() =>
+							(showTemplateInfo = false)}
 						class="{$isDarkMode
 							? 'bg-slate-600 text-slate-400 hover:bg-slate-400 hover:text-slate-900'
 							: 'bg-lime-600 text-white hover:bg-lime-400 hover:text-black'} relative rounded-full w-4 h-4 text-xs"
 						>i
 						{#if showTemplateInfo}
 							<div
-								in:fly={{ y: 10 }}
+								in:fly={{
+									y: 10,
+								}}
 								class="{$isDarkMode
 									? 'bg-slate-950 text-slate-100'
 									: 'bg-lime-400 text-black border-black'} border-[1px] text-xs absolute -top-24 -left-20 text-left w-60 z-20 p-4"
 							>
-								Format your message with three possible
+								Format your
+								message with
+								three possible
 								variables:
 								<p class="">
-									<span class="text-lime-400"
+									<span
+										class="text-lime-400"
 										>&#123;SENDER&#125;</span
 									>,
-									<span class="text-lime-400"
+									<span
+										class="text-lime-400"
 										>&#123;AMOUNT&#125;</span
 									>,
-									<span class="text-lime-400"
+									<span
+										class="text-lime-400"
 										>&#123;GIFT&#125;</span
 									>.
 								</p>
@@ -1458,7 +1632,8 @@
 
 				<!-- text input -->
 				<input
-					value={$currentAlert?.config.messageTemplate}
+					value={$currentAlert?.config
+						.messageTemplate}
 					on:change={(e) =>
 						updateAlertConfig(
 							"messageTemplate",
@@ -1476,14 +1651,20 @@
 			<!-- alert duration -->
 			<div class="flex flex-col space-y-2">
 				<div class="flex space-x-6">
-					<label class="block mb-2" for="alertduration"
+					<label
+						class="block mb-2"
+						for="alertduration"
 						>Alert Duration</label
 					>
-					<p>{$currentAlert?.config.alertDuration}s</p>
+					<p>
+						{$currentAlert?.config
+							.alertDuration}s
+					</p>
 				</div>
 				<!-- alert duration input -->
 				<input
-					value={$currentAlert?.config.alertDuration}
+					value={$currentAlert?.config
+						.alertDuration}
 					on:change={(e) =>
 						updateAlertConfig(
 							"alertDuration",
@@ -1495,11 +1676,17 @@
 					min="2"
 					max="200"
 					step="1"
-					class="p-4 {$isDarkMode ? 'bg-slate-950' : 'bg-lime-200'}"
+					class="p-4 {$isDarkMode
+						? 'bg-slate-950'
+						: 'bg-lime-200'}"
 				/>
 				{#if showVideoDurationControls}
-					<div class="pt-3 flex flex-col space-y-2">
-						<label for="videoDurationControl" class="block mb-2"
+					<div
+						class="pt-3 flex flex-col space-y-2"
+					>
+						<label
+							for="videoDurationControl"
+							class="block mb-2"
 							>Video Duration</label
 						>
 						<select
@@ -1507,17 +1694,27 @@
 							class="p-4 {$isDarkMode
 								? 'bg-slate-950'
 								: 'bg-lime-200'}"
-							value={$currentAlert?.config.videoDuration ||
+							value={$currentAlert
+								?.config
+								.videoDuration ||
 								"once"}
 							on:change={(e) =>
 								handleUpdateVideoDuration(
-									e.currentTarget.value,
+									e
+										.currentTarget
+										.value,
 								)}
 						>
-							<option value="loop">Loop</option>
-							<option value="once">Play Once</option>
+							<option value="loop"
+								>Loop</option
+							>
+							<option value="once"
+								>Play Once</option
+							>
 							<option value="match"
-								>Match Alert Duration to Video Duration</option
+								>Match Alert
+								Duration to
+								Video Duration</option
 							>
 						</select>
 					</div>
@@ -1540,16 +1737,23 @@
 					name="sound"
 					id="sound"
 				>
-					<p class="absolute text-2xl left-3">🎧</p>
+					<p class="absolute text-2xl left-3">
+						🎧
+					</p>
 
 					<p class="pl-10">
-						{$currentAlert?.config?.notificationSound?.src
-							? $currentAlert?.config?.notificationSound?.src
+						{$currentAlert?.config
+							?.notificationSound?.src
+							? $currentAlert?.config
+									?.notificationSound
+									?.src
 							: "upload/link audio"}
 					</p>
 					<button
-						on:mouseenter={() => (showAudioUploadControls = true)}
-						on:mouseleave={() => (showAudioUploadControls = false)}
+						on:mouseenter={() =>
+							(showAudioUploadControls = true)}
+						on:mouseleave={() =>
+							(showAudioUploadControls = false)}
 						class="text-xs z-20 {$isDarkMode
 							? 'bg-slate-950'
 							: 'bg-lime-200'} flex space-x-0 absolute right-2"
@@ -1590,7 +1794,9 @@
 								>
 							{/if}
 						{:else}
-							<p class="text-2xl p-2">+</p>
+							<p class="text-2xl p-2">
+								+
+							</p>
 						{/if}
 					</button>
 				</button>
@@ -1599,20 +1805,27 @@
 			<!-- alert volume -->
 			<div class="flex flex-col space-y-2">
 				<div class="flex space-x-6">
-					<label class="block mb-2" for="volume">Volume</label>
+					<label class="block mb-2" for="volume"
+						>Volume</label
+					>
 					<p>
-						{$currentAlert?.config.alertVolume ?? 50}%
+						{$currentAlert?.config
+							.alertVolume ?? 50}%
 					</p>
 				</div>
 				<!-- volume slider -->
 				<input
 					value={$currentAlert?.config.alertVolume
-						? $currentAlert?.config.alertVolume
+						? $currentAlert?.config
+								.alertVolume
 						: ""}
 					on:input={(e) =>
 						updateAlertConfig(
 							"alertVolume",
-							parseInt(e.currentTarget.value),
+							parseInt(
+								e.currentTarget
+									.value,
+							),
 						)}
 					type="range"
 					id="volume"
@@ -1644,13 +1857,19 @@
 						: 'bg-lime-200'}"
 					name="font"
 					id="font"
-					value={$currentAlert?.config.fontFamily ??
+					value={$currentAlert?.config
+						.fontFamily ??
 						$alertConfig.fontFamily}
 					on:change={(e) =>
-						updateAlertConfig("fontFamily", e.currentTarget.value)}
+						updateAlertConfig(
+							"fontFamily",
+							e.currentTarget.value,
+						)}
 				>
 					{#each fonts as font}
-						<option style="font-family: {font};" value={font}
+						<option
+							style="font-family: {font};"
+							value={font}
 							>{font}</option
 						>
 					{/each}
@@ -1660,13 +1879,20 @@
 			<!-- size -->
 			<div class="flex flex-col space-y-2">
 				<div class="flex space-x-6">
-					<label class="block mb-2" for="font">Size</label>
-					<p>{$currentAlert?.config.fontSize ?? fontSize}</p>
+					<label class="block mb-2" for="font"
+						>Size</label
+					>
+					<p>
+						{$currentAlert?.config
+							.fontSize ?? fontSize}
+					</p>
 				</div>
 				<!-- font size slider -->
 				<input
 					value={parseInt(
-						$currentAlert?.config.fontSize ?? $alertConfig.fontSize,
+						$currentAlert?.config
+							.fontSize ??
+							$alertConfig.fontSize,
 					)}
 					on:input={(e) =>
 						updateAlertConfig(
@@ -1687,20 +1913,26 @@
 				<div class="space-x-2">
 					<label for="fontweight">Weight</label>
 					<button
-						on:mouseenter={() => (showWeightInfo = true)}
-						on:mouseleave={() => (showWeightInfo = false)}
+						on:mouseenter={() =>
+							(showWeightInfo = true)}
+						on:mouseleave={() =>
+							(showWeightInfo = false)}
 						class="relative {$isDarkMode
 							? 'bg-slate-600 hover:bg-slate-400 text-slate-400 hover:text-slate-900'
 							: 'bg-lime-600 text-white hover:bg-lime-400 hover:text-black'} rounded-full w-4 h-4 text-xs"
 						>i
 						{#if showWeightInfo}
 							<div
-								in:fly={{ y: 10 }}
+								in:fly={{
+									y: 10,
+								}}
 								class="absolute border-[1px] -top-20 -left-20 text-left w-48 z-20 p-3 {$isDarkMode
 									? 'bg-slate-300 text-slate-600'
 									: 'bg-lime-400 text-black border-black'}"
 							>
-								Some fonts do not have variable weights
+								Some fonts do
+								not have
+								variable weights
 							</div>
 						{/if}
 					</button>
@@ -1711,12 +1943,19 @@
 						: 'bg-lime-200'}"
 					name="fontweight"
 					id="fontweight"
-					value={$currentAlert?.config.fontWeight ?? 400}
+					value={$currentAlert?.config
+						.fontWeight ?? 400}
 					on:change={(e) =>
-						updateAlertConfig("fontWeight", e.currentTarget.value)}
+						updateAlertConfig(
+							"fontWeight",
+							e.currentTarget.value,
+						)}
 				>
 					{#each fontWeights as weight}
-						<option value={weight.toString()}>{weight}</option>
+						<option
+							value={weight.toString()}
+							>{weight}</option
+						>
 					{/each}
 				</select>
 			</div>
@@ -1724,18 +1963,27 @@
 			<!-- tracking -->
 			<div class="flex flex-col space-y-2">
 				<div class="flex space-x-6">
-					<label class="block mb-2" for="letterspacing"
+					<label
+						class="block mb-2"
+						for="letterspacing"
 						>Letter Spacing</label
 					>
-					<p>{$currentAlert?.config.letterSpacing ?? 0}em</p>
+					<p>
+						{$currentAlert?.config
+							.letterSpacing ?? 0}em
+					</p>
 				</div>
 				<!-- letter spacing slider -->
 				<input
-					value={$currentAlert?.config.letterSpacing}
+					value={$currentAlert?.config
+						.letterSpacing}
 					on:input={(e) =>
 						updateAlertConfig(
 							"letterSpacing",
-							parseFloat(e.currentTarget.value).toFixed(2),
+							parseFloat(
+								e.currentTarget
+									.value,
+							).toFixed(2),
 						)}
 					type="range"
 					id="letterspacing"
@@ -1755,11 +2003,13 @@
 						name="color"
 						id="color"
 						type="color"
-						value={$currentAlert?.config.textColor}
+						value={$currentAlert?.config
+							.textColor}
 						on:input={(e) =>
 							updateAlertConfig(
 								"textColor",
-								e.currentTarget.value,
+								e.currentTarget
+									.value,
 							)}
 						class="mt-1 block"
 					/>
@@ -1767,16 +2017,20 @@
 
 				<!-- highlight color -->
 				<div class="flex space-x-2 items-center">
-					<label for="color">Highlight Color</label>
+					<label for="color"
+						>Highlight Color</label
+					>
 					<input
 						name="highlightcolor"
 						id="highlightcolor"
 						type="color"
-						value={$currentAlert?.config.highlightColor}
+						value={$currentAlert?.config
+							.highlightColor}
 						on:input={(e) =>
 							updateAlertConfig(
 								"highlightColor",
-								e.currentTarget.value,
+								e.currentTarget
+									.value,
 							)}
 						class="mt-1 block"
 					/>
@@ -1785,28 +2039,38 @@
 
 			<!-- Text Transform -->
 			<div class="flex flex-col space-y-2">
-				<label for="texttransform">Text Transform</label>
+				<label for="texttransform">Text Transform</label
+				>
 				<select
 					class="custom-dropdown p-4 {$isDarkMode
 						? 'bg-slate-950'
 						: 'bg-lime-200'}"
 					name="texttransform"
 					id="texttransform"
-					value={$currentAlert?.config.textTransform}
+					value={$currentAlert?.config
+						.textTransform}
 					on:change={(e) =>
 						updateAlertConfig(
 							"textTransform",
 							e.currentTarget.value,
 						)}
 				>
-					<option class="" value="none">none</option>
-					<option class="lowercase" value="lowercase"
+					<option class="" value="none"
+						>none</option
+					>
+					<option
+						class="lowercase"
+						value="lowercase"
 						>lowercase</option
 					>
-					<option class="uppsercase" value="uppercase"
+					<option
+						class="uppsercase"
+						value="uppercase"
 						>uppercase</option
 					>
-					<option class="capitalize" value="capitalize"
+					<option
+						class="capitalize"
+						value="capitalize"
 						>capitalize</option
 					>
 				</select>
